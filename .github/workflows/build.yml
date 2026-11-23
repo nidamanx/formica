@@ -77,13 +77,10 @@ jobs:
         env:
           FORMICA_DEBUG_KEYSTORE_FILE: ${{ steps.debug_key.outputs.file }}
           FORMICA_DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
-        run: |
-          set -o pipefail
-          if ! ./gradlew --no-daemon lintDebug testDebugUnitTest assembleDebug assembleRelease \
-              2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
-            scripts/report-gradle-failure.sh "$RUNNER_TEMP/gradle.log"
-            exit 1
-          fi
+        # A failed download on the runner is retried once; any other error stops the build
+        run: >-
+          scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log"
+          lintDebug testDebugUnitTest assembleDebug assembleRelease
 
       - name: Remove the debug key
         if: always()
