@@ -48,10 +48,10 @@ jobs:
         # install over each other. Pull requests get no secrets: SDK debug key, no error.
         id: debug_key
         env:
-          DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
-          DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+          FORMICA_KEY_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+          FORMICA_KEY_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
         run: |
-          if [[ -z $DEBUG_KEYSTORE_BASE64 || -z $DEBUG_KEYSTORE_PASSWORD ]]; then
+          if [[ -z $FORMICA_KEY_BASE64 || -z $FORMICA_KEY_PASSWORD ]]; then
             if [[ $GITHUB_EVENT_NAME != pull_request ]]; then
               echo "::error::The DEBUG_KEYSTORE_BASE64 or DEBUG_KEYSTORE_PASSWORD secret is missing (keystore/README.md)."
               exit 1
@@ -59,10 +59,8 @@ jobs:
             echo "No debug key here: the debug APK is signed with the SDK's own debug key."
             exit 0
           fi
-          # Spaces and line breaks picked up when pasting the secret are not part of base64
-          printf '%s' "$DEBUG_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d \
-            | openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 \
-                -out "$RUNNER_TEMP/debug.p12" -pass env:DEBUG_KEYSTORE_PASSWORD
+          # Checks every step and reports a wrong secret precisely, never its value
+          scripts/decrypt-signing-key.sh debug "$RUNNER_TEMP/debug.p12"
           echo "file=$RUNNER_TEMP/debug.p12" >> "$GITHUB_OUTPUT"
 
       - name: Lint, unit tests, debug and release builds
