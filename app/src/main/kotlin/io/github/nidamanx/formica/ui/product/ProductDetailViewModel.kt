@@ -57,6 +57,7 @@ data class ProductDetailState(
 /** The dialog or panel open on the detail screen; [key] null means the whole product. */
 sealed interface DetailDialog {
     data object Purchase : DetailDialog
+    data object Preparation : DetailDialog
     data class Use(val key: GroupKey?) : DetailDialog
     data class Discard(val key: GroupKey) : DetailDialog
     data class Move(val key: GroupKey) : DetailDialog
@@ -162,9 +163,14 @@ class ProductDetailViewModel(
         pantry.correct(productId, key, realQuantity)
     }
 
-    fun purchase(quantity: Long, expiresOn: Long?, locationId: String, storeId: String?) =
+    fun purchase(quantity: Long, purchasedOn: Long, expiresOn: Long?, locationId: String, storeId: String?) =
         perform(0L, DetailMessage::OnlyWere) {
-            pantry.purchase(productId, quantity, locationId, expiresOn, LocalDate.now().toEpochDay(), storeId)
+            pantry.purchase(productId, quantity, locationId, expiresOn, purchasedOn, storeId)
+        }
+
+    fun prepare(quantity: Long, preparedOn: Long, readyFrom: Long?, expiresOn: Long?, locationId: String) =
+        perform(0L, DetailMessage::OnlyWere) {
+            pantry.prepare(productId, quantity, locationId, preparedOn, expiresOn, readyFrom)
         }
 
     /** The notes of a group are written on each of its batches. */

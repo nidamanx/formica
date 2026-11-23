@@ -52,6 +52,7 @@ sealed interface PantrySheet {
     val productId: String
 
     data class Purchase(override val productId: String) : PantrySheet
+    data class Preparation(override val productId: String) : PantrySheet
     data class Use(override val productId: String) : PantrySheet
 }
 
@@ -117,6 +118,7 @@ class PantryViewModel(
     fun setQuery(query: String) = filter.update { it.copy(query = query) }
     fun setLocation(locationId: String?) = filter.update { it.copy(locationId = locationId) }
     fun setCategory(categoryId: String?) = filter.update { it.copy(categoryId = categoryId) }
+    fun toggleHomemade() = filter.update { it.copy(homemadeOnly = !it.homemadeOnly) }
     fun setSort(value: PantrySort) {
         sort.value = value
     }
@@ -130,8 +132,10 @@ class PantryViewModel(
         }
     }
 
+    /** + on a card: a new preparation for homemade products, a purchase for the others. */
     fun onPlus(card: ProductSummary) {
-        _sheet.value = PantrySheet.Purchase(card.product.id)
+        val id = card.product.id
+        _sheet.value = if (card.product.homemade) PantrySheet.Preparation(id) else PantrySheet.Purchase(id)
     }
 
     fun closeSheet() {
@@ -144,18 +148,28 @@ class PantryViewModel(
         viewModelScope.launch { report(pantry.consume(productId, amount), amount, unit) }
     }
 
-    fun addPurchase(productId: String, quantity: Long, expiresOn: Long?, locationId: String, storeId: String?) {
+    fun addPurchase(
+        productId: String,
+        quantity: Long,
+        purchasedOn: Long,
+        expiresOn: Long?,
+        locationId: String,
+        storeId: String?,
+    ) {
         _sheet.value = null
-        viewModelScope.launch {
-            pantry.purchase(
-                productId = productId,
-                quantity = quantity,
-                locationId = locationId,
-                expiresOn = expiresOn,
-                purchasedOn = LocalDate.now().toEpochDay(),
-                storeId = storeId,
-            )
-        }
+        viewModelScope.launch { pantry.purchase(productId, quantity, locationId, expiresOn, purchasedOn, storeId) }
+    }
+
+    fun addPreparation(
+        productId: String,
+        quantity: Long,
+        preparedOn: Long,
+        readyFrom: Long?,
+        expiresOn: Long?,
+        locationId: String,
+    ) {
+        _sheet.value = null
+        viewModelScope.launch { pantry.prepare(productId, quantity, locationId, preparedOn, expiresOn, readyFrom) }
     }
 
     private suspend fun report(plan: StockPlan, requested: Long, unit: MeasureUnit) {

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.model.MeasureUnit
+import io.github.nidamanx.formica.domain.proposedExpiry
+import io.github.nidamanx.formica.domain.proposedReadyFrom
 import io.github.nidamanx.formica.ui.components.BackTopBar
 import io.github.nidamanx.formica.ui.components.DateField
 import io.github.nidamanx.formica.ui.components.SelectField
@@ -46,6 +50,7 @@ import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.fullName
 import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
 import io.github.nidamanx.formica.ui.settings.NameError
+import java.time.LocalDate
 
 /** New product ([productId] null) or edit of an existing one. */
 @Composable
@@ -86,15 +91,26 @@ private fun ProductForm(
     var unit by rememberSaveable { mutableStateOf(p?.unit ?: MeasureUnit.PIECE) }
     var locationId by rememberSaveable { mutableStateOf(p?.defaultLocationId ?: state.locations.firstOrNull()?.id) }
     var categoryId by rememberSaveable { mutableStateOf(p?.categoryId) }
-    var expiresOn by rememberSaveable { mutableStateOf<Long?>(null) }
+    var homemade by rememberSaveable { mutableStateOf(p?.homemade ?: false) }
+    val today = remember { LocalDate.now().toEpochDay() }
+    var preparedOn by rememberSaveable { mutableStateOf(today) }
+    var ready by rememberSaveable { mutableStateOf<Long?>(null) }
+    var readyEdited by rememberSaveable { mutableStateOf(false) }
+    var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
+    var expiryEdited by rememberSaveable { mutableStateOf(false) }
     var shelfLife by rememberSaveable { mutableStateOf(p?.shelfLifeDays?.toString().orEmpty()) }
+    var untilReady by rememberSaveable { mutableStateOf(p?.daysUntilReady?.toString().orEmpty()) }
     var afterOpening by rememberSaveable { mutableStateOf(p?.daysAfterOpening?.toString().orEmpty()) }
     var warning by rememberSaveable { mutableStateOf(p?.expiryWarningDays?.toString().orEmpty()) }
     var minStock by rememberSaveable { mutableStateOf(p?.minStock?.let { format.number(it) }.orEmpty()) }
     var notes by rememberSaveable { mutableStateOf(p?.notes.orEmpty()) }
     var moreOpen by rememberSaveable {
-        mutableStateOf(listOf(shelfLife, afterOpening, warning, minStock).any { it.isNotEmpty() })
+        mutableStateOf(listOf(shelfLife, untilReady, afterOpening, warning, minStock).any { it.isNotEmpty() })
     }
+    // The first stock's dates follow the durations until the user sets them
+    val stockDate = if (homemade) preparedOn else today
+    val expiresOn = if (expiryEdited) expiry else proposedExpiry(stockDate, shelfLife.daysOrNull())
+    val readyFrom = if (readyEdited) ready else proposedReadyFrom(preparedOn, untilReady.daysOrNull())
     var errors by remember { mutableStateOf(ProductFormErrors()) }
 
     Column(
@@ -165,13 +181,52 @@ private fun ProductForm(
             onSelect = { categoryId = it },
             modifier = Modifier.fillMaxWidth(),
         )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .toggleable(value = homemade, role = Role.Switch, onValueChange = { homemade = it })
+                .padding(vertical = 4.dp),
+        ) {
+            Text(
+                stringResource(R.string.label_homemade),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            Switch(checked = homemade, onCheckedChange = null)
+        }
+        if (isNew && homemade) {
+            DateField(
+                label = stringResource(R.string.field_prepared_on),
+                value = preparedOn,
+                emptyText = "",
+                format = format,
+                onChange = { date -> date?.let { preparedOn = it } },
+                clearable = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            DateField(
+                label = stringResource(R.string.field_ready_from),
+                value = readyFrom,
+                emptyText = none,
+                format = format,
+                onChange = {
+                    ready = it
+                    readyEdited = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
         if (isNew) {
             DateField(
                 label = stringResource(R.string.field_expiry),
                 value = expiresOn,
                 emptyText = none,
                 format = format,
-                onChange = { expiresOn = it },
+                onChange = {
+                    expiry = it
+                    expiryEdited = true
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -206,6 +261,17 @@ private fun ProductForm(
             ) {
                 shelfLife = it
                 errors = errors.copy(shelfLifeDays = false)
+            }
+            if (homemade) {
+                NumberField(
+                    label = stringResource(R.string.field_days_until_ready),
+                    value = untilReady,
+                    error = if (errors.daysUntilReady) daysError else null,
+                    help = stringResource(R.string.field_days_until_ready_help),
+                ) {
+                    untilReady = it
+                    errors = errors.copy(daysUntilReady = false)
+                }
             }
             NumberField(
                 label = stringResource(R.string.field_days_after_opening),
@@ -251,8 +317,12 @@ private fun ProductForm(
                         unit = unit,
                         locationId = locationId,
                         categoryId = categoryId,
+                        homemade = homemade,
+                        preparedOn = preparedOn,
+                        readyFrom = readyFrom,
                         expiresOn = expiresOn,
                         shelfLifeDays = shelfLife,
+                        daysUntilReady = if (homemade) untilReady else p?.daysUntilReady?.toString().orEmpty(),
                         daysAfterOpening = afterOpening,
                         warningDays = warning,
                         minStock = minStock,

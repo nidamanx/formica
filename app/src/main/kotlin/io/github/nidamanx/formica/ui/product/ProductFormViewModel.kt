@@ -32,8 +32,13 @@ data class ProductFields(
     val unit: MeasureUnit,
     val locationId: String?,
     val categoryId: String?,
+    val homemade: Boolean,
+    /** First stock only (new product): preparation date, ready date and expiry. */
+    val preparedOn: Long,
+    val readyFrom: Long?,
     val expiresOn: Long?,
     val shelfLifeDays: String,
+    val daysUntilReady: String,
     val daysAfterOpening: String,
     val warningDays: String,
     val minStock: String,
@@ -44,12 +49,14 @@ data class ProductFormErrors(
     val name: NameError? = null,
     val quantity: Boolean = false,
     val shelfLifeDays: Boolean = false,
+    val daysUntilReady: Boolean = false,
     val daysAfterOpening: Boolean = false,
     val warningDays: Boolean = false,
     val minStock: Boolean = false,
 ) {
     val any: Boolean
-        get() = name != null || quantity || shelfLifeDays || daysAfterOpening || warningDays || minStock
+        get() = name != null || quantity || shelfLifeDays || daysUntilReady || daysAfterOpening || warningDays ||
+            minStock
 }
 
 data class ProductFormState(
@@ -105,6 +112,7 @@ class ProductFormViewModel(
             },
             quantity = fields.quantity.isNotBlank() && quantity == null,
             shelfLifeDays = !fields.shelfLifeDays.isValidDays(),
+            daysUntilReady = !fields.daysUntilReady.isValidDays(),
             daysAfterOpening = !fields.daysAfterOpening.isValidDays(),
             warningDays = !fields.warningDays.isValidDays(),
             minStock = fields.minStock.isNotBlank() && minStock == null,
@@ -115,10 +123,14 @@ class ProductFormViewModel(
         viewModelScope.launch {
             if (stored == null) {
                 val location = fields.locationId
-                val initial = if (quantity != null && quantity > 0 && location != null) {
-                    InitialStock.Purchase(quantity, location, fields.expiresOn, LocalDate.now().toEpochDay(), null)
-                } else {
-                    null
+                val initial = when {
+                    quantity == null || quantity <= 0 || location == null -> null
+                    fields.homemade -> InitialStock.Preparation(
+                        quantity, location, fields.preparedOn, fields.expiresOn, fields.readyFrom,
+                    )
+                    else -> InitialStock.Purchase(
+                        quantity, location, fields.expiresOn, LocalDate.now().toEpochDay(), null,
+                    )
                 }
                 pantry.createProduct(fields.applyTo(emptyProduct(), minStock), initial)
             } else {
@@ -135,7 +147,9 @@ class ProductFormViewModel(
             unit = unit,
             categoryId = categoryId,
             defaultLocationId = locationId,
+            homemade = homemade,
             shelfLifeDays = shelfLifeDays.toDays(),
+            daysUntilReady = daysUntilReady.toDays(),
             daysAfterOpening = daysAfterOpening.toDays(),
             expiryWarningDays = warningDays.toDays(),
             minStock = minStock,
@@ -157,3 +171,6 @@ private fun String.isValidDays(): Boolean {
 }
 
 private fun String.toDays(): Int? = trim().takeIf { it.isNotEmpty() }?.toInt()
+
+/** Days typed in the form, or null while empty or not valid (used for the live proposals). */
+fun String.daysOrNull(): Int? = if (isValidDays()) toDays() else null

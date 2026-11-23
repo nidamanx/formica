@@ -31,11 +31,15 @@ import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
 import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.proposedExpiry
+import io.github.nidamanx.formica.domain.proposedReadyFrom
 import io.github.nidamanx.formica.ui.components.DateField
 import io.github.nidamanx.formica.ui.components.SelectField
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 
-/** "Add purchase", prefilled: 1, proposed expiry, usual location; one tap to confirm. */
+/**
+ * "Add purchase", prefilled: 1, today, proposed expiry, usual location; one tap to confirm.
+ * The expiry follows the purchase date until the user sets it.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PurchaseSheet(
@@ -44,18 +48,18 @@ fun PurchaseSheet(
     stores: List<Store>,
     today: Long,
     format: DisplayFormat,
-    onConfirm: (quantity: Long, expiresOn: Long?, locationId: String, storeId: String?) -> Unit,
+    onConfirm: (quantity: Long, purchasedOn: Long, expiresOn: Long?, locationId: String, storeId: String?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val product = card.product
-    val defaultLocation = listOfNotNull(product.defaultLocationId, card.locationIds.firstOrNull())
-        .firstOrNull { id -> locations.any { it.id == id } }
-        ?: locations.firstOrNull()?.id
     var quantityText by rememberSaveable { mutableStateOf(format.number(ONE_UNIT)) }
     var quantityError by rememberSaveable { mutableStateOf(false) }
-    var expiresOn by rememberSaveable { mutableStateOf(proposedExpiry(today, product.shelfLifeDays)) }
-    var locationId by rememberSaveable { mutableStateOf(defaultLocation) }
+    var purchasedOn by rememberSaveable { mutableStateOf(today) }
+    var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
+    var expiryEdited by rememberSaveable { mutableStateOf(false) }
+    var locationId by rememberSaveable { mutableStateOf(defaultLocation(card, locations)) }
     var storeId by rememberSaveable { mutableStateOf<String?>(null) }
+    val expiresOn = if (expiryEdited) expiry else proposedExpiry(purchasedOn, product.shelfLifeDays)
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         SheetColumn(title = stringResource(R.string.purchase_title), subtitle = product.name) {
@@ -64,21 +68,26 @@ fun PurchaseSheet(
                 quantityError = false
             }
             DateField(
+                label = stringResource(R.string.field_purchased_on),
+                value = purchasedOn,
+                emptyText = "",
+                format = format,
+                onChange = { date -> date?.let { purchasedOn = it } },
+                clearable = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            DateField(
                 label = stringResource(R.string.field_expiry),
                 value = expiresOn,
                 emptyText = stringResource(R.string.value_none_f),
                 format = format,
-                onChange = { expiresOn = it },
+                onChange = {
+                    expiry = it
+                    expiryEdited = true
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
-            SelectField(
-                label = stringResource(R.string.field_location),
-                options = locations.map { it.id },
-                selected = locationId.orEmpty(),
-                optionLabel = { id -> locations.firstOrNull { it.id == id }?.name.orEmpty() },
-                onSelect = { locationId = it },
-                modifier = Modifier.fillMaxWidth(),
-            )
+            LocationField(locations, locationId) { locationId = it }
             val none = stringResource(R.string.value_none_m)
             SelectField(
                 label = stringResource(R.string.field_store),
@@ -94,12 +103,111 @@ fun PurchaseSheet(
                     val quantity = format.parse(quantityText)?.takeIf { it > 0 }
                     val location = locationId
                     quantityError = quantity == null
-                    if (quantity != null && location != null) onConfirm(quantity, expiresOn, location, storeId)
+                    if (quantity != null && location != null) {
+                        onConfirm(quantity, purchasedOn, expiresOn, location, storeId)
+                    }
                 },
                 modifier = Modifier.align(Alignment.End),
             ) { Text(stringResource(R.string.action_add)) }
         }
     }
+}
+
+/**
+ * "New preparation" of a homemade product, prefilled: 1, today, proposed ready date and
+ * expiry, usual location. Both proposals follow the preparation date until the user sets them.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PreparationSheet(
+    card: ProductSummary,
+    locations: List<Location>,
+    today: Long,
+    format: DisplayFormat,
+    onConfirm: (quantity: Long, preparedOn: Long, readyFrom: Long?, expiresOn: Long?, locationId: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val product = card.product
+    var quantityText by rememberSaveable { mutableStateOf(format.number(ONE_UNIT)) }
+    var quantityError by rememberSaveable { mutableStateOf(false) }
+    var preparedOn by rememberSaveable { mutableStateOf(today) }
+    var ready by rememberSaveable { mutableStateOf<Long?>(null) }
+    var readyEdited by rememberSaveable { mutableStateOf(false) }
+    var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
+    var expiryEdited by rememberSaveable { mutableStateOf(false) }
+    var locationId by rememberSaveable { mutableStateOf(defaultLocation(card, locations)) }
+    val readyFrom = if (readyEdited) ready else proposedReadyFrom(preparedOn, product.daysUntilReady)
+    val expiresOn = if (expiryEdited) expiry else proposedExpiry(preparedOn, product.shelfLifeDays)
+
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        SheetColumn(title = stringResource(R.string.preparation_title), subtitle = product.name) {
+            QuantityField(quantityText, quantityError) {
+                quantityText = it
+                quantityError = false
+            }
+            DateField(
+                label = stringResource(R.string.field_prepared_on),
+                value = preparedOn,
+                emptyText = "",
+                format = format,
+                onChange = { date -> date?.let { preparedOn = it } },
+                clearable = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            DateField(
+                label = stringResource(R.string.field_ready_from),
+                value = readyFrom,
+                emptyText = stringResource(R.string.value_none_f),
+                format = format,
+                onChange = {
+                    ready = it
+                    readyEdited = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            DateField(
+                label = stringResource(R.string.field_expiry),
+                value = expiresOn,
+                emptyText = stringResource(R.string.value_none_f),
+                format = format,
+                onChange = {
+                    expiry = it
+                    expiryEdited = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            LocationField(locations, locationId) { locationId = it }
+            Button(
+                enabled = locationId != null,
+                onClick = {
+                    val quantity = format.parse(quantityText)?.takeIf { it > 0 }
+                    val location = locationId
+                    quantityError = quantity == null
+                    if (quantity != null && location != null) {
+                        onConfirm(quantity, preparedOn, readyFrom, expiresOn, location)
+                    }
+                },
+                modifier = Modifier.align(Alignment.End),
+            ) { Text(stringResource(R.string.action_add)) }
+        }
+    }
+}
+
+private fun defaultLocation(card: ProductSummary, locations: List<Location>): String? =
+    listOfNotNull(card.product.defaultLocationId, card.locationIds.firstOrNull())
+        .firstOrNull { id -> locations.any { it.id == id } }
+        ?: locations.firstOrNull()?.id
+
+@Composable
+private fun LocationField(locations: List<Location>, selected: String?, onSelect: (String) -> Unit) {
+    SelectField(
+        label = stringResource(R.string.field_location),
+        options = locations.map { it.id },
+        selected = selected.orEmpty(),
+        optionLabel = { id -> locations.firstOrNull { it.id == id }?.name.orEmpty() },
+        onSelect = onSelect,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 /** Amount to use, for products measured by weight or volume. */

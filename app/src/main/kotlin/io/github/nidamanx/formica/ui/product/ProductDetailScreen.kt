@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,9 +57,11 @@ import io.github.nidamanx.formica.domain.effectiveExpiry
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.MovementType
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
+import io.github.nidamanx.formica.domain.model.Origin
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.quantityText
 import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
+import io.github.nidamanx.formica.ui.pantry.PreparationSheet
 import io.github.nidamanx.formica.ui.pantry.PurchaseSheet
 import io.github.nidamanx.formica.ui.pantry.UseSheet
 import java.time.Instant
@@ -102,6 +106,7 @@ fun ProductDetailScreen(
     val summary = state.summary ?: return
     val product = summary.product
     val locationNames = state.locations.associate { it.id to it.name }
+    val storeNames = state.stores.associate { it.id to it.name }
     val plainGroup = state.groups.singleOrNull()?.takeIf { !state.showGroups }
 
     Scaffold(
@@ -119,6 +124,9 @@ fun ProductDetailScreen(
                     }
                     OverflowMenu(
                         buildList<Pair<Int, () -> Unit>> {
+                            if (product.homemade) {
+                                add(R.string.purchase_title to { viewModel.open(DetailDialog.Purchase) })
+                            }
                             if (plainGroup != null) addAll(groupActions(plainGroup, viewModel))
                             add(R.string.menu_correct to { viewModel.open(DetailDialog.Correct(null)) })
                             add(R.string.action_delete to { viewModel.open(DetailDialog.Delete) })
@@ -139,13 +147,17 @@ fun ProductDetailScreen(
                     format = format,
                     locationNames = locationNames,
                     onUse = { viewModel.open(DetailDialog.Use(null)) },
-                    onPurchase = { viewModel.open(DetailDialog.Purchase) },
+                    onAdd = {
+                        viewModel.open(if (product.homemade) DetailDialog.Preparation else DetailDialog.Purchase)
+                    },
                 )
             }
             if (state.showGroups) {
                 item { SectionTitle(stringResource(R.string.section_stock)) }
                 items(state.groups, key = { it.batches.first().id }) { group ->
-                    GroupRow(group, product.unit, product.daysAfterOpening, state.today, locationNames, format) {
+                    GroupRow(
+                        group, product.unit, product.daysAfterOpening, state.today, locationNames, storeNames, format,
+                    ) {
                         OverflowMenu(groupActions(group, viewModel))
                     }
                 }
@@ -168,6 +180,14 @@ fun ProductDetailScreen(
             today = state.today,
             format = format,
             onConfirm = viewModel::purchase,
+            onDismiss = viewModel::close,
+        )
+        DetailDialog.Preparation -> PreparationSheet(
+            card = summary,
+            locations = state.locations,
+            today = state.today,
+            format = format,
+            onConfirm = viewModel::prepare,
             onDismiss = viewModel::close,
         )
         is DetailDialog.Use -> UseSheet(
@@ -266,12 +286,13 @@ private fun Header(
     format: DisplayFormat,
     locationNames: Map<String, String>,
     onUse: () -> Unit,
-    onPurchase: () -> Unit,
+    onAdd: () -> Unit,
 ) {
     val summary = state.summary ?: return
     val product = summary.product
     val resources = LocalResources.current
     val meta = listOfNotNull(
+        if (product.homemade) stringResource(R.string.label_homemade) else null,
         state.categories.firstOrNull { it.id == product.categoryId }?.name,
         summary.locationIds.mapNotNull { locationNames[it] }.takeIf { it.isNotEmpty() }?.joinToString(", "),
     ).joinToString(" · ")
@@ -279,20 +300,35 @@ private fun Header(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
-        Text(
-            resources.quantityText(displayedQuantity(summary.quantity), product.unit, format),
-            style = MaterialTheme.typography.headlineMedium,
-        )
-        if (meta.isNotEmpty()) SecondaryText(meta)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                resources.quantityText(displayedQuantity(summary.quantity), product.unit, format),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            if (summary.toMake) SmallBadge(stringResource(R.string.badge_to_make))
+        }
+        if (meta.isNotEmpty()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (product.homemade) {
+                    Icon(
+                        painterResource(R.drawable.ic_homemade),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+                SecondaryText(meta)
+            }
+        }
         SecondaryText(stringResource(R.string.estimate_label, resources.estimateText(state.estimate)))
         product.notes?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
             Button(onClick = onUse) {
                 Text(stringResource(R.string.use_title))
             }
-            FilledTonalButton(onClick = onPurchase) {
+            FilledTonalButton(onClick = onAdd) {
                 Icon(Icons.Filled.Add, contentDescription = null)
-                Text(stringResource(R.string.purchase_title))
+                Text(stringResource(if (product.homemade) R.string.preparation_title else R.string.purchase_title))
             }
         }
     }
@@ -320,6 +356,7 @@ private fun GroupRow(
     daysAfterOpening: Int?,
     today: Long,
     locationNames: Map<String, String>,
+    storeNames: Map<String, String>,
     format: DisplayFormat,
     menu: @Composable () -> Unit,
 ) {
@@ -328,6 +365,7 @@ private fun GroupRow(
     val expiry = effectiveExpiry(group.batches.first(), daysAfterOpening)
     val details = listOfNotNull(
         key.preparedOn?.let { stringResource(R.string.line_made_on, format.date(it)) },
+        boughtLine(group, storeNames, format),
         expiry?.let {
             stringResource(if (it < today) R.string.line_expired else R.string.line_expires, format.date(it))
         },
@@ -363,6 +401,20 @@ private fun GroupRow(
             }
             menu()
         }
+    }
+}
+
+/** Purchase date and store, shown only when every batch of the group agrees on them. */
+@Composable
+private fun boughtLine(group: BatchGroup, storeNames: Map<String, String>, format: DisplayFormat): String? {
+    if (group.key.origin != Origin.PURCHASED) return null
+    val date = group.batches.map { it.purchasedOn }.distinct().singleOrNull()
+    val store = group.batches.map { it.storeId }.distinct().singleOrNull()?.let { storeNames[it] }
+    return when {
+        date != null && store != null -> stringResource(R.string.line_bought_on_at, format.date(date), store)
+        date != null -> stringResource(R.string.line_bought_on, format.date(date))
+        store != null -> stringResource(R.string.line_bought_at, store)
+        else -> null
     }
 }
 

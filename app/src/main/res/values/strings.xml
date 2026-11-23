@@ -142,7 +142,7 @@
     <string name="field_category">Category</string>
     <string name="form_more">More</string>
     <string name="field_shelf_life">Keeps for (days)</string>
-    <string name="field_shelf_life_help">Used to suggest the expiry date of new purchases.</string>
+    <string name="field_shelf_life_help">Used to suggest the expiry date of new purchases and preparations.</string>
     <string name="field_days_after_opening">Lasts after opening (days)</string>
     <string name="field_warning_days">Warn me before expiry (days)</string>
     <string name="field_min_stock">Minimum stock</string>
@@ -217,4 +217,15 @@
         <item>Personal care</item>
         <item>Other</item>
     </string-array>
+    <string name="label_homemade">Homemade</string>
+    <string name="field_prepared_on">Preparation date</string>
+    <string name="field_ready_from">Ready from</string>
+    <string name="field_days_until_ready">Days until ready</string>
+    <string name="field_days_until_ready_help">Used to suggest when new preparations are ready.</string>
+    <string name="field_purchased_on">Purchase date</string>
+    <string name="preparation_title">New preparation</string>
+    <string name="badge_to_make">To make</string>
+    <string name="line_bought_on">bought %1$s</string>
+    <string name="line_bought_on_at">bought %1$s at %2$s</string>
+    <string name="line_bought_at">from %1$s</string>
 </resources>

@@ -74,7 +74,10 @@ fun <T> SelectField(
     }
 }
 
-/** An optional date (epoch day) chosen with the Material calendar; [emptyText] when null. */
+/**
+ * A date (epoch day) chosen with the Material calendar; [emptyText] when null.
+ * A required date ([clearable] false) has no clear button.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(
@@ -84,6 +87,7 @@ fun DateField(
     format: DisplayFormat,
     onChange: (Long?) -> Unit,
     modifier: Modifier = Modifier,
+    clearable: Boolean = true,
 ) {
     var picking by remember { mutableStateOf(false) }
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -103,7 +107,7 @@ fun DateField(
                     .clickable { picking = true },
             )
         }
-        if (value != null) {
+        if (clearable && value != null) {
             IconButton(onClick = { onChange(null) }) {
                 Icon(Icons.Filled.Clear, contentDescription = stringResource(R.string.cd_clear_date))
             }

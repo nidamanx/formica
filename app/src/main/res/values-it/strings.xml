@@ -142,7 +142,7 @@
     <string name="field_category">Categoria</string>
     <string name="form_more">Altro</string>
     <string name="field_shelf_life">Si conserva per (giorni)</string>
-    <string name="field_shelf_life_help">Serve a proporre la scadenza dei nuovi acquisti.</string>
+    <string name="field_shelf_life_help">Serve a proporre la scadenza dei nuovi acquisti e delle nuove preparazioni.</string>
     <string name="field_days_after_opening">Dopo l\'apertura dura (giorni)</string>
     <string name="field_warning_days">Avvisami prima della scadenza (giorni)</string>
     <string name="field_min_stock">Scorta minima</string>
@@ -217,4 +217,15 @@
         <item>Igiene personale</item>
         <item>Altro</item>
     </string-array>
+    <string name="label_homemade">Fatto in casa</string>
+    <string name="field_prepared_on">Data di preparazione</string>
+    <string name="field_ready_from">Pronto dal</string>
+    <string name="field_days_until_ready">Giorni per essere pronto</string>
+    <string name="field_days_until_ready_help">Serve a proporre \"Pronto dal\" delle nuove preparazioni.</string>
+    <string name="field_purchased_on">Data di acquisto</string>
+    <string name="preparation_title">Nuova preparazione</string>
+    <string name="badge_to_make">Da preparare</string>
+    <string name="line_bought_on">comprata il %1$s</string>
+    <string name="line_bought_on_at">comprata il %1$s da %2$s</string>
+    <string name="line_bought_at">da %1$s</string>
 </resources>

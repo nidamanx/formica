@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -156,8 +157,18 @@ fun PantryScreen(
                     stores = state.stores,
                     today = state.today,
                     format = format,
-                    onConfirm = { quantity, expiry, location, store ->
-                        viewModel.addPurchase(card.product.id, quantity, expiry, location, store)
+                    onConfirm = { quantity, purchasedOn, expiry, location, store ->
+                        viewModel.addPurchase(card.product.id, quantity, purchasedOn, expiry, location, store)
+                    },
+                    onDismiss = viewModel::closeSheet,
+                )
+                is PantrySheet.Preparation -> PreparationSheet(
+                    card = card,
+                    locations = state.locations,
+                    today = state.today,
+                    format = format,
+                    onConfirm = { quantity, preparedOn, ready, expiry, location ->
+                        viewModel.addPreparation(card.product.id, quantity, preparedOn, ready, expiry, location)
                     },
                     onDismiss = viewModel::closeSheet,
                 )
@@ -214,6 +225,16 @@ private fun FilterRow(state: PantryUiState, viewModel: PantryViewModel) {
             selected = state.filter.categoryId != null,
             options = listOf<Pair<String?, String>>(null to all) + state.categories.map { it.id to it.name },
             onSelect = viewModel::setCategory,
+        )
+        FilterChip(
+            selected = state.filter.homemadeOnly,
+            onClick = viewModel::toggleHomemade,
+            label = { Text(stringResource(R.string.label_homemade)) },
+            leadingIcon = if (state.filter.homemadeOnly) {
+                { Icon(Icons.Filled.Check, contentDescription = null, Modifier.size(18.dp)) }
+            } else {
+                null
+            },
         )
     }
 }
@@ -280,6 +301,7 @@ private fun ProductCard(
     ).joinToString(" · ")
     val badges = listOfNotNull(
         if (card.readyFrom != null) R.string.badge_not_ready else null,
+        if (card.toMake) R.string.badge_to_make else null,
         if (card.runningLow) R.string.badge_running_low else null,
         if (card.needsCheck) R.string.badge_check else null,
     )
@@ -306,6 +328,14 @@ private fun ProductCard(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false),
                     )
+                    if (product.homemade) {
+                        Icon(
+                            painterResource(R.drawable.ic_homemade),
+                            contentDescription = stringResource(R.string.label_homemade),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
                     if (card.hasNotes) {
                         Icon(
                             painterResource(R.drawable.ic_notes),
@@ -340,7 +370,8 @@ private fun ProductCard(
                         Icon(painterResource(R.drawable.ic_remove), contentDescription = stringResource(R.string.cd_use))
                     }
                     IconButton(onClick = onPlus) {
-                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_purchase))
+                        val plus = if (product.homemade) R.string.preparation_title else R.string.cd_add_purchase
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(plus))
                     }
                 }
             }
