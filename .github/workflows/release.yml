@@ -1,0 +1,156 @@
+# Builds, signs and publishes a release of the versionName in app/build.gradle.kts.
+# Started by hand only, on main: Actions > Release > Run workflow. It creates the tag
+# v<versionName> itself (the tag ruleset forbids moving or deleting it afterwards).
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write           # create the tag and the release
+  id-token: write           # sign the build provenance attestation
+  attestations: write       # store the attestation
+  artifact-metadata: write  # artifact storage record (attest v4)
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read and check the version
+        id: version
+        run: |
+          if [[ $GITHUB_REF != refs/heads/main ]]; then
+            echo "::error::Run the release from main, not from $GITHUB_REF"
+            exit 1
+          fi
+          name=$(sed -n 's/^[[:space:]]*versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)
+          code=$(sed -n 's/^[[:space:]]*versionCode = \([0-9]*\)$/\1/p' app/build.gradle.kts)
+          tag="v$name"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
+            echo "::error::Tag $tag already exists. Increase versionName and versionCode first."
+            exit 1
+          fi
+          # Same checks as the Build workflow, plus a released CHANGELOG section
+          scripts/check-version.sh --release
+          {
+            echo "name=$name"
+            echo "tag=$tag"
+            echo "changelog=fastlane/metadata/android/en-US/changelogs/$code.txt"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Decrypt the release key
+        env:
+          FORMICA_KEY_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          FORMICA_KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [[ -z $FORMICA_KEY_BASE64 || -z $FORMICA_KEY_PASSWORD ]]; then
+            echo "::error::The KEYSTORE_BASE64 or KEYSTORE_PASSWORD secret is missing (docs/MAINTAINING.md)."
+            exit 1
+          fi
+          # Checks every step and reports a wrong secret precisely, never its value
+          scripts/decrypt-signing-key.sh release "$RUNNER_TEMP/release.p12"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          # MIT-licensed cache: the default "enhanced" one is proprietary since v6
+          cache-provider: basic
+          # Release builds always start from a clean state
+          cache-read-only: true
+
+      - name: Lint, unit tests and signed release build
+        env:
+          FORMICA_KEYSTORE_FILE: ${{ runner.temp }}/release.p12
+          FORMICA_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          set -o pipefail
+          if ! ./gradlew --no-daemon lintRelease testReleaseUnitTest assembleRelease \
+              2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
+            scripts/report-gradle-failure.sh "$RUNNER_TEMP/gradle.log"
+            exit 1
+          fi
+
+      - name: Remove the plain key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.p12"
+
+      - name: Check permissions
+        run: scripts/check-permissions.sh app/build/outputs/apk/release/app-release.apk
+
+      - name: Verify the signature and prepare the files
+        id: files
+        run: |
+          apk="formica-${{ steps.version.outputs.name }}.apk"
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/$apk"
+
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          "$apksigner" verify --verbose --print-certs "dist/$apk" | tee "$RUNNER_TEMP/certs.txt"
+
+          # The APK must be signed with the key whose fingerprint is published
+          signed=$(sed -n 's/.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/certs.txt" | head -n 1)
+          expected=$(tr -d ':\n' < keystore/certificate-sha256.txt | tr 'A-F' 'a-f')
+          if [[ $signed != "$expected" ]]; then
+            echo "::error::APK certificate ($signed) differs from keystore/certificate-sha256.txt ($expected)"
+            exit 1
+          fi
+
+          (cd dist && sha256sum "$apk" > SHA256SUMS)
+          echo "apk=$apk" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/${{ steps.files.outputs.apk }}
+
+      - name: Write release notes
+        run: |
+          apk="${{ steps.files.outputs.apk }}"
+          {
+            cat "${{ steps.version.outputs.changelog }}"
+            echo
+            echo "## Verify"
+            echo
+            echo "SHA-256 of \`$apk\`:"
+            echo
+            echo '```'
+            cat dist/SHA256SUMS
+            echo '```'
+            echo
+            echo "Signing certificate SHA-256 (also in the README):"
+            echo
+            echo '```'
+            cat keystore/certificate-sha256.txt
+            echo '```'
+            echo
+            echo "Build provenance:"
+            echo
+            echo '```'
+            echo "gh attestation verify $apk --repo $GITHUB_REPOSITORY"
+            echo '```'
+          } > "$RUNNER_TEMP/notes.md"
+
+      - name: Publish the release
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Formica ${{ steps.version.outputs.name }}" \
+            --notes-file "$RUNNER_TEMP/notes.md"
