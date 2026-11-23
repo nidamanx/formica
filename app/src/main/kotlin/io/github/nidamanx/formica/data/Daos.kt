@@ -28,6 +28,10 @@ interface LocationDao {
     @Query("DELETE FROM locations")
     suspend fun deleteAll()
 
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM locations WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
+
     @Query("SELECT COUNT(*) FROM locations")
     suspend fun countIncludingDeleted(): Int
 
@@ -48,6 +52,10 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories")
     suspend fun deleteAll()
+
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM categories WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
 
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun countIncludingDeleted(): Int
@@ -70,6 +78,10 @@ interface StoreDao {
     @Query("DELETE FROM stores")
     suspend fun deleteAll()
 
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM stores WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
+
     @Upsert
     suspend fun upsert(items: List<StoreEntity>)
 }
@@ -91,6 +103,10 @@ interface ProductDao {
     @Query("DELETE FROM products")
     suspend fun deleteAll()
 
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM products WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
+
     @Upsert
     suspend fun upsert(items: List<ProductEntity>)
 }
@@ -111,6 +127,10 @@ interface BatchDao {
 
     @Query("DELETE FROM batches")
     suspend fun deleteAll()
+
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM batches WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
 
     /** Batches with stock left in a location, among the products that are not deleted. */
     @Query(
@@ -178,6 +198,10 @@ interface ShoppingItemDao {
 
     @Query("DELETE FROM shopping_items")
     suspend fun deleteAll()
+
+    /** Tombstone clean-up (SPEC §11.7): the number of records removed. */
+    @Query("DELETE FROM shopping_items WHERE deletedAt IS NOT NULL AND deletedAt < :before")
+    suspend fun purgeDeleted(before: Long): Int
 
     @Upsert
     suspend fun upsert(items: List<ShoppingItemEntity>)

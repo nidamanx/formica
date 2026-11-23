@@ -414,4 +414,16 @@
     <string name="msg_copy_restored">Copy restored</string>
     <string name="msg_import_undone">Import undone</string>
     <string name="action_undo">Undo</string>
+    <string name="section_exchange_log">Exchange log</string>
+    <string name="exchange_log_entry">Imported %1$s · %2$s</string>
+    <string name="section_maintenance">Maintenance</string>
+    <string name="clean_up">Clean up deleted items</string>
+    <string name="clean_up_hint">Older than 6 months</string>
+    <string name="clean_up_text">Items deleted more than 6 months ago will be removed for good. A phone that has not exchanged data for more than 6 months could bring them back.</string>
+    <string name="action_clean_up">Clean up</string>
+    <plurals name="clean_up_done">
+        <item quantity="one">%1$d item removed</item>
+        <item quantity="other">%1$d items removed</item>
+    </plurals>
+    <string name="clean_up_nothing">Nothing to clean up.</string>
 </resources>

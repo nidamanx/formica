@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.nidamanx.formica.R
+import io.github.nidamanx.formica.domain.model.ImportMode
 import io.github.nidamanx.formica.domain.model.ImportRecord
 import io.github.nidamanx.formica.sync.Exporter
 import io.github.nidamanx.formica.ui.components.BackTopBar
@@ -73,6 +74,7 @@ fun ExchangeScreen(
     val snackbar = remember { SnackbarHostState() }
     var exporting by rememberSaveable { mutableStateOf(false) }
     var confirmingUndo by rememberSaveable { mutableStateOf(false) }
+    var confirmingCleanUp by rememberSaveable { mutableStateOf(false) }
     val format = rememberDisplayFormat()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(Exporter.MIME)) { uri ->
         if (uri != null) viewModel.saveTo(uri)
@@ -94,6 +96,13 @@ fun ExchangeScreen(
                 ExchangeEvent.SaveFailed -> snackbar.showSnackbar(resources.getString(R.string.msg_save_failed))
                 ExchangeEvent.ImportUndone -> snackbar.showSnackbar(resources.getString(R.string.msg_import_undone))
                 ExchangeEvent.CopyUnreadable -> snackbar.showSnackbar(resources.getString(R.string.import_unreadable))
+                is ExchangeEvent.CleanedUp -> snackbar.showSnackbar(
+                    if (event.removed == 0) {
+                        resources.getString(R.string.clean_up_nothing)
+                    } else {
+                        resources.getQuantityString(R.plurals.clean_up_done, event.removed, event.removed)
+                    },
+                )
             }
         }
     }
@@ -140,6 +149,29 @@ fun ExchangeScreen(
                     },
                     modifier = Modifier.clickable(onClick = onOpenBackups),
                 )
+                if (state.log.isNotEmpty()) {
+                    SectionTitle(stringResource(R.string.section_exchange_log))
+                    state.log.forEach { record ->
+                        ListItem(
+                            headlineContent = { Text(record.deviceName) },
+                            supportingContent = {
+                                Text(
+                                    stringResource(
+                                        R.string.exchange_log_entry,
+                                        format.dateTime(record.importedAt),
+                                        stringResource(record.mode.label()),
+                                    ),
+                                )
+                            },
+                        )
+                    }
+                }
+                SectionTitle(stringResource(R.string.section_maintenance))
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.clean_up)) },
+                    supportingContent = { Text(stringResource(R.string.clean_up_hint)) },
+                    modifier = Modifier.clickable { confirmingCleanUp = true },
+                )
             }
         }
     }
@@ -160,6 +192,23 @@ fun ExchangeScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmingUndo = false }) { Text(stringResource(R.string.action_cancel)) }
+            },
+        )
+    }
+
+    if (confirmingCleanUp) {
+        AlertDialog(
+            onDismissRequest = { confirmingCleanUp = false },
+            title = { Text(stringResource(R.string.clean_up)) },
+            text = { Text(stringResource(R.string.clean_up_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmingCleanUp = false
+                    viewModel.cleanUp()
+                }) { Text(stringResource(R.string.action_clean_up)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmingCleanUp = false }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
@@ -208,6 +257,12 @@ private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit, onImport
             }
         }
     }
+}
+
+private fun ImportMode.label(): Int = when (this) {
+    ImportMode.MERGE -> R.string.mode_merge
+    ImportMode.NEW_PRODUCTS_ONLY -> R.string.mode_new_products
+    ImportMode.REPLACE_ALL -> R.string.mode_replace_all
 }
 
 @Composable

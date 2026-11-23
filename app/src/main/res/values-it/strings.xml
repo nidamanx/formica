@@ -431,4 +431,17 @@
     <string name="msg_copy_restored">Copia ripristinata</string>
     <string name="msg_import_undone">Importazione annullata</string>
     <string name="action_undo">Annulla</string>
+    <string name="section_exchange_log">Registro scambi</string>
+    <string name="exchange_log_entry">Importato il %1$s · %2$s</string>
+    <string name="section_maintenance">Manutenzione</string>
+    <string name="clean_up">Pulisci elementi eliminati</string>
+    <string name="clean_up_hint">Più vecchi di 6 mesi</string>
+    <string name="clean_up_text">Gli elementi eliminati più di 6 mesi fa saranno cancellati del tutto. Un telefono che non scambia dati da più di 6 mesi potrebbe farli ricomparire.</string>
+    <string name="action_clean_up">Pulisci</string>
+    <plurals name="clean_up_done">
+        <item quantity="one">%1$d elemento cancellato</item>
+        <item quantity="many">%1$d elementi cancellati</item>
+        <item quantity="other">%1$d elementi cancellati</item>
+    </plurals>
+    <string name="clean_up_nothing">Nessun elemento da pulire.</string>
 </resources>

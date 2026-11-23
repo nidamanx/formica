@@ -75,6 +75,21 @@ class ExchangeRepository(private val db: FormicaDatabase) {
         }
     }
 
+    /**
+     * Removes for good the records deleted before [before] (SPEC §11.7). Movements stay:
+     * they are never deleted, and those of a removed batch are simply no longer reached.
+     *
+     * @return the number of records removed
+     */
+    suspend fun purgeDeleted(before: Long): Int = db.withTransaction {
+        db.locationDao().purgeDeleted(before) +
+            db.categoryDao().purgeDeleted(before) +
+            db.storeDao().purgeDeleted(before) +
+            db.productDao().purgeDeleted(before) +
+            db.batchDao().purgeDeleted(before) +
+            db.shoppingItemDao().purgeDeleted(before)
+    }
+
     private suspend fun readSnapshot() = Snapshot(
         locations = db.locationDao().all().map { it.toDomain() },
         categories = db.categoryDao().all().map { it.toDomain() },

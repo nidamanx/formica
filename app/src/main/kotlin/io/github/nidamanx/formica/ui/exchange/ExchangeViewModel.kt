@@ -14,6 +14,7 @@ import io.github.nidamanx.formica.sync.Exporter
 import io.github.nidamanx.formica.sync.Importer
 import io.github.nidamanx.formica.ui.appContainer
 import java.io.IOException
+import java.time.ZonedDateTime
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,12 +25,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+private const val CLEAN_UP_MONTHS = 6L
+
 data class ExchangeUiState(
     val loaded: Boolean = false,
     val lastImport: ImportRecord? = null,
     /** The copy taken before [lastImport] still exists: the import can be undone. */
     val canUndo: Boolean = false,
     val copies: Int = 0,
+    /** The imported files, newest first. */
+    val log: List<ImportRecord> = emptyList(),
 )
 
 sealed interface ExchangeEvent {
@@ -39,10 +44,11 @@ sealed interface ExchangeEvent {
     data object SaveFailed : ExchangeEvent
     data object ImportUndone : ExchangeEvent
     data object CopyUnreadable : ExchangeEvent
+    data class CleanedUp(val removed: Int) : ExchangeEvent
 }
 
 class ExchangeViewModel(
-    exchange: ExchangeRepository,
+    private val exchange: ExchangeRepository,
     private val exporter: Exporter,
     private val importer: Importer,
     backups: Backups,
@@ -56,11 +62,20 @@ class ExchangeViewModel(
             lastImport = last,
             canUndo = last != null && last.importedAt in copies,
             copies = copies.size,
+            log = log,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExchangeUiState())
 
     init {
         viewModelScope.launch { backups.refresh() }
+    }
+
+    /** "Clean up deleted items": those deleted more than 6 months ago (SPEC §11.7). */
+    fun cleanUp() {
+        viewModelScope.launch {
+            val before = ZonedDateTime.now().minusMonths(CLEAN_UP_MONTHS).toInstant().toEpochMilli()
+            eventChannel.send(ExchangeEvent.CleanedUp(exchange.purgeDeleted(before)))
+        }
     }
 
     fun undoLastImport() {
