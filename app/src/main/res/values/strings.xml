@@ -10,6 +10,45 @@
     <string name="placeholder_shopping_list">Your shopping list is empty.</string>
     <string name="placeholder_expiries">Nothing is about to expire.</string>
 
+    <!-- Common actions -->
+    <string name="action_add">Add</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_move_up">Move up</string>
+    <string name="action_move_down">Move down</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_more_options">More options</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_locations">Locations</string>
+    <string name="settings_categories">Categories</string>
+    <string name="settings_stores">Stores</string>
+    <string name="settings_device_name">Device name</string>
+    <string name="settings_device_name_hint">Other phones see it when you exchange data.</string>
+    <string name="location_new">New location</string>
+    <string name="location_edit">Edit location</string>
+    <string name="category_new">New category</string>
+    <string name="category_edit">Edit category</string>
+    <string name="store_new">New store</string>
+    <string name="store_edit">Edit store</string>
+    <string name="field_name">Name</string>
+    <string name="field_type">Type</string>
+    <string name="field_notes">Notes</string>
+    <string name="store_type_supermarket">Supermarket</string>
+    <string name="store_type_shop">Shop</string>
+    <string name="store_type_market">Market</string>
+    <string name="store_type_producer">Producer</string>
+    <string name="delete_confirm">Delete \"%1$s\"?</string>
+    <string name="delete_category_message">Products in this category will have no category.</string>
+    <string name="delete_store_message">Linked products will have no store.</string>
+    <string name="location_in_use">There are still products in \"%1$s\": move them first.</string>
+    <string name="error_name_required">Enter a name.</string>
+    <string name="error_name_exists">\"%1$s\" already exists.</string>
+    <string name="stores_empty">No stores yet. Add the supermarkets, shops, markets and producers you buy from.</string>
+
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">

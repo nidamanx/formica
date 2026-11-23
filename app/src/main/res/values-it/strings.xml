@@ -8,6 +8,43 @@
     <string name="placeholder_shopping_list">La lista della spesa è vuota.</string>
     <string name="placeholder_expiries">Nessun prodotto in scadenza.</string>
 
+    <string name="action_add">Aggiungi</string>
+    <string name="action_save">Salva</string>
+    <string name="action_cancel">Annulla</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_delete">Elimina</string>
+    <string name="action_move_up">Sposta su</string>
+    <string name="action_move_down">Sposta giù</string>
+    <string name="cd_back">Indietro</string>
+    <string name="cd_more_options">Altre opzioni</string>
+
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_locations">Posizioni</string>
+    <string name="settings_categories">Categorie</string>
+    <string name="settings_stores">Luoghi d\'acquisto</string>
+    <string name="settings_device_name">Nome del dispositivo</string>
+    <string name="settings_device_name_hint">Lo vedono gli altri telefoni quando vi scambiate i dati.</string>
+    <string name="location_new">Nuova posizione</string>
+    <string name="location_edit">Modifica posizione</string>
+    <string name="category_new">Nuova categoria</string>
+    <string name="category_edit">Modifica categoria</string>
+    <string name="store_new">Nuovo luogo d\'acquisto</string>
+    <string name="store_edit">Modifica luogo d\'acquisto</string>
+    <string name="field_name">Nome</string>
+    <string name="field_type">Tipo</string>
+    <string name="field_notes">Note</string>
+    <string name="store_type_supermarket">Supermercato</string>
+    <string name="store_type_shop">Negozio</string>
+    <string name="store_type_market">Mercato</string>
+    <string name="store_type_producer">Produttore</string>
+    <string name="delete_confirm">Eliminare \"%1$s\"?</string>
+    <string name="delete_category_message">I prodotti di questa categoria resteranno senza categoria.</string>
+    <string name="delete_store_message">I prodotti collegati resteranno senza luogo d\'acquisto.</string>
+    <string name="location_in_use">In \"%1$s\" ci sono ancora prodotti: spostali prima.</string>
+    <string name="error_name_required">Scrivi un nome.</string>
+    <string name="error_name_exists">\"%1$s\" esiste già.</string>
+    <string name="stores_empty">Nessun luogo d\'acquisto. Aggiungi i supermercati, i negozi, i mercati e i produttori da cui compri.</string>
+
     <string-array name="initial_locations">
         <item>Frigo</item>
         <item>Freezer</item>

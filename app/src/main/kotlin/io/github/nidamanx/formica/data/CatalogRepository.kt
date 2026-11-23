@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.data
 
 import androidx.room.withTransaction
 import io.github.nidamanx.formica.domain.OperationContext
+import io.github.nidamanx.formica.domain.cleanName
 import io.github.nidamanx.formica.domain.editCategory
 import io.github.nidamanx.formica.domain.editLocation
 import io.github.nidamanx.formica.domain.editStore
@@ -34,7 +35,7 @@ class CatalogRepository(
         return db.withTransaction {
             val location = Location(
                 id = ctx.newId(),
-                name = name,
+                name = cleanName(name),
                 sortOrder = nextSortOrder(locationDao.all().map { it.sortOrder }),
                 notes = notes,
                 notesModifiedAt = notes?.let { ctx.now },
@@ -47,20 +48,30 @@ class CatalogRepository(
         }
     }
 
-    suspend fun updateLocation(edited: Location) {
-        val ctx = context()
-        db.withTransaction {
-            val stored = locationDao.get(edited.id)?.toDomain() ?: error("location ${edited.id} not found")
-            locationDao.upsert(listOf(editLocation(stored, edited, ctx).toEntity()))
-        }
-    }
-
-    suspend fun deleteLocation(id: String) {
+    suspend fun updateLocation(id: String, change: (Location) -> Location) {
         val ctx = context()
         db.withTransaction {
             val stored = locationDao.get(id)?.toDomain() ?: error("location $id not found")
-            if (stored.deletedAt != null) return@withTransaction
-            locationDao.upsert(listOf(stored.softDeleted(ctx).toEntity()))
+            val edited = change(stored)
+            locationDao.upsert(listOf(editLocation(stored, edited.copy(name = cleanName(edited.name)), ctx).toEntity()))
+        }
+    }
+
+    suspend fun isLocationInUse(id: String): Boolean = db.batchDao().countWithStockIn(id) > 0
+
+    /** A location still holding stock is never deleted: returns false and changes nothing. */
+    suspend fun deleteLocation(id: String): Boolean {
+        val ctx = context()
+        return db.withTransaction {
+            val stored = locationDao.get(id)?.toDomain() ?: error("location $id not found")
+            when {
+                stored.deletedAt != null -> true
+                db.batchDao().countWithStockIn(id) > 0 -> false
+                else -> {
+                    locationDao.upsert(listOf(stored.softDeleted(ctx).toEntity()))
+                    true
+                }
+            }
         }
     }
 
@@ -84,7 +95,7 @@ class CatalogRepository(
         return db.withTransaction {
             val category = Category(
                 id = ctx.newId(),
-                name = name,
+                name = cleanName(name),
                 sortOrder = nextSortOrder(categoryDao.all().map { it.sortOrder }),
                 createdAt = ctx.now,
                 modifiedAt = ctx.now,
@@ -95,11 +106,12 @@ class CatalogRepository(
         }
     }
 
-    suspend fun updateCategory(edited: Category) {
+    suspend fun updateCategory(id: String, change: (Category) -> Category) {
         val ctx = context()
         db.withTransaction {
-            val stored = categoryDao.get(edited.id)?.toDomain() ?: error("category ${edited.id} not found")
-            categoryDao.upsert(listOf(editCategory(stored, edited, ctx).toEntity()))
+            val stored = categoryDao.get(id)?.toDomain() ?: error("category $id not found")
+            val edited = change(stored)
+            categoryDao.upsert(listOf(editCategory(stored, edited.copy(name = cleanName(edited.name)), ctx).toEntity()))
         }
     }
 
@@ -131,7 +143,7 @@ class CatalogRepository(
         return db.withTransaction {
             val store = Store(
                 id = ctx.newId(),
-                name = name,
+                name = cleanName(name),
                 type = type,
                 sortOrder = nextSortOrder(storeDao.all().map { it.sortOrder }),
                 notes = notes,
@@ -145,11 +157,12 @@ class CatalogRepository(
         }
     }
 
-    suspend fun updateStore(edited: Store) {
+    suspend fun updateStore(id: String, change: (Store) -> Store) {
         val ctx = context()
         db.withTransaction {
-            val stored = storeDao.get(edited.id)?.toDomain() ?: error("store ${edited.id} not found")
-            storeDao.upsert(listOf(editStore(stored, edited, ctx).toEntity()))
+            val stored = storeDao.get(id)?.toDomain() ?: error("store $id not found")
+            val edited = change(stored)
+            storeDao.upsert(listOf(editStore(stored, edited.copy(name = cleanName(edited.name)), ctx).toEntity()))
         }
     }
 

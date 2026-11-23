@@ -90,6 +90,14 @@ interface BatchDao {
     @Query("SELECT * FROM batches WHERE deletedAt IS NULL")
     fun observeAll(): Flow<List<BatchEntity>>
 
+    /** Batches with stock left in a location, among the products that are not deleted. */
+    @Query(
+        "SELECT COUNT(*) FROM batches b JOIN products p ON p.id = b.productId " +
+            "WHERE b.locationId = :locationId AND b.deletedAt IS NULL AND p.deletedAt IS NULL " +
+            "AND (SELECT COALESCE(SUM(m.delta), 0) FROM movements m WHERE m.batchId = b.id) > 0",
+    )
+    suspend fun countWithStockIn(locationId: String): Int
+
     @Upsert
     suspend fun upsert(items: List<BatchEntity>)
 }
