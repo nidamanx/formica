@@ -239,6 +239,31 @@ class PantryRepository(
         return result
     }
 
+    /**
+     * After an import (SPEC §11.5.8): the products it took under their minimum stock are
+     * added to the shopping list, or asked about, as for a consumption.
+     */
+    suspend fun restock(productIds: List<String>) {
+        if (productIds.isEmpty()) return
+        val ctx = context()
+        val behavior = minStockBehavior()
+        val ask = mutableListOf<Product>()
+        db.withTransaction {
+            val items = shoppingDao.active().map { it.toDomain() }.toMutableList()
+            for (id in productIds) {
+                if (openItemFor(items, id) != null) continue
+                when (behavior) {
+                    MinStockBehavior.AUTOMATIC -> planToBuy(id, null, items, automatic = true, ctx)?.let {
+                        shoppingDao.upsert(listOf(it.toEntity()))
+                        items += it
+                    }
+                    MinStockBehavior.ASK -> ask += requireProduct(id)
+                }
+            }
+        }
+        ask.forEach { restockChannel.trySend(it) }
+    }
+
     private suspend fun applyPlan(plan: StockPlan) {
         val changed = plan.newBatches + plan.updatedBatches
         if (changed.isNotEmpty()) batchDao.upsert(changed.map { it.toEntity() })

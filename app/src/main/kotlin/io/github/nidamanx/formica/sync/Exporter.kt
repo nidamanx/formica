@@ -4,9 +4,7 @@ package io.github.nidamanx.formica.sync
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import androidx.core.content.FileProvider
 import io.github.nidamanx.formica.data.ExchangeRepository
 import io.github.nidamanx.formica.settings.DeviceSettings
@@ -60,21 +58,10 @@ class Exporter(
     private suspend fun exportText(): String {
         val file = exchange.snapshot().toExportFile(
             device = deviceSettings.device(),
-            appVersion = appVersion(),
+            appVersion = appVersionName(context),
             exportedAt = System.currentTimeMillis(),
         )
         return FormatCodec.write(file)
-    }
-
-    private fun appVersion(): String {
-        val manager = context.packageManager
-        val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            manager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-        } else {
-            @Suppress("DEPRECATION")
-            manager.getPackageInfo(context.packageName, 0)
-        }
-        return info.versionName.orEmpty()
     }
 
     companion object {

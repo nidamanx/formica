@@ -519,3 +519,27 @@ private fun <T> changes(
         deleted = old.keys.count { it !in new },
     )
 }
+
+/**
+ * Rule 8: the products that this import took under their minimum stock (the same moment
+ * as for a consumption, SPEC §8); homemade and deleted products excluded.
+ */
+fun productsDroppedBelowMinStock(before: Snapshot, after: Snapshot): List<String> {
+    val oldQuantities = quantitiesByBatch(before.movements)
+    val newQuantities = quantitiesByBatch(after.movements)
+    val oldBatches = before.batches.groupBy { it.productId }
+    val newBatches = after.batches.groupBy { it.productId }
+    val oldProducts = before.products.associateBy { it.id }
+    return after.products
+        .filter { product ->
+            val old = oldProducts[product.id]
+            val wasAbove = old == null || old.deletedAt != null ||
+                !isBelowMinStock(productQuantity(oldBatches[product.id].orEmpty(), oldQuantities), old.minStock)
+            wasAbove && droppedBelowMinStock(
+                product,
+                before = Long.MAX_VALUE,
+                after = productQuantity(newBatches[product.id].orEmpty(), newQuantities),
+            )
+        }
+        .map { it.id }
+}

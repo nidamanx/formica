@@ -319,4 +319,25 @@ class MergeTest {
         assertEquals(remote, result.snapshot)
         assertEquals(ChangeCounts(new = 1, deleted = 1), result.products)
     }
+
+    @Test
+    fun `an import that takes a product under its minimum stock is reported`() {
+        val milk = product("milk").copy(minStock = units(2))
+        val bought = Snapshot(
+            products = listOf(milk),
+            batches = listOf(batch("b", productId = "milk")),
+            movements = listOf(movement("b", units(3))),
+        )
+        val use = { amount: Long, id: String -> movement("b", -units(amount), MovementType.CONSUMPTION, id = id) }
+        val used = bought.copy(movements = bought.movements + use(2, "u"))
+        assertEquals(listOf("milk"), productsDroppedBelowMinStock(bought, used))
+        // Already under the minimum before: not again
+        val usedMore = used.copy(movements = used.movements + use(1, "v"))
+        assertEquals(emptyList<String>(), productsDroppedBelowMinStock(used, usedMore))
+        // A new product arriving under its minimum counts; a homemade one never does
+        val jam = product("jam").copy(minStock = units(5))
+        val pesto = product("pesto").copy(minStock = units(5), homemade = true)
+        val arrived = Snapshot(products = listOf(jam, pesto))
+        assertEquals(listOf("jam"), productsDroppedBelowMinStock(Snapshot(), arrived))
+    }
 }

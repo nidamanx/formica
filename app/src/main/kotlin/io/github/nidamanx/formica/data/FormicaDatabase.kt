@@ -19,8 +19,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         MovementEntity::class,
         ShoppingItemEntity::class,
         ImportRecordEntity::class,
+        NotesReviewEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class FormicaDatabase : RoomDatabase() {
@@ -32,6 +33,7 @@ abstract class FormicaDatabase : RoomDatabase() {
     abstract fun movementDao(): MovementDao
     abstract fun shoppingItemDao(): ShoppingItemDao
     abstract fun importRecordDao(): ImportRecordDao
+    abstract fun notesReviewDao(): NotesReviewDao
 
     companion object {
         /** mergedIntoId on locations, categories and stores (SPEC §11.8). */
@@ -43,9 +45,19 @@ abstract class FormicaDatabase : RoomDatabase() {
             }
         }
 
+        /** The local "notes to review" marks (SPEC §11.8). */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `notes_review` " +
+                        "(`type` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`type`, `id`))",
+                )
+            }
+        }
+
         fun create(context: Context): FormicaDatabase =
             Room.databaseBuilder(context, FormicaDatabase::class.java, "formica.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 // Development only, until the first release: a schema change recreates the
                 // database. It must be removed before the first release, when every
                 // migration becomes explicit.

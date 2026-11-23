@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import io.github.nidamanx.formica.domain.RecordType
 import kotlinx.coroutines.flow.Flow
 
 /*
@@ -23,6 +24,9 @@ interface LocationDao {
 
     @Query("SELECT * FROM locations")
     suspend fun all(): List<LocationEntity>
+
+    @Query("DELETE FROM locations")
+    suspend fun deleteAll()
 
     @Query("SELECT COUNT(*) FROM locations")
     suspend fun countIncludingDeleted(): Int
@@ -42,6 +46,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories")
     suspend fun all(): List<CategoryEntity>
 
+    @Query("DELETE FROM categories")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun countIncludingDeleted(): Int
 
@@ -59,6 +66,9 @@ interface StoreDao {
 
     @Query("SELECT * FROM stores")
     suspend fun all(): List<StoreEntity>
+
+    @Query("DELETE FROM stores")
+    suspend fun deleteAll()
 
     @Upsert
     suspend fun upsert(items: List<StoreEntity>)
@@ -78,6 +88,9 @@ interface ProductDao {
     @Query("SELECT * FROM products")
     suspend fun all(): List<ProductEntity>
 
+    @Query("DELETE FROM products")
+    suspend fun deleteAll()
+
     @Upsert
     suspend fun upsert(items: List<ProductEntity>)
 }
@@ -95,6 +108,9 @@ interface BatchDao {
 
     @Query("SELECT * FROM batches")
     suspend fun all(): List<BatchEntity>
+
+    @Query("DELETE FROM batches")
+    suspend fun deleteAll()
 
     /** Batches with stock left in a location, among the products that are not deleted. */
     @Query(
@@ -132,6 +148,9 @@ interface MovementDao {
     @Query("SELECT * FROM movements")
     suspend fun all(): List<MovementEntity>
 
+    @Query("DELETE FROM movements")
+    suspend fun deleteAll()
+
     @Query("SELECT batchId AS id, SUM(delta) AS quantity FROM movements GROUP BY batchId")
     fun observeBatchQuantities(): Flow<List<IdQuantity>>
 
@@ -157,6 +176,9 @@ interface ShoppingItemDao {
     @Query("SELECT * FROM shopping_items")
     suspend fun all(): List<ShoppingItemEntity>
 
+    @Query("DELETE FROM shopping_items")
+    suspend fun deleteAll()
+
     @Upsert
     suspend fun upsert(items: List<ShoppingItemEntity>)
 }
@@ -172,4 +194,16 @@ interface ImportRecordDao {
     /** Last import from a device: its exportedAt is the reference time of the notes merge. */
     @Query("SELECT * FROM import_records WHERE deviceId = :deviceId ORDER BY exportedAt DESC LIMIT 1")
     suspend fun lastFrom(deviceId: String): ImportRecordEntity?
+}
+
+@Dao
+interface NotesReviewDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(items: List<NotesReviewEntity>)
+
+    @Query("SELECT * FROM notes_review")
+    fun observeAll(): Flow<List<NotesReviewEntity>>
+
+    @Query("DELETE FROM notes_review WHERE type = :type AND id = :id")
+    suspend fun delete(type: RecordType, id: String)
 }

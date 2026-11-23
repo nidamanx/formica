@@ -15,7 +15,9 @@ import io.github.nidamanx.formica.notifications.DailyCheckScheduler
 import io.github.nidamanx.formica.settings.DeviceSettings
 import io.github.nidamanx.formica.settings.NotificationSettings
 import io.github.nidamanx.formica.settings.ShoppingSettings
+import io.github.nidamanx.formica.sync.Backups
 import io.github.nidamanx.formica.sync.Exporter
+import io.github.nidamanx.formica.sync.Importer
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +46,8 @@ class AppContainer(context: Context) {
     val shopping = ShoppingRepository(database, ::operationContext)
     val exchange = ExchangeRepository(database)
     val exporter = Exporter(appContext, exchange, deviceSettings)
+    val backups = Backups(appContext)
+    val importer = Importer(appContext, exchange, pantry, deviceSettings, backups, ::operationContext)
     private val initialData = InitialData(database, appContext.resources, ::operationContext)
 
     /** Time, date and device of an operation, taken when the operation starts. */

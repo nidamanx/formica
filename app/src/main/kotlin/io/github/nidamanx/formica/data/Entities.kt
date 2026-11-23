@@ -4,6 +4,7 @@ package io.github.nidamanx.formica.data
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.model.ImportMode
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.MovementType
@@ -149,6 +150,10 @@ data class ImportRecordEntity(
     val importedAt: Long,
     val mode: ImportMode,
 )
+
+/** Local mark "notes to review" after notes were appended in an import (SPEC §11.8); not synced. */
+@Entity(tableName = "notes_review", primaryKeys = ["type", "id"])
+data class NotesReviewEntity(val type: RecordType, val id: String)
 
 /** Result row of the quantity queries. */
 data class IdQuantity(val id: String, val quantity: Long)
