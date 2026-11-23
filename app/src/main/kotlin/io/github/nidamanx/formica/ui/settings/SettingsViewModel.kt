@@ -35,6 +35,10 @@ class SettingsViewModel(
         viewModelScope.launch { notificationSettings.setEnabled(value) }
     }
 
+    fun onPermissionAsked() {
+        viewModelScope.launch { notificationSettings.setPermissionAsked() }
+    }
+
     fun setNotificationTime(hour: Int, minute: Int) {
         viewModelScope.launch { notificationSettings.setMinuteOfDay(hour * 60 + minute) }
     }

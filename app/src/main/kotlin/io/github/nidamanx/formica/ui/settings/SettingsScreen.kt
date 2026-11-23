@@ -47,6 +47,8 @@ import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.MinStockBehavior
 import io.github.nidamanx.formica.domain.TickBehavior
 import io.github.nidamanx.formica.ui.components.BackTopBar
+import io.github.nidamanx.formica.ui.components.NotificationAccess
+import io.github.nidamanx.formica.ui.components.rememberNotificationAccess
 import java.util.Calendar
 
 @Composable
@@ -60,6 +62,10 @@ fun SettingsScreen(
     val notifications by viewModel.notifications.collectAsStateWithLifecycle()
     var renaming by rememberSaveable { mutableStateOf(false) }
     var choosing by rememberSaveable { mutableStateOf<Choice?>(null) }
+    val access = rememberNotificationAccess(
+        asked = notifications?.permissionAsked ?: true,
+        onAsked = viewModel::onPermissionAsked,
+    )
 
     Scaffold(topBar = { BackTopBar(stringResource(R.string.settings_title), onBack) }) { padding ->
         Column(
@@ -79,8 +85,23 @@ fun SettingsScreen(
             notifications?.let { prefs ->
                 HorizontalDivider()
                 SectionTitle(stringResource(R.string.settings_notifications))
-                SwitchRow(stringResource(R.string.settings_daily_notification), prefs.enabled) {
-                    viewModel.setNotificationsEnabled(it)
+                SwitchRow(stringResource(R.string.settings_daily_notification), prefs.enabled) { on ->
+                    viewModel.setNotificationsEnabled(on)
+                    if (on && access.access == NotificationAccess.ASK) access.resolve()
+                }
+                if (prefs.enabled && access.access == NotificationAccess.BLOCKED) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.notif_permission_denied),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        trailingContent = {
+                            TextButton(onClick = access.resolve) { Text(stringResource(R.string.action_open_settings)) }
+                        },
+                    )
                 }
                 ValueRow(stringResource(R.string.settings_notification_time), timeText(prefs.minuteOfDay)) {
                     choosing = Choice.TIME

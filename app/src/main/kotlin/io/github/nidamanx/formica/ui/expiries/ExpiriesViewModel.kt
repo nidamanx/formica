@@ -10,6 +10,8 @@ import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.domain.ExpiryOverview
 import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.expiryOverview
+import io.github.nidamanx.formica.settings.NotificationPreferences
+import io.github.nidamanx.formica.settings.NotificationSettings
 import io.github.nidamanx.formica.ui.appContainer
 import java.text.Collator
 import java.time.LocalDate
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class ExpiriesUiState(
     val loaded: Boolean = false,
@@ -30,7 +33,20 @@ class ExpiriesViewModel(
     pantry: PantryRepository,
     catalog: CatalogRepository,
     thresholds: Flow<ListThresholds>,
+    private val notificationSettings: NotificationSettings,
 ) : ViewModel() {
+
+    val notifications: StateFlow<NotificationPreferences?> = notificationSettings.preferences
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** "No, thanks" on the banner: the daily notification is turned off (it can be turned on in the settings). */
+    fun declineNotifications() {
+        viewModelScope.launch { notificationSettings.setEnabled(false) }
+    }
+
+    fun onPermissionAsked() {
+        viewModelScope.launch { notificationSettings.setPermissionAsked() }
+    }
 
     val state: StateFlow<ExpiriesUiState> = combine(
         pantry.products,
@@ -60,7 +76,7 @@ class ExpiriesViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ExpiriesViewModel(c.pantry, c.catalog, c.listThresholds)
+                ExpiriesViewModel(c.pantry, c.catalog, c.listThresholds, c.notificationSettings)
             }
         }
     }

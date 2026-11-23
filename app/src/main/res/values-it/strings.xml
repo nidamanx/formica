@@ -331,4 +331,10 @@
         <item quantity="many">+%1$d altri</item>
         <item quantity="other">+%1$d altri</item>
     </plurals>
+    <string name="notif_banner_title">Avvisi delle scadenze</string>
+    <string name="notif_banner_text">Ogni mattina, una sola notifica con quello che scade e quello che è pronto. Niente se non c\'è nulla.</string>
+    <string name="action_enable">Attiva</string>
+    <string name="action_no_thanks">No, grazie</string>
+    <string name="notif_permission_denied">Le notifiche sono bloccate. Puoi attivarle dalle impostazioni di Android.</string>
+    <string name="action_open_settings">Apri impostazioni</string>
 </resources>

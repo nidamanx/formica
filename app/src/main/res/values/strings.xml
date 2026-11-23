@@ -322,4 +322,10 @@
         <item quantity="one">+%1$d more</item>
         <item quantity="other">+%1$d more</item>
     </plurals>
+    <string name="notif_banner_title">Expiry reminders</string>
+    <string name="notif_banner_text">Every morning, a single notification with what is expiring and what is ready. Nothing if there is nothing to report.</string>
+    <string name="action_enable">Turn on</string>
+    <string name="action_no_thanks">No, thanks</string>
+    <string name="notif_permission_denied">Notifications are blocked. You can allow them in the Android settings.</string>
+    <string name="action_open_settings">Open settings</string>
 </resources>

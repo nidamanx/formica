@@ -46,6 +46,9 @@ import io.github.nidamanx.formica.domain.ExpiryEntry
 import io.github.nidamanx.formica.domain.ExpirySection
 import io.github.nidamanx.formica.ui.components.DaysDisc
 import io.github.nidamanx.formica.ui.components.DiscTone
+import io.github.nidamanx.formica.ui.components.NotificationAccess
+import io.github.nidamanx.formica.ui.components.NotificationBanner
+import io.github.nidamanx.formica.ui.components.rememberNotificationAccess
 import io.github.nidamanx.formica.ui.components.SectionTopBar
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.quantityText
@@ -58,39 +61,64 @@ fun ExpiriesScreen(
     viewModel: ExpiriesViewModel = viewModel(factory = ExpiriesViewModel.Factory),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val notifications by viewModel.notifications.collectAsStateWithLifecycle()
     val format = rememberDisplayFormat()
     var laterOpen by rememberSaveable { mutableStateOf(false) }
+    val access = rememberNotificationAccess(
+        asked = notifications?.permissionAsked ?: true,
+        onAsked = viewModel::onPermissionAsked,
+    )
+    val showBanner = notifications?.enabled == true && access.access != NotificationAccess.GRANTED
 
     Scaffold(topBar = { SectionTopBar(stringResource(R.string.nav_expiries), onOpenSettings) }) { padding ->
-        val overview = state.overview
-        when {
-            !state.loaded -> Unit
-            overview.isEmpty -> Box(
-                Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(stringResource(R.string.placeholder_expiries), textAlign = TextAlign.Center)
+        Column(Modifier.padding(padding)) {
+            if (showBanner) {
+                NotificationBanner(
+                    access = access.access,
+                    onEnable = access.resolve,
+                    onDismiss = viewModel::declineNotifications,
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                )
             }
-            else -> LazyColumn(
-                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(padding),
-            ) {
-                val card: @Composable (ExpiryEntry) -> Unit = { entry ->
-                    ExpiryCard(entry, state.today, state.locationNames, format) { onOpenProduct(entry.product.id) }
+            ExpiryList(state, format, laterOpen, { laterOpen = !laterOpen }, onOpenProduct)
+        }
+    }
+}
+
+@Composable
+private fun ExpiryList(
+    state: ExpiriesUiState,
+    format: DisplayFormat,
+    laterOpen: Boolean,
+    onToggleLater: () -> Unit,
+    onOpenProduct: (String) -> Unit,
+) {
+    val overview = state.overview
+    when {
+        !state.loaded -> Unit
+        overview.isEmpty -> Box(
+            Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(stringResource(R.string.placeholder_expiries), textAlign = TextAlign.Center)
+        }
+        else -> LazyColumn(
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            val card: @Composable (ExpiryEntry) -> Unit = { entry ->
+                ExpiryCard(entry, state.today, state.locationNames, format) { onOpenProduct(entry.product.id) }
+            }
+            section(R.string.expiries_expired, overview.expired, card, error = true)
+            section(R.string.expiries_expiring, overview.expiring, card)
+            section(R.string.expiries_preparing, overview.preparing, card)
+            if (overview.later.isNotEmpty()) {
+                item(key = "later-toggle") {
+                    LaterToggle(overview.later.size, laterOpen, onToggleLater)
                 }
-                section(R.string.expiries_expired, overview.expired, card, error = true)
-                section(R.string.expiries_expiring, overview.expiring, card)
-                section(R.string.expiries_preparing, overview.preparing, card)
-                if (overview.later.isNotEmpty()) {
-                    item(key = "later-toggle") {
-                        LaterToggle(overview.later.size, laterOpen) { laterOpen = !laterOpen }
-                    }
-                    if (laterOpen) entries(overview.later, card)
-                }
+                if (laterOpen) entries(overview.later, card)
             }
         }
     }

@@ -20,6 +20,8 @@ data class NotificationPreferences(
     /** Time of the daily notification, in minutes after midnight (local time). */
     val minuteOfDay: Int = DEFAULT_TIME,
     val warningDays: Int = DisplayDefaults.EXPIRY_WARNING_DAYS,
+    /** The Android 13+ permission has been asked at least once. */
+    val permissionAsked: Boolean = false,
 )
 
 /** Daily notification settings (SPEC §9): on by default, 9:00, 3 days of warning. */
@@ -46,6 +48,10 @@ class NotificationSettings(context: Context) {
         store.edit { it[WARNING_DAYS] = days }
     }
 
+    suspend fun setPermissionAsked() {
+        store.edit { it[PERMISSION_ASKED] = true }
+    }
+
     /** Epoch day of the last completed daily check, null if it never ran. */
     suspend fun lastCheckDay(): Long? = store.data.first()[LAST_CHECK_DAY]
 
@@ -57,6 +63,7 @@ class NotificationSettings(context: Context) {
         enabled = this[ENABLED] ?: true,
         minuteOfDay = this[MINUTE_OF_DAY]?.takeIf { it in 0 until MINUTES_PER_DAY } ?: DEFAULT_TIME,
         warningDays = this[WARNING_DAYS]?.takeIf { it > 0 } ?: DisplayDefaults.EXPIRY_WARNING_DAYS,
+        permissionAsked = this[PERMISSION_ASKED] ?: false,
     )
 
     private companion object {
@@ -64,5 +71,6 @@ class NotificationSettings(context: Context) {
         val MINUTE_OF_DAY = intPreferencesKey("notification_minute_of_day")
         val WARNING_DAYS = intPreferencesKey("expiry_warning_days")
         val LAST_CHECK_DAY = longPreferencesKey("notification_last_check_day")
+        val PERMISSION_ASKED = booleanPreferencesKey("notification_permission_asked")
     }
 }
