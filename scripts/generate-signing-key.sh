@@ -85,8 +85,13 @@ unset repeat
 (( ${#password} >= 24 )) || { echo "Error: the password must have at least 24 characters" >&2; exit 1; }
 
 echo "Creating the $kind key (RSA 4096, certificate valid about 27 years)..."
-openssl req -x509 -newkey rsa:4096 -sha256 -days 10000 -noenc -subj "$subject" \
-  -keyout "$work/key.pem" -out "$work/cert.pem" 2>/dev/null
+# openssl prints progress dots while creating the key: show its output only on failure
+if ! openssl req -x509 -newkey rsa:4096 -sha256 -days 10000 -noenc -subj "$subject" \
+    -keyout "$work/key.pem" -out "$work/cert.pem" 2>"$work/req.log"; then
+  cat "$work/req.log" >&2
+  echo "Error: openssl could not create the key" >&2
+  exit 1
+fi
 openssl pkcs12 -export -inkey "$work/key.pem" -in "$work/cert.pem" -name "$alias_name" \
   -out "$work/keystore.p12" -passout fd:3 3<<<"$password"
 shred -u "$work/key.pem"
