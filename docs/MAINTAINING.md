@@ -5,8 +5,8 @@ are needed.
 
 ## Branches
 
-- `develop`: work in progress. Every push runs the Build workflow and, when the app or
-  the build changes, the emulator smoke test.
+- `develop`: work in progress. Every push runs the Build and CodeQL workflows and, when
+  the app or the build changes, the emulator smoke test.
 - `main`: the default branch. It only receives usable, released versions: one commit
   for each release, made identical to `develop` just before releasing. Releases are
   built from `main` only.
@@ -77,3 +77,7 @@ fixed with a new version.
   every push to `develop` that changes the app or the build; by hand (*Actions →
   Emulator smoke test → Run workflow*, once the workflow is on `main`) also on one level
   only (input `only`) or on Android 17 (experimental).
+- CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,
+  on every push to `main` or `develop`, on pull requests to `main` and every Monday.
+  Alerts are in *Security → Code scanning*; those of `develop` are shown with the branch
+  filter.
