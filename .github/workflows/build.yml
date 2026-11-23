@@ -59,7 +59,8 @@ jobs:
             echo "No debug key here: the debug APK is signed with the SDK's own debug key."
             exit 0
           fi
-          printf '%s' "$DEBUG_KEYSTORE_BASE64" | base64 -d \
+          # Spaces and line breaks picked up when pasting the secret are not part of base64
+          printf '%s' "$DEBUG_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d \
             | openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 \
                 -out "$RUNNER_TEMP/debug.p12" -pass env:DEBUG_KEYSTORE_PASSWORD
           echo "file=$RUNNER_TEMP/debug.p12" >> "$GITHUB_OUTPUT"
