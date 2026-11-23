@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+// Release signing is configured only when the keystore comes from environment variables
+// (the Release workflow, from its secrets). Builds without them produce an unsigned
+// release APK, which is what F-Droid needs for its reproducibility check.
+val keystoreFile: String? = System.getenv("FORMICA_KEYSTORE_FILE")
+val keystorePassword: String? = System.getenv("FORMICA_KEYSTORE_PASSWORD")
+val hasReleaseSigning = !keystoreFile.isNullOrBlank() && !keystorePassword.isNullOrBlank()
+
+android {
+    namespace = "io.github.nidamanx.formica"
+    compileSdk = 37
+
+    defaultConfig {
+        // Never change it: Android identifies the app (and its updates) by this id
+        applicationId = "io.github.nidamanx.formica"
+        minSdk = 26
+        targetSdk = 37
+        // versionCode must increase with every release (Android and F-Droid rely on it)
+        versionCode = 1
+        versionName = "0.1.0"
+        manifestPlaceholders["appLabel"] = "Formica"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(keystoreFile!!)
+                storeType = "pkcs12"
+                storePassword = keystorePassword
+                keyAlias = "formica"
+                keyPassword = keystorePassword
+                enableV1Signing = false
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
+    buildTypes {
+        // Test builds are a separate app, "Formica-D", installable next to the released one
+        debug {
+            applicationIdSuffix = ".dev"
+            manifestPlaceholders["appLabel"] = "Formica-D"
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            // No git metadata in the APK: identical output however the source was checked out
+            vcsInfo.include = false
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    // Required by F-Droid: no Google-encrypted dependency metadata in the packages
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
+        // Every UI text lives in strings.xml, translated into every supported language
+        error += listOf("HardcodedText", "MissingTranslation")
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+
+    testImplementation(libs.junit)
+}

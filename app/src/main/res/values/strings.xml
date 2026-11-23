@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Default language: English. Every other values-XX/strings.xml must translate every string
+     (lint: MissingTranslation is an error). -->
+<resources>
+    <string name="nav_pantry">Pantry</string>
+    <string name="nav_shopping_list">Shopping list</string>
+    <string name="nav_expiries">Expiry dates</string>
+    <string name="placeholder_pantry">Your pantry is empty.</string>
+    <string name="placeholder_shopping_list">Your shopping list is empty.</string>
+    <string name="placeholder_expiries">Nothing is about to expire.</string>
+</resources>

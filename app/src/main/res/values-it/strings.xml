@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<resources>
+    <string name="nav_pantry">Dispensa</string>
+    <string name="nav_shopping_list">Lista spesa</string>
+    <string name="nav_expiries">Scadenze</string>
+    <string name="placeholder_pantry">La dispensa è vuota.</string>
+    <string name="placeholder_shopping_list">La lista della spesa è vuota.</string>
+    <string name="placeholder_expiries">Nessun prodotto in scadenza.</string>
+</resources>

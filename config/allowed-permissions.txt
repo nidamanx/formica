@@ -1,0 +1,9 @@
+# The only permissions Formica may request. CI fails if the built APK requests anything
+# not listed here. Adding a line needs the owner's approval and an update of the README
+# permission table. Network permissions are never allowed.
+android.permission.POST_NOTIFICATIONS
+android.permission.RECEIVE_BOOT_COMPLETED
+android.permission.WAKE_LOCK
+# Declared by AndroidX Core for the app itself (signature level, no other app can hold
+# it): it keeps the app's internal broadcast receivers private on Android 8-12.
+${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
