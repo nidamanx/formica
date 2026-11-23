@@ -14,7 +14,12 @@ val hasReleaseSigning = !keystoreFile.isNullOrBlank() && !keystorePassword.isNul
 
 android {
     namespace = "io.github.nidamanx.formica"
-    compileSdk = 37
+    // Android 17 with its minor update 37.2: required by Compose 1.13 (BOM 2026.11.01)
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 2
+        }
+    }
 
     defaultConfig {
         // Never change it: Android identifies the app (and its updates) by this id
