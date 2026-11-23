@@ -19,6 +19,7 @@ on:
       - "gradle.properties"
       - ".github/workflows/emulator.yml"
       - "scripts/emulator-smoke.sh"
+      - "scripts/run-gradle.sh"
   workflow_dispatch:
     inputs:
       only:
@@ -80,7 +81,8 @@ jobs:
 
       - name: Build debug APK
         if: env.SELECTED == 'true'
-        run: ./gradlew --no-daemon assembleDebug
+        # A failed download on the runner is retried once; other errors become an annotation
+        run: scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log" assembleDebug
 
       - name: Install, start and check
         if: env.SELECTED == 'true'

@@ -60,7 +60,7 @@ jobs:
       - name: Build
         if: matrix.build-mode == 'manual'
         # --rerun-tasks: every Kotlin file must really be compiled for CodeQL to see it
-        run: ./gradlew --no-daemon --rerun-tasks assembleDebug
+        run: scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log" --rerun-tasks assembleDebug
 
       - name: Analyze
         uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
