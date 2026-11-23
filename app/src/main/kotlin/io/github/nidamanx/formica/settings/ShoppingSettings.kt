@@ -22,7 +22,7 @@ data class ShoppingPreferences(
 class ShoppingSettings(context: Context) {
     private val store = context.settingsDataStore
 
-    val preferences: Flow<ShoppingPreferences> = store.data.map { it.toPreferences() }
+    val preferences: Flow<ShoppingPreferences> = store.data.map { it.toShoppingPreferences() }
 
     suspend fun current(): ShoppingPreferences = preferences.first()
 
@@ -39,7 +39,7 @@ class ShoppingSettings(context: Context) {
         store.edit { it[RUNNING_LOW_DAYS] = days }
     }
 
-    private fun Preferences.toPreferences() = ShoppingPreferences(
+    private fun Preferences.toShoppingPreferences() = ShoppingPreferences(
         onTick = this[ON_TICK].toEnum(TickBehavior.ASK),
         minStock = this[MIN_STOCK].toEnum(MinStockBehavior.AUTOMATIC),
         runningLowDays = this[RUNNING_LOW_DAYS]?.takeIf { it > 0 } ?: DisplayDefaults.RUNNING_LOW_DAYS,
