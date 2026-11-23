@@ -6,6 +6,7 @@ import io.github.nidamanx.formica.domain.RecordRef
 import io.github.nidamanx.formica.domain.model.ImportRecord
 import io.github.nidamanx.formica.domain.model.Snapshot
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /** Whole-database reads and writes of the data exchange (SPEC §11). */
@@ -18,6 +19,8 @@ class ExchangeRepository(private val db: FormicaDatabase) {
     val importLog: Flow<List<ImportRecord>> =
         db.importRecordDao().observeAll().map { list -> list.map { it.toDomain() } }
 
+    suspend fun lastImport(): ImportRecord? = importLog.first().firstOrNull()
+
     /** exportedAt of the last file imported from [deviceId], 0 if none (SPEC §11.5.3). */
     suspend fun lastExportedAtFrom(deviceId: String): Long = db.importRecordDao().lastFrom(deviceId)?.exportedAt ?: 0L
 
@@ -25,9 +28,19 @@ class ExchangeRepository(private val db: FormicaDatabase) {
      * Writes the result of an import in one transaction (SPEC §11.3): with [replace] every
      * synced record is removed first; otherwise records are upserted and movements added.
      * The local log and the "notes to review" marks are written in the same transaction.
+     *
+     * @param undoImportsFrom when restoring a copy: the imports from this time on are undone,
+     *   so they leave the log (the merge of notes relies on the last import per device)
      */
-    suspend fun apply(snapshot: Snapshot, replace: Boolean, record: ImportRecord?, review: Set<RecordRef>) {
+    suspend fun apply(
+        snapshot: Snapshot,
+        replace: Boolean,
+        record: ImportRecord?,
+        review: Set<RecordRef>,
+        undoImportsFrom: Long? = null,
+    ) {
         db.withTransaction {
+            if (undoImportsFrom != null) db.importRecordDao().deleteFrom(undoImportsFrom)
             if (replace) {
                 db.locationDao().deleteAll()
                 db.categoryDao().deleteAll()

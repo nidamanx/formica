@@ -80,6 +80,30 @@ class Importer(
         return ctx.now
     }
 
+    /**
+     * Puts back the copy taken at [takenAt] with the logic of "Replace everything"
+     * (SPEC §11.6); the imports made from that moment on leave the log.
+     *
+     * @return false if the copy cannot be read (nothing changes)
+     */
+    suspend fun restore(takenAt: Long): Boolean {
+        val copy = backups.read(takenAt) as? ReadResult.Valid ?: return false
+        exchange.apply(
+            snapshot = copy.file.toSnapshot(),
+            replace = true,
+            record = null,
+            review = emptySet(),
+            undoImportsFrom = takenAt,
+        )
+        return true
+    }
+
+    /** "Undo last import": the copy taken just before it. */
+    suspend fun undoLastImport(): Boolean {
+        val last = exchange.lastImport() ?: return false
+        return restore(last.importedAt)
+    }
+
     private suspend fun merge(
         file: ExportFile,
         mode: ImportMode,

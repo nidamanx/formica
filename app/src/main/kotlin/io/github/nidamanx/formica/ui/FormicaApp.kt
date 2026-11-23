@@ -16,6 +16,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.nidamanx.formica.R
+import io.github.nidamanx.formica.ui.exchange.BackupsScreen
 import io.github.nidamanx.formica.ui.exchange.ExchangeScreen
 import io.github.nidamanx.formica.ui.exchange.ImportScreen
 import io.github.nidamanx.formica.ui.expiries.ExpiriesScreen
@@ -64,6 +66,7 @@ private object Routes {
     const val CATALOG = "settings/catalog/{kind}"
     const val EXCHANGE = "settings/exchange"
     const val IMPORT = "import"
+    const val BACKUPS = "settings/exchange/backups"
     const val PRODUCT_NEW = "new-product"
     const val PRODUCT_EDIT = "product/{id}/edit"
     const val PRODUCT_DETAIL = "product/{id}"
@@ -75,9 +78,14 @@ private object Routes {
 /**
  * @param openExpiries start on the Expiries section (tap on the daily notification)
  * @param pendingImport a file to import: the import preview opens for it
+ * @param undoImport the "Undo" of the message after an import; false if the copy cannot be read
  */
 @Composable
-fun FormicaApp(openExpiries: Boolean = false, pendingImport: StateFlow<Uri?> = MutableStateFlow(null)) {
+fun FormicaApp(
+    openExpiries: Boolean = false,
+    pendingImport: StateFlow<Uri?> = MutableStateFlow(null),
+    undoImport: suspend () -> Boolean = { false },
+) {
     val navController = rememberNavController()
     LaunchedEffect(Unit) {
         if (openExpiries) navController.navigateToSection(TopLevelDestination.EXPIRIES)
@@ -85,6 +93,9 @@ fun FormicaApp(openExpiries: Boolean = false, pendingImport: StateFlow<Uri?> = M
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val importedText = stringResource(R.string.import_done)
+    val undoLabel = stringResource(R.string.action_undo)
+    val undoneText = stringResource(R.string.msg_import_undone)
+    val unreadableText = stringResource(R.string.import_unreadable)
     val importRequest by pendingImport.collectAsStateWithLifecycle()
     LaunchedEffect(importRequest) {
         if (importRequest != null) navController.navigate(Routes.IMPORT) { launchSingleTop = true }
@@ -166,12 +177,27 @@ fun FormicaApp(openExpiries: Boolean = false, pendingImport: StateFlow<Uri?> = M
                     onClose = { navController.popBackStack() },
                     onImported = {
                         navController.navigateToSection(TopLevelDestination.PANTRY)
-                        scope.launch { snackbar.showSnackbar(importedText) }
+                        scope.launch {
+                            val result = snackbar.showSnackbar(
+                                message = importedText,
+                                actionLabel = undoLabel,
+                                withDismissAction = true,
+                            )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                snackbar.showSnackbar(if (undoImport()) undoneText else unreadableText)
+                            }
+                        }
                     },
                 )
             }
             composable(Routes.EXCHANGE) {
-                ExchangeScreen(onBack = { navController.popBackStack() })
+                ExchangeScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenBackups = { navController.navigate(Routes.BACKUPS) },
+                )
+            }
+            composable(Routes.BACKUPS) {
+                BackupsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.CATALOG) { entry ->
                 val kind = CatalogKind.valueOf(requireNotNull(entry.arguments?.getString("kind")))

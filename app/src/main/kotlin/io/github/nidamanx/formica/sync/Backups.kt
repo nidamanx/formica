@@ -6,6 +6,8 @@ import io.github.nidamanx.formica.domain.model.Device
 import io.github.nidamanx.formica.domain.model.Snapshot
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 private const val BACKUP_DIR = "backups"
@@ -20,6 +22,14 @@ private val BACKUP_NAME = Regex("backup-(\\d+)\\.json")
 class Backups(private val context: Context) {
     private val dir get() = File(context.filesDir, BACKUP_DIR)
 
+    private val _copies = MutableStateFlow<List<Long>>(emptyList())
+    /** The times of the saved copies, newest first; [refresh] fills it the first time. */
+    val copies: StateFlow<List<Long>> = _copies
+
+    suspend fun refresh() {
+        _copies.value = list()
+    }
+
     suspend fun save(snapshot: Snapshot, device: Device, takenAt: Long) = withContext(Dispatchers.IO) {
         dir.mkdirs()
         val file = snapshot.toExportFile(device, appVersionName(context), exportedAt = takenAt)
@@ -29,10 +39,10 @@ class Backups(private val context: Context) {
         // A copy is never left half written
         check(temporary.renameTo(target)) { "cannot save the backup" }
         list().drop(KEPT).forEach { File(dir, "backup-$it.json").delete() }
+        refresh()
     }
 
-    /** The times of the saved copies, newest first. */
-    suspend fun list(): List<Long> = withContext(Dispatchers.IO) {
+    private suspend fun list(): List<Long> = withContext(Dispatchers.IO) {
         dir.listFiles().orEmpty()
             .mapNotNull { BACKUP_NAME.matchEntire(it.name)?.groupValues?.get(1)?.toLongOrNull() }
             .sortedDescending()

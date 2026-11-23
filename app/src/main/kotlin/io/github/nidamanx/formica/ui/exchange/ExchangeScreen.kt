@@ -14,7 +14,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -28,6 +30,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,6 +52,7 @@ import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.model.ImportRecord
 import io.github.nidamanx.formica.sync.Exporter
 import io.github.nidamanx.formica.ui.components.BackTopBar
+import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -60,6 +64,7 @@ private val IMPORT_TYPES = arrayOf("application/json", "text/plain", "applicatio
 @Composable
 fun ExchangeScreen(
     onBack: () -> Unit,
+    onOpenBackups: () -> Unit,
     viewModel: ExchangeViewModel = viewModel(factory = ExchangeViewModel.Factory),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -67,6 +72,8 @@ fun ExchangeScreen(
     val resources = LocalResources.current
     val snackbar = remember { SnackbarHostState() }
     var exporting by rememberSaveable { mutableStateOf(false) }
+    var confirmingUndo by rememberSaveable { mutableStateOf(false) }
+    val format = rememberDisplayFormat()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(Exporter.MIME)) { uri ->
         if (uri != null) viewModel.saveTo(uri)
     }
@@ -85,6 +92,8 @@ fun ExchangeScreen(
                 }
                 ExchangeEvent.Saved -> snackbar.showSnackbar(resources.getString(R.string.msg_file_saved))
                 ExchangeEvent.SaveFailed -> snackbar.showSnackbar(resources.getString(R.string.msg_save_failed))
+                ExchangeEvent.ImportUndone -> snackbar.showSnackbar(resources.getString(R.string.msg_import_undone))
+                ExchangeEvent.CopyUnreadable -> snackbar.showSnackbar(resources.getString(R.string.import_unreadable))
             }
         }
     }
@@ -110,8 +119,49 @@ fun ExchangeScreen(
                         }
                     },
                 )
+                SectionTitle(stringResource(R.string.section_backups))
+                val last = state.lastImport
+                if (last != null && state.canUndo) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.undo_last_import)) },
+                        supportingContent = {
+                            Text(stringResource(R.string.undo_last_import_hint, format.dateTime(last.importedAt)))
+                        },
+                        modifier = Modifier.clickable { confirmingUndo = true },
+                    )
+                }
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.saved_copies)) },
+                    supportingContent = {
+                        Text(pluralStringResource(R.plurals.saved_copies_count, state.copies, state.copies))
+                    },
+                    trailingContent = {
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                    },
+                    modifier = Modifier.clickable(onClick = onOpenBackups),
+                )
             }
         }
+    }
+
+    val last = state.lastImport
+    if (confirmingUndo && last != null) {
+        AlertDialog(
+            onDismissRequest = { confirmingUndo = false },
+            title = { Text(stringResource(R.string.undo_import_title)) },
+            text = {
+                Text(stringResource(R.string.undo_import_text, format.dateTime(last.importedAt), last.deviceName))
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmingUndo = false
+                    viewModel.undoLastImport()
+                }) { Text(stringResource(R.string.action_restore)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmingUndo = false }) { Text(stringResource(R.string.action_cancel)) }
+            },
+        )
     }
 
     if (exporting) {
@@ -158,6 +208,16 @@ private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit, onImport
             }
         }
     }
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+    )
 }
 
 @Composable

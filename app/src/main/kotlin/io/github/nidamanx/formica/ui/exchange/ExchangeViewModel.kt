@@ -9,7 +9,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.ExchangeRepository
 import io.github.nidamanx.formica.domain.model.ImportRecord
+import io.github.nidamanx.formica.sync.Backups
 import io.github.nidamanx.formica.sync.Exporter
+import io.github.nidamanx.formica.sync.Importer
 import io.github.nidamanx.formica.ui.appContainer
 import java.io.IOException
 import kotlinx.coroutines.channels.Channel
@@ -17,29 +19,56 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class ExchangeUiState(val loaded: Boolean = false, val lastImport: ImportRecord? = null)
+data class ExchangeUiState(
+    val loaded: Boolean = false,
+    val lastImport: ImportRecord? = null,
+    /** The copy taken before [lastImport] still exists: the import can be undone. */
+    val canUndo: Boolean = false,
+    val copies: Int = 0,
+)
 
 sealed interface ExchangeEvent {
     data class Share(val chooser: Intent) : ExchangeEvent
     data class SaveAs(val fileName: String) : ExchangeEvent
     data object Saved : ExchangeEvent
     data object SaveFailed : ExchangeEvent
+    data object ImportUndone : ExchangeEvent
+    data object CopyUnreadable : ExchangeEvent
 }
 
 class ExchangeViewModel(
     exchange: ExchangeRepository,
     private val exporter: Exporter,
+    private val importer: Importer,
+    backups: Backups,
     private val pendingImport: MutableStateFlow<Uri?>,
 ) : ViewModel() {
 
-    val state: StateFlow<ExchangeUiState> = exchange.importLog
-        .map { ExchangeUiState(loaded = true, lastImport = it.firstOrNull()) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExchangeUiState())
+    val state: StateFlow<ExchangeUiState> = combine(exchange.importLog, backups.copies) { log, copies ->
+        val last = log.firstOrNull()
+        ExchangeUiState(
+            loaded = true,
+            lastImport = last,
+            canUndo = last != null && last.importedAt in copies,
+            copies = copies.size,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExchangeUiState())
+
+    init {
+        viewModelScope.launch { backups.refresh() }
+    }
+
+    fun undoLastImport() {
+        viewModelScope.launch {
+            val undone = importer.undoLastImport()
+            eventChannel.send(if (undone) ExchangeEvent.ImportUndone else ExchangeEvent.CopyUnreadable)
+        }
+    }
 
     private val eventChannel = Channel<ExchangeEvent>(Channel.BUFFERED)
     val events: Flow<ExchangeEvent> = eventChannel.receiveAsFlow()
@@ -78,7 +107,7 @@ class ExchangeViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ExchangeViewModel(c.exchange, c.exporter, c.pendingImport)
+                ExchangeViewModel(c.exchange, c.exporter, c.importer, c.backups, c.pendingImport)
             }
         }
     }

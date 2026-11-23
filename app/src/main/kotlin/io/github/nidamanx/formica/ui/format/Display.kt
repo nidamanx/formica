@@ -12,7 +12,9 @@ import io.github.nidamanx.formica.domain.model.ONE_UNIT
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -31,6 +33,15 @@ class DisplayFormat(val locale: Locale) {
         .let { DateTimeFormatter.ofPattern(it, locale) }
 
     fun date(epochDay: Long): String = dateFormatter.format(LocalDate.ofEpochDay(epochDay))
+
+    private val timeFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
+
+    /** An instant in this phone's time zone: "23/11/2026 18:30". */
+    fun dateTime(epochMillis: Long): String {
+        val time = Instant.ofEpochMilli(epochMillis).atZone(ZoneId.systemDefault())
+        return date(time.toLocalDate().toEpochDay()) + " " + timeFormatter.format(time)
+    }
 
     fun number(thousandths: Long): String = formatThousandths(thousandths, decimalSeparator)
 

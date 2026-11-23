@@ -194,6 +194,10 @@ interface ImportRecordDao {
     /** Last import from a device: its exportedAt is the reference time of the notes merge. */
     @Query("SELECT * FROM import_records WHERE deviceId = :deviceId ORDER BY exportedAt DESC LIMIT 1")
     suspend fun lastFrom(deviceId: String): ImportRecordEntity?
+
+    /** The imports undone by restoring the copy taken at [time]. */
+    @Query("DELETE FROM import_records WHERE importedAt >= :time")
+    suspend fun deleteFrom(time: Long)
 }
 
 @Dao

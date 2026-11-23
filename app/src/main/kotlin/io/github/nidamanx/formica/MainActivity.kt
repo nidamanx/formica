@@ -23,10 +23,14 @@ class MainActivity : ComponentActivity() {
         val openExpiries = savedInstanceState == null && intent.getBooleanExtra(EXTRA_OPEN_EXPIRIES, false)
         if (savedInstanceState == null) takeImport(intent)
         scheduleDailyCheck()
-        val pendingImport = (application as FormicaApplication).container.pendingImport
+        val container = (application as FormicaApplication).container
         setContent {
             FormicaTheme {
-                FormicaApp(openExpiries = openExpiries, pendingImport = pendingImport)
+                FormicaApp(
+                    openExpiries = openExpiries,
+                    pendingImport = container.pendingImport,
+                    undoImport = container.importer::undoLastImport,
+                )
             }
         }
     }

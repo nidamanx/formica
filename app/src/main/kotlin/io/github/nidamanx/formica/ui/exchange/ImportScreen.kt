@@ -33,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -47,11 +46,7 @@ import io.github.nidamanx.formica.domain.ProductDuplicate
 import io.github.nidamanx.formica.domain.model.ImportMode
 import io.github.nidamanx.formica.sync.ReadResult
 import io.github.nidamanx.formica.ui.components.BackTopBar
-import io.github.nidamanx.formica.ui.format.DisplayFormat
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
 
 /** The import preview (SPEC §11.3): nothing changes until "Import". */
 @Composable
@@ -213,10 +208,7 @@ private fun Preview(state: ImportUiState.Ready, viewModel: ImportViewModel) {
 
 @Composable
 private fun FileCard(deviceName: String, exportedAt: Long) {
-    val locale = LocalConfiguration.current.locales[0]
-    val time = Instant.ofEpochMilli(exportedAt).atZone(ZoneId.systemDefault())
-    val exported = DisplayFormat(locale).date(time.toLocalDate().toEpochDay()) + " " +
-        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).format(time)
+    val exported = rememberDisplayFormat().dateTime(exportedAt)
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
