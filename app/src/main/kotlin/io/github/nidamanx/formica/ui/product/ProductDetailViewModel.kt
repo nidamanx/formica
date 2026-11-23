@@ -12,6 +12,7 @@ import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.DurationEstimate
 import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.HistoryEntry
+import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.buildHistory
@@ -29,8 +30,6 @@ import io.github.nidamanx.formica.domain.openItemFor
 import io.github.nidamanx.formica.domain.quantitiesByBatch
 import io.github.nidamanx.formica.domain.summarizeProduct
 import io.github.nidamanx.formica.domain.visibleGroups
-import io.github.nidamanx.formica.settings.DisplayDefaults
-import io.github.nidamanx.formica.settings.ShoppingSettings
 import io.github.nidamanx.formica.ui.appContainer
 import java.time.LocalDate
 import kotlinx.coroutines.channels.Channel
@@ -84,7 +83,7 @@ class ProductDetailViewModel(
     private val pantry: PantryRepository,
     private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
-    settings: ShoppingSettings,
+    thresholds: Flow<ListThresholds>,
 ) : ViewModel() {
 
     val restockQuestions: Flow<Product> = pantry.restockQuestions
@@ -97,8 +96,8 @@ class ProductDetailViewModel(
 
     private val catalogs = combine(catalog.locations, catalog.categories, catalog.stores) { l, c, s -> Triple(l, c, s) }
 
-    private val listContext = combine(shopping.items, settings.preferences) { items, preferences ->
-        (openItemFor(items, productId) != null) to preferences.runningLowDays
+    private val listContext = combine(shopping.items, thresholds) { items, limits ->
+        (openItemFor(items, productId) != null) to limits
     }
 
     val state: StateFlow<ProductDetailState> = combine(
@@ -107,15 +106,14 @@ class ProductDetailViewModel(
         pantry.observeMovements(productId),
         catalogs,
         listContext,
-    ) { product, batches, movements, (locations, categories, stores), (inList, runningLowDays) ->
+    ) { product, batches, movements, (locations, categories, stores), (inList, limits) ->
         val today = LocalDate.now().toEpochDay()
         val now = System.currentTimeMillis()
         if (product == null || product.deletedAt != null) {
             return@combine ProductDetailState(loaded = true)
         }
         val quantities = quantitiesByBatch(movements)
-        val thresholds = DisplayDefaults.thresholds(runningLowDays)
-        val summary = summarizeProduct(product, batches, quantities, movements, today, now, thresholds)
+        val summary = summarizeProduct(product, batches, quantities, movements, today, now, limits)
         val groups = visibleGroups(groupBatches(batches, quantities, product.daysAfterOpening))
         val only = groups.singleOrNull()?.key
         val plain = only != null && only.expiresOn == null && only.preparedOn == null &&
@@ -237,7 +235,7 @@ class ProductDetailViewModel(
         fun factory(productId: String) = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ProductDetailViewModel(productId, c.pantry, c.shopping, c.catalog, c.shoppingSettings)
+                ProductDetailViewModel(productId, c.pantry, c.shopping, c.catalog, c.listThresholds)
             }
         }
     }

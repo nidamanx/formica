@@ -281,4 +281,15 @@
     </plurals>
     <string name="action_show">Mostra</string>
     <string name="action_hide">Nascondi</string>
+    <string name="settings_notifications">Notifiche</string>
+    <string name="settings_daily_notification">Notifica giornaliera</string>
+    <string name="settings_notification_time">Ora</string>
+    <string name="notification_time_title">Ora della notifica</string>
+    <string name="settings_warning_days">Preavviso</string>
+    <plurals name="warning_days_summary">
+        <item quantity="one">%1$d giorno prima della scadenza</item>
+        <item quantity="many">%1$d giorni prima della scadenza</item>
+        <item quantity="other">%1$d giorni prima della scadenza</item>
+    </plurals>
+    <string name="settings_warning_days_help">Se un prodotto ha un suo preavviso, vale quello.</string>
 </resources>

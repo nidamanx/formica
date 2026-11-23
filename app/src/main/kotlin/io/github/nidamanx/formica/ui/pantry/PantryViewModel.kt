@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.data.ShoppingRepository
+import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.PantryFilter
 import io.github.nidamanx.formica.domain.PantrySort
 import io.github.nidamanx.formica.domain.ProductSummary
@@ -21,7 +22,6 @@ import io.github.nidamanx.formica.domain.model.ONE_UNIT
 import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.model.isCountable
-import io.github.nidamanx.formica.settings.ShoppingSettings
 import io.github.nidamanx.formica.ui.appContainer
 import io.github.nidamanx.formica.ui.productSummaries
 import java.text.Collator
@@ -71,7 +71,7 @@ class PantryViewModel(
     private val pantry: PantryRepository,
     private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
-    settings: ShoppingSettings,
+    thresholds: Flow<ListThresholds>,
 ) : ViewModel() {
 
     /** Products below their minimum stock, when the setting asks first. */
@@ -85,7 +85,7 @@ class PantryViewModel(
     private val _sheet = MutableStateFlow<PantrySheet?>(null)
     val sheet: StateFlow<PantrySheet?> = _sheet
 
-    private val summaries: Flow<List<ProductSummary>> = productSummaries(pantry, settings)
+    private val summaries: Flow<List<ProductSummary>> = productSummaries(pantry, thresholds)
 
     private val catalogs = combine(catalog.locations, catalog.categories, catalog.stores) { l, c, s -> Triple(l, c, s) }
 
@@ -190,7 +190,7 @@ class PantryViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                PantryViewModel(c.pantry, c.shopping, c.catalog, c.shoppingSettings)
+                PantryViewModel(c.pantry, c.shopping, c.catalog, c.listThresholds)
             }
         }
     }

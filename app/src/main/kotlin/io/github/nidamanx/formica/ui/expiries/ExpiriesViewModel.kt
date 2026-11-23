@@ -8,11 +8,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.domain.ExpiryOverview
+import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.expiryOverview
-import io.github.nidamanx.formica.settings.DisplayDefaults
 import io.github.nidamanx.formica.ui.appContainer
 import java.text.Collator
 import java.time.LocalDate
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -25,14 +26,19 @@ data class ExpiriesUiState(
     val today: Long = 0,
 )
 
-class ExpiriesViewModel(pantry: PantryRepository, catalog: CatalogRepository) : ViewModel() {
+class ExpiriesViewModel(
+    pantry: PantryRepository,
+    catalog: CatalogRepository,
+    thresholds: Flow<ListThresholds>,
+) : ViewModel() {
 
     val state: StateFlow<ExpiriesUiState> = combine(
         pantry.products,
         pantry.batches,
         pantry.batchQuantities,
         catalog.locations,
-    ) { products, batches, quantities, locations ->
+        thresholds,
+    ) { products, batches, quantities, locations, limits ->
         val today = LocalDate.now().toEpochDay()
         val collator = Collator.getInstance()
         ExpiriesUiState(
@@ -42,7 +48,7 @@ class ExpiriesViewModel(pantry: PantryRepository, catalog: CatalogRepository) : 
                 batches = batches,
                 quantities = quantities,
                 today = today,
-                defaultWarningDays = DisplayDefaults.EXPIRY_WARNING_DAYS,
+                defaultWarningDays = limits.expiryWarningDays,
                 compareNames = { a, b -> collator.compare(a, b) },
             ),
             locationNames = locations.associate { it.id to it.name },
@@ -54,7 +60,7 @@ class ExpiriesViewModel(pantry: PantryRepository, catalog: CatalogRepository) : 
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ExpiriesViewModel(c.pantry, c.catalog)
+                ExpiriesViewModel(c.pantry, c.catalog, c.listThresholds)
             }
         }
     }

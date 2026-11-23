@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.data.ShoppingRepository
+import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.ShoppingGrouping
 import io.github.nidamanx.formica.domain.ShoppingRow
@@ -69,6 +70,7 @@ class ShoppingViewModel(
     private val pantry: PantryRepository,
     catalog: CatalogRepository,
     private val settings: ShoppingSettings,
+    thresholds: Flow<ListThresholds>,
 ) : ViewModel() {
 
     private val options = MutableStateFlow(ListOptions(ShoppingGrouping.CATEGORY, null))
@@ -81,7 +83,7 @@ class ShoppingViewModel(
     }
 
     private val pantryData: Flow<Pair<List<ProductSummary>, Map<String, String>>> = combine(
-        productSummaries(pantry, settings),
+        productSummaries(pantry, thresholds),
         pantry.batches,
     ) { summaries, batches -> summaries to batches.associate { it.id to it.productId } }
 
@@ -194,7 +196,7 @@ class ShoppingViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ShoppingViewModel(c.shopping, c.pantry, c.catalog, c.shoppingSettings)
+                ShoppingViewModel(c.shopping, c.pantry, c.catalog, c.shoppingSettings, c.listThresholds)
             }
         }
     }

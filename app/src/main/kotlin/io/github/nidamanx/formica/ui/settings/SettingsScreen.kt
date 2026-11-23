@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -21,8 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -41,6 +47,7 @@ import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.MinStockBehavior
 import io.github.nidamanx.formica.domain.TickBehavior
 import io.github.nidamanx.formica.ui.components.BackTopBar
+import java.util.Calendar
 
 @Composable
 fun SettingsScreen(
@@ -50,8 +57,9 @@ fun SettingsScreen(
 ) {
     val deviceName by viewModel.deviceName.collectAsStateWithLifecycle()
     val shopping by viewModel.shopping.collectAsStateWithLifecycle()
+    val notifications by viewModel.notifications.collectAsStateWithLifecycle()
     var renaming by rememberSaveable { mutableStateOf(false) }
-    var choosing by rememberSaveable { mutableStateOf<ShoppingChoice?>(null) }
+    var choosing by rememberSaveable { mutableStateOf<Choice?>(null) }
 
     Scaffold(topBar = { BackTopBar(stringResource(R.string.settings_title), onBack) }) { padding ->
         Column(
@@ -68,32 +76,61 @@ fun SettingsScreen(
                 supportingContent = { Text(deviceName.orEmpty()) },
                 modifier = Modifier.clickable(enabled = deviceName != null) { renaming = true },
             )
+            notifications?.let { prefs ->
+                HorizontalDivider()
+                SectionTitle(stringResource(R.string.settings_notifications))
+                SwitchRow(stringResource(R.string.settings_daily_notification), prefs.enabled) {
+                    viewModel.setNotificationsEnabled(it)
+                }
+                ValueRow(stringResource(R.string.settings_notification_time), timeText(prefs.minuteOfDay)) {
+                    choosing = Choice.TIME
+                }
+                ValueRow(
+                    stringResource(R.string.settings_warning_days),
+                    pluralStringResource(R.plurals.warning_days_summary, prefs.warningDays, prefs.warningDays),
+                ) { choosing = Choice.WARNING_DAYS }
+            }
             shopping?.let { prefs ->
                 HorizontalDivider()
-                Text(
-                    stringResource(R.string.settings_shopping),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
-                )
+                SectionTitle(stringResource(R.string.settings_shopping))
                 ValueRow(stringResource(R.string.settings_on_tick), stringResource(prefs.onTick.label())) {
-                    choosing = ShoppingChoice.ON_TICK
+                    choosing = Choice.ON_TICK
                 }
                 ValueRow(stringResource(R.string.settings_min_stock), stringResource(prefs.minStock.label())) {
-                    choosing = ShoppingChoice.MIN_STOCK
+                    choosing = Choice.MIN_STOCK
                 }
                 ValueRow(
                     stringResource(R.string.settings_running_low),
                     pluralStringResource(R.plurals.running_low_summary, prefs.runningLowDays, prefs.runningLowDays),
-                ) { choosing = ShoppingChoice.RUNNING_LOW }
+                ) { choosing = Choice.RUNNING_LOW }
             }
         }
     }
 
     val prefs = shopping
+    val notificationPrefs = notifications
     when (choosing) {
         null -> Unit
-        ShoppingChoice.ON_TICK -> if (prefs != null) {
+        Choice.TIME -> if (notificationPrefs != null) {
+            TimeDialog(
+                minuteOfDay = notificationPrefs.minuteOfDay,
+                onSave = { hour, minute ->
+                    viewModel.setNotificationTime(hour, minute)
+                    choosing = null
+                },
+                onDismiss = { choosing = null },
+            )
+        }
+        Choice.WARNING_DAYS -> if (notificationPrefs != null) {
+            DaysDialog(
+                title = stringResource(R.string.settings_warning_days),
+                help = stringResource(R.string.settings_warning_days_help),
+                current = notificationPrefs.warningDays,
+                onSave = { if (viewModel.setWarningDays(it)) choosing = null },
+                onDismiss = { choosing = null },
+            )
+        }
+        Choice.ON_TICK -> if (prefs != null) {
             ChoiceDialog(
                 title = stringResource(R.string.settings_on_tick),
                 options = TickBehavior.entries,
@@ -106,7 +143,7 @@ fun SettingsScreen(
                 onDismiss = { choosing = null },
             )
         }
-        ShoppingChoice.MIN_STOCK -> if (prefs != null) {
+        Choice.MIN_STOCK -> if (prefs != null) {
             ChoiceDialog(
                 title = stringResource(R.string.settings_min_stock),
                 options = MinStockBehavior.entries,
@@ -119,8 +156,10 @@ fun SettingsScreen(
                 onDismiss = { choosing = null },
             )
         }
-        ShoppingChoice.RUNNING_LOW -> if (prefs != null) {
-            RunningLowDialog(
+        Choice.RUNNING_LOW -> if (prefs != null) {
+            DaysDialog(
+                title = stringResource(R.string.settings_running_low),
+                help = stringResource(R.string.settings_running_low_help),
                 current = prefs.runningLowDays,
                 onSave = { if (viewModel.setRunningLowDays(it)) choosing = null },
                 onDismiss = { choosing = null },
@@ -137,7 +176,58 @@ fun SettingsScreen(
     }
 }
 
-private enum class ShoppingChoice { ON_TICK, MIN_STOCK, RUNNING_LOW }
+private enum class Choice { TIME, WARNING_DAYS, ON_TICK, MIN_STOCK, RUNNING_LOW }
+
+/** The time in the phone's format (9:00 or 9:00 AM). */
+@Composable
+private fun timeText(minuteOfDay: Int): String {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, minuteOfDay / 60)
+        set(Calendar.MINUTE, minuteOfDay % 60)
+    }
+    return android.text.format.DateFormat.getTimeFormat(context).format(calendar.time)
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+    )
+}
+
+@Composable
+private fun SwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    ListItem(
+        headlineContent = { Text(title) },
+        trailingContent = { Switch(checked = checked, onCheckedChange = null) },
+        modifier = Modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onChange),
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeDialog(minuteOfDay: Int, onSave: (Int, Int) -> Unit, onDismiss: () -> Unit) {
+    val state = rememberTimePickerState(
+        initialHour = minuteOfDay / 60,
+        initialMinute = minuteOfDay % 60,
+        is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current),
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.notification_time_title)) },
+        text = { TimePicker(state = state) },
+        confirmButton = {
+            TextButton(onClick = { onSave(state.hour, state.minute) }) { Text(stringResource(R.string.action_ok)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
 
 private fun TickBehavior.label(): Int = when (this) {
     TickBehavior.ASK -> R.string.on_tick_ask
@@ -200,15 +290,15 @@ private fun <T> ChoiceDialog(
 }
 
 @Composable
-private fun RunningLowDialog(current: Int, onSave: (String) -> Unit, onDismiss: () -> Unit) {
+private fun DaysDialog(title: String, help: String, current: Int, onSave: (String) -> Unit, onDismiss: () -> Unit) {
     var days by rememberSaveable { mutableStateOf(current.toString()) }
     var showError by rememberSaveable { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.settings_running_low)) },
+        title = { Text(title) },
         text = {
             Column {
-                Text(stringResource(R.string.settings_running_low_help))
+                Text(help)
                 OutlinedTextField(
                     value = days,
                     onValueChange = {
