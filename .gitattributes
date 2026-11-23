@@ -1,0 +1,9 @@
+# Keep Linux line endings: CRLF would break shell scripts (bash: $'\r')
+* text=auto eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Binary files: never touch their bytes
+*.png binary
+*.jpg binary
+*.jar binary
