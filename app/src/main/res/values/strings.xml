@@ -270,4 +270,13 @@
         <item quantity="one">Less than %1$d day</item>
         <item quantity="other">Less than %1$d days</item>
     </plurals>
+    <string name="expiries_expired">Expired</string>
+    <string name="expiries_expiring">Expiring soon</string>
+    <string name="expiries_preparing">Getting ready / ready soon</string>
+    <plurals name="expiries_later">
+        <item quantity="one">Later · %1$d item</item>
+        <item quantity="other">Later · %1$d items</item>
+    </plurals>
+    <string name="action_show">Show</string>
+    <string name="action_hide">Hide</string>
 </resources>

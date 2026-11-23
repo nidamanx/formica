@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -48,8 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,14 +58,14 @@ import io.github.nidamanx.formica.domain.ExpiryStatus
 import io.github.nidamanx.formica.domain.PantrySort
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.displayedQuantity
+import io.github.nidamanx.formica.ui.components.DaysDisc
+import io.github.nidamanx.formica.ui.components.DiscTone
 import io.github.nidamanx.formica.ui.components.RestockQuestions
 import io.github.nidamanx.formica.ui.components.SectionTopBar
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.preparedAgo
 import io.github.nidamanx.formica.ui.format.quantityText
 import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
-
-private const val DAYS_SHOWN_AS_DAYS = 60
 
 @Composable
 fun PantryScreen(
@@ -401,52 +398,21 @@ private fun ProductCard(
     }
 }
 
-/** Days left to the nearest expiry, colored by status; TalkBack reads the status instead. */
+/** Days left to the nearest expiry, colored by status. */
 @Composable
 private fun ExpiryDisc(card: ProductSummary, today: Long) {
-    val colors = MaterialTheme.colorScheme
-    val (background, foreground) = when {
-        card.expiryStatus == ExpiryStatus.EXPIRED -> colors.errorContainer to colors.onErrorContainer
-        card.expiryStatus == ExpiryStatus.EXPIRING -> colors.tertiaryContainer to colors.onTertiaryContainer
-        card.readyFrom != null -> colors.secondaryContainer to colors.onSecondaryContainer
-        else -> colors.surfaceContainerHighest to colors.onSurfaceVariant
+    val tone = when {
+        card.expiryStatus == ExpiryStatus.EXPIRED -> DiscTone.EXPIRED
+        card.expiryStatus == ExpiryStatus.EXPIRING -> DiscTone.EXPIRING
+        card.readyFrom != null -> DiscTone.PREPARING
+        else -> DiscTone.NEUTRAL
     }
     val statusText = when (card.expiryStatus) {
         ExpiryStatus.EXPIRED -> stringResource(R.string.badge_expired)
         ExpiryStatus.EXPIRING -> stringResource(R.string.badge_expiring)
         else -> ""
     }
-    val days = card.nearestExpiry?.let { it - today }
-    val (number, word) = when {
-        days == null -> "–" to ""
-        card.expiryStatus == ExpiryStatus.EXPIRED -> "" to stringResource(R.string.disc_expired)
-        days == 0L -> "" to stringResource(R.string.disc_today)
-        days < DAYS_SHOWN_AS_DAYS -> days.toString() to LocalResources.current
-            .getQuantityString(R.plurals.disc_days, days.toInt())
-        else -> (days * 12 / 365).let { months ->
-            months.toString() to LocalResources.current.getQuantityString(R.plurals.disc_months, months.toInt())
-        }
-    }
-    Surface(
-        shape = CircleShape,
-        color = background,
-        contentColor = foreground,
-        modifier = Modifier
-            .size(52.dp)
-            .clearAndSetSemantics { if (statusText.isNotEmpty()) contentDescription = statusText },
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            if (number.isNotEmpty()) {
-                Text(number, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            }
-            if (word.isNotEmpty()) {
-                Text(word, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-            }
-        }
-    }
+    DaysDisc(card.nearestExpiry?.let { it - today }, tone, statusText)
 }
 
 @Composable

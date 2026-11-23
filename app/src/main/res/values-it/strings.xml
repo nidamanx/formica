@@ -271,4 +271,14 @@
         <item quantity="many">Meno di %1$d giorni</item>
         <item quantity="other">Meno di %1$d giorni</item>
     </plurals>
+    <string name="expiries_expired">Scaduti</string>
+    <string name="expiries_expiring">In scadenza</string>
+    <string name="expiries_preparing">In preparazione / pronti a breve</string>
+    <plurals name="expiries_later">
+        <item quantity="one">Più avanti · %1$d confezione</item>
+        <item quantity="many">Più avanti · %1$d confezioni</item>
+        <item quantity="other">Più avanti · %1$d confezioni</item>
+    </plurals>
+    <string name="action_show">Mostra</string>
+    <string name="action_hide">Nascondi</string>
 </resources>
