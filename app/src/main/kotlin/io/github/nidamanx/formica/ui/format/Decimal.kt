@@ -42,3 +42,17 @@ fun formatThousandths(value: Long, decimalSeparator: Char): String {
     val digits = fraction.toString().padStart(MAX_DECIMALS, '0').trimEnd('0')
     return "$sign$whole$decimalSeparator$digits"
 }
+
+private const val THOUSANDTHS_PER_CENT = 10L
+
+/** Parses a price in euro typed by the user ("2,40", "2"): cents, or null with more than 2 decimals. */
+fun parseCents(text: String, decimalSeparator: Char): Long? =
+    parseThousandths(text, decimalSeparator)
+        ?.takeIf { it % THOUSANDTHS_PER_CENT == 0L }
+        ?.let { it / THOUSANDTHS_PER_CENT }
+
+/** A price for an input field: 240 → "2,40", 200 → "2". */
+fun formatCentsInput(cents: Long, decimalSeparator: Char): String {
+    if (cents % 100 == 0L) return (cents / 100).toString()
+    return "${cents / 100}$decimalSeparator${(cents % 100).toString().padStart(2, '0')}"
+}

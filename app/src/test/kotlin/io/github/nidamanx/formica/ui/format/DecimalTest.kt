@@ -53,4 +53,17 @@ class DecimalTest {
             assertEquals(it, parseThousandths(formatThousandths(it, ','), ','))
         }
     }
+
+    @Test
+    fun `prices are read as cents with at most two decimals`() {
+        assertEquals(240L, parseCents("2,40", ','))
+        assertEquals(240L, parseCents("2,4", ','))
+        assertEquals(200L, parseCents("2", ','))
+        assertEquals(5L, parseCents("0.05", '.'))
+        assertNull(parseCents("2,405", ','))
+        assertNull(parseCents("", ','))
+        assertEquals("2,40", formatCentsInput(240, ','))
+        assertEquals("2", formatCentsInput(200, ','))
+        assertEquals("0.05", formatCentsInput(5, '.'))
+    }
 }
