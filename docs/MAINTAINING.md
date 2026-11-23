@@ -5,10 +5,10 @@ are needed.
 
 ## Branches
 
-- `dev`: work in progress. Every push runs the Build workflow and, when the app or the
-  build changes, the emulator smoke test on Android 8 (API 26).
+- `develop`: work in progress. Every push runs the Build workflow and, when the app or
+  the build changes, the emulator smoke test on Android 8 (API 26).
 - `main`: the default branch. It only receives verified, working states, one commit
-  each, made identical to `dev`. Releases are built from `main` only.
+  each, made identical to `develop`. Releases are built from `main` only.
 
 ## Signing keys
 
@@ -67,7 +67,7 @@ fixed with a new version.
 
 ## Testing builds
 
-- Every push to `main` or `dev` runs the Build workflow: lint, unit tests, debug and
+- Every push to `main` or `develop` runs the Build workflow: lint, unit tests, debug and
   release builds, permission check (`config/allowed-permissions.txt`), debug APK as an
   artifact. On a Gradle failure the errors are also written as an annotation.
 - *Actions → Emulator smoke test → Run workflow*: installs and starts the debug app on

@@ -2,7 +2,7 @@
 # version and recent ones), checks it does not crash and takes a screenshot of every
 # section, in the light and the dark theme.
 # Two ways to start it:
-#  - automatically, on a push to dev that changes the app or the build: Android 8
+#  - automatically, on a push to develop that changes the app or the build: Android 8
 #    (API 26) only, the oldest supported version;
 #  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one. GitHub
 #    shows this button only once the workflow is on the default branch (main).
@@ -11,7 +11,7 @@ name: Emulator smoke test
 
 on:
   push:
-    branches: [dev]
+    branches: [develop]
     paths:
       - "app/**"
       - "gradle/**"
