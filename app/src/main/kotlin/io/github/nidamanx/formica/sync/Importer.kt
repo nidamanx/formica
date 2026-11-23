@@ -20,6 +20,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.time.LocalDate
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -68,7 +69,14 @@ class Importer(
         val result = merge(file, mode, keepSeparate, local, ctx)
         val record = ImportRecord(file.device.id, file.device.name, file.exportedAt, ctx.now, mode)
         exchange.apply(result.snapshot, replace = mode == ImportMode.REPLACE_ALL, record, result.notesToReview)
-        pantry.restock(productsDroppedBelowMinStock(local, result.snapshot))
+        // The import is written: a failure here must not report it as failed
+        try {
+            pantry.restock(productsDroppedBelowMinStock(local, result.snapshot))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            // The minimum stock is checked again at the next use of these products
+        }
         return ctx.now
     }
 

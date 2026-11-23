@@ -2,6 +2,7 @@
 package io.github.nidamanx.formica
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.ExchangeRepository
@@ -21,6 +22,7 @@ import io.github.nidamanx.formica.sync.Importer
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -48,6 +50,9 @@ class AppContainer(context: Context) {
     val exporter = Exporter(appContext, exchange, deviceSettings)
     val backups = Backups(appContext)
     val importer = Importer(appContext, exchange, pantry, deviceSettings, backups, ::operationContext)
+
+    /** A file to import, from another app or from "Import from file": the import screen takes it. */
+    val pendingImport = MutableStateFlow<Uri?>(null)
     private val initialData = InitialData(database, appContext.resources, ::operationContext)
 
     /** Time, date and device of an operation, taken when the operation starts. */

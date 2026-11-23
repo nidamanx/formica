@@ -345,4 +345,55 @@
     <string name="action_save_to">Save to…</string>
     <string name="msg_file_saved">File saved</string>
     <string name="msg_save_failed">Could not save the file.</string>
+    <string name="action_import_file">Import from file</string>
+    <string name="import_title">Import</string>
+    <string name="import_file_from">File from</string>
+    <string name="import_exported_on">Exported %1$s</string>
+    <string name="import_same_device">This file was exported from this phone. You can import it anyway.</string>
+    <string name="import_mode">Mode</string>
+    <string name="mode_merge">Merge</string>
+    <string name="mode_merge_hint">Keeps the changes made on both phones</string>
+    <string name="mode_new_products">New products only</string>
+    <string name="mode_new_products_hint">Adds the products missing here; nothing else changes</string>
+    <string name="mode_replace_all">Replace everything</string>
+    <string name="mode_replace_all_hint">This phone\'s data become those of the file</string>
+    <string name="import_changes">What changes</string>
+    <string name="import_products">Products</string>
+    <plurals name="import_new_masculine">
+        <item quantity="one">%1$d new</item>
+        <item quantity="other">%1$d new</item>
+    </plurals>
+    <plurals name="import_updated_masculine">
+        <item quantity="one">%1$d updated</item>
+        <item quantity="other">%1$d updated</item>
+    </plurals>
+    <plurals name="import_deleted_masculine">
+        <item quantity="one">%1$d deleted</item>
+        <item quantity="other">%1$d deleted</item>
+    </plurals>
+    <plurals name="import_new_feminine">
+        <item quantity="one">%1$d new</item>
+        <item quantity="other">%1$d new</item>
+    </plurals>
+    <plurals name="import_updated_feminine">
+        <item quantity="one">%1$d updated</item>
+        <item quantity="other">%1$d updated</item>
+    </plurals>
+    <plurals name="import_deleted_feminine">
+        <item quantity="one">%1$d deleted</item>
+        <item quantity="other">%1$d deleted</item>
+    </plurals>
+    <string name="import_no_changes">No changes</string>
+    <string name="import_duplicates">Possible duplicates</string>
+    <string name="import_auto_merged">Locations, categories and stores with the same name will be merged: %1$d</string>
+    <string name="import_duplicate_names">Here: \"%1$s\" · In the file: \"%2$s\"</string>
+    <string name="duplicate_merge">Merge</string>
+    <string name="duplicate_keep_separate">Keep separate</string>
+    <string name="import_both_notes">Notes written on both phones</string>
+    <string name="import_notes_appended">will be kept one after the other</string>
+    <string name="import_not_formica">This is not a Formica file.</string>
+    <string name="import_newer_version">This file comes from a newer version of Formica. Update the app to import it.</string>
+    <string name="import_unreadable">Could not read the file.</string>
+    <string name="import_done">Import completed</string>
+    <string name="import_failed">The import failed: no data changed.</string>
 </resources>

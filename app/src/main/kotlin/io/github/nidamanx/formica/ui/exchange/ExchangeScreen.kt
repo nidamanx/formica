@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -51,6 +53,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+// Chat apps and file managers label exchange files differently (SPEC §11.3)
+private val IMPORT_TYPES = arrayOf("application/json", "text/plain", "application/octet-stream")
+
 /** Export, import, backups, exchange log and clean-up (SPEC §11.8, option A). */
 @Composable
 fun ExchangeScreen(
@@ -64,6 +69,9 @@ fun ExchangeScreen(
     var exporting by rememberSaveable { mutableStateOf(false) }
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(Exporter.MIME)) { uri ->
         if (uri != null) viewModel.saveTo(uri)
+    }
+    val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) viewModel.importFrom(uri)
     }
 
     LaunchedEffect(viewModel) {
@@ -91,7 +99,17 @@ fun ExchangeScreen(
                 .verticalScroll(rememberScrollState()),
         ) {
             if (state.loaded) {
-                LastExchangeCard(state.lastImport, onExport = { exporting = true })
+                LastExchangeCard(
+                    last = state.lastImport,
+                    onExport = { exporting = true },
+                    onImport = {
+                        try {
+                            openLauncher.launch(IMPORT_TYPES)
+                        } catch (_: ActivityNotFoundException) {
+                            // No file picker on this phone: files can still be opened from other apps
+                        }
+                    },
+                )
             }
         }
     }
@@ -112,7 +130,7 @@ fun ExchangeScreen(
 }
 
 @Composable
-private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit) {
+private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit, onImport: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -134,8 +152,9 @@ private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit) {
                 },
                 style = MaterialTheme.typography.bodyLarge,
             )
-            Button(onClick = onExport, modifier = Modifier.padding(top = 6.dp)) {
-                Text(stringResource(R.string.action_export))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 6.dp)) {
+                Button(onClick = onExport) { Text(stringResource(R.string.action_export)) }
+                FilledTonalButton(onClick = onImport) { Text(stringResource(R.string.action_import_file)) }
             }
         }
     }

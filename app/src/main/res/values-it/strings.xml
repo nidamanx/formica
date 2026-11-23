@@ -355,4 +355,61 @@
     <string name="action_save_to">Salva in…</string>
     <string name="msg_file_saved">File salvato</string>
     <string name="msg_save_failed">Impossibile salvare il file.</string>
+    <string name="action_import_file">Importa da file</string>
+    <string name="import_title">Importa</string>
+    <string name="import_file_from">File di</string>
+    <string name="import_exported_on">Esportato il %1$s</string>
+    <string name="import_same_device">Questo file è stato esportato da questo telefono. Puoi importarlo lo stesso.</string>
+    <string name="import_mode">Modalità</string>
+    <string name="mode_merge">Unisci</string>
+    <string name="mode_merge_hint">Tiene le modifiche di tutti e due i telefoni</string>
+    <string name="mode_new_products">Solo nuovi prodotti</string>
+    <string name="mode_new_products_hint">Aggiunge i prodotti che qui non ci sono; il resto non cambia</string>
+    <string name="mode_replace_all">Sostituisci tutto</string>
+    <string name="mode_replace_all_hint">I dati di questo telefono diventano quelli del file</string>
+    <string name="import_changes">Cosa cambia</string>
+    <string name="import_products">Prodotti</string>
+    <plurals name="import_new_masculine">
+        <item quantity="one">%1$d nuovo</item>
+        <item quantity="many">%1$d nuovi</item>
+        <item quantity="other">%1$d nuovi</item>
+    </plurals>
+    <plurals name="import_updated_masculine">
+        <item quantity="one">%1$d aggiornato</item>
+        <item quantity="many">%1$d aggiornati</item>
+        <item quantity="other">%1$d aggiornati</item>
+    </plurals>
+    <plurals name="import_deleted_masculine">
+        <item quantity="one">%1$d eliminato</item>
+        <item quantity="many">%1$d eliminati</item>
+        <item quantity="other">%1$d eliminati</item>
+    </plurals>
+    <plurals name="import_new_feminine">
+        <item quantity="one">%1$d nuova</item>
+        <item quantity="many">%1$d nuove</item>
+        <item quantity="other">%1$d nuove</item>
+    </plurals>
+    <plurals name="import_updated_feminine">
+        <item quantity="one">%1$d aggiornata</item>
+        <item quantity="many">%1$d aggiornate</item>
+        <item quantity="other">%1$d aggiornate</item>
+    </plurals>
+    <plurals name="import_deleted_feminine">
+        <item quantity="one">%1$d eliminata</item>
+        <item quantity="many">%1$d eliminate</item>
+        <item quantity="other">%1$d eliminate</item>
+    </plurals>
+    <string name="import_no_changes">Nessuna modifica</string>
+    <string name="import_duplicates">Possibili doppioni</string>
+    <string name="import_auto_merged">Posizioni, categorie e luoghi con lo stesso nome verranno uniti: %1$d</string>
+    <string name="import_duplicate_names">Qui: \"%1$s\" · Nel file: \"%2$s\"</string>
+    <string name="duplicate_merge">Unisci</string>
+    <string name="duplicate_keep_separate">Tieni separati</string>
+    <string name="import_both_notes">Note scritte da tutti e due</string>
+    <string name="import_notes_appended">verranno messe una sotto l\'altra</string>
+    <string name="import_not_formica">Questo file non è un file di Formica.</string>
+    <string name="import_newer_version">Questo file viene da una versione più recente di Formica. Aggiorna l\'app per importarlo.</string>
+    <string name="import_unreadable">Impossibile leggere il file.</string>
+    <string name="import_done">Importazione completata</string>
+    <string name="import_failed">Importazione non riuscita: nessun dato è cambiato.</string>
 </resources>

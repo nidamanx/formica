@@ -14,6 +14,7 @@ import io.github.nidamanx.formica.ui.appContainer
 import java.io.IOException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,11 @@ sealed interface ExchangeEvent {
     data object SaveFailed : ExchangeEvent
 }
 
-class ExchangeViewModel(exchange: ExchangeRepository, private val exporter: Exporter) : ViewModel() {
+class ExchangeViewModel(
+    exchange: ExchangeRepository,
+    private val exporter: Exporter,
+    private val pendingImport: MutableStateFlow<Uri?>,
+) : ViewModel() {
 
     val state: StateFlow<ExchangeUiState> = exchange.importLog
         .map { ExchangeUiState(loaded = true, lastImport = it.firstOrNull()) }
@@ -46,6 +51,11 @@ class ExchangeViewModel(exchange: ExchangeRepository, private val exporter: Expo
     /** "Save to…": the system file picker opens with the proposed name. */
     fun chooseSaveLocation() {
         viewModelScope.launch { eventChannel.send(ExchangeEvent.SaveAs(exporter.fileName())) }
+    }
+
+    /** "Import from file": the import preview takes the chosen file. */
+    fun importFrom(uri: Uri) {
+        pendingImport.value = uri
     }
 
     fun saveTo(uri: Uri) {
@@ -68,7 +78,7 @@ class ExchangeViewModel(exchange: ExchangeRepository, private val exporter: Expo
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ExchangeViewModel(c.exchange, c.exporter)
+                ExchangeViewModel(c.exchange, c.exporter, c.pendingImport)
             }
         }
     }

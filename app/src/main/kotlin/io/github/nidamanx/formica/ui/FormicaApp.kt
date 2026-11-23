@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package io.github.nidamanx.formica.ui
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -13,13 +14,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -29,6 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.ui.exchange.ExchangeScreen
+import io.github.nidamanx.formica.ui.exchange.ImportScreen
 import io.github.nidamanx.formica.ui.expiries.ExpiriesScreen
 import io.github.nidamanx.formica.ui.pantry.PantryScreen
 import io.github.nidamanx.formica.ui.product.ProductDetailScreen
@@ -37,6 +44,9 @@ import io.github.nidamanx.formica.ui.settings.CatalogKind
 import io.github.nidamanx.formica.ui.settings.CatalogScreen
 import io.github.nidamanx.formica.ui.settings.SettingsScreen
 import io.github.nidamanx.formica.ui.shopping.ShoppingScreen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /** The three sections of the bottom bar. */
 enum class TopLevelDestination(
@@ -53,6 +63,7 @@ private object Routes {
     const val SETTINGS = "settings"
     const val CATALOG = "settings/catalog/{kind}"
     const val EXCHANGE = "settings/exchange"
+    const val IMPORT = "import"
     const val PRODUCT_NEW = "new-product"
     const val PRODUCT_EDIT = "product/{id}/edit"
     const val PRODUCT_DETAIL = "product/{id}"
@@ -61,12 +72,22 @@ private object Routes {
     fun productDetail(id: String) = "product/$id"
 }
 
-/** @param openExpiries start on the Expiries section (tap on the daily notification) */
+/**
+ * @param openExpiries start on the Expiries section (tap on the daily notification)
+ * @param pendingImport a file to import: the import preview opens for it
+ */
 @Composable
-fun FormicaApp(openExpiries: Boolean = false) {
+fun FormicaApp(openExpiries: Boolean = false, pendingImport: StateFlow<Uri?> = MutableStateFlow(null)) {
     val navController = rememberNavController()
     LaunchedEffect(Unit) {
         if (openExpiries) navController.navigateToSection(TopLevelDestination.EXPIRIES)
+    }
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val importedText = stringResource(R.string.import_done)
+    val importRequest by pendingImport.collectAsStateWithLifecycle()
+    LaunchedEffect(importRequest) {
+        if (importRequest != null) navController.navigate(Routes.IMPORT) { launchSingleTop = true }
     }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -75,6 +96,7 @@ fun FormicaApp(openExpiries: Boolean = false) {
     // Each screen has its own Scaffold and top bar: this one only adds the bottom bar
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             if (atTopLevel) {
                 NavigationBar {
@@ -137,6 +159,15 @@ fun FormicaApp(openExpiries: Boolean = false) {
                     onBack = { navController.popBackStack() },
                     onOpenCatalog = { navController.navigate(Routes.catalog(it)) },
                     onOpenExchange = { navController.navigate(Routes.EXCHANGE) },
+                )
+            }
+            composable(Routes.IMPORT) {
+                ImportScreen(
+                    onClose = { navController.popBackStack() },
+                    onImported = {
+                        navController.navigateToSection(TopLevelDestination.PANTRY)
+                        scope.launch { snackbar.showSnackbar(importedText) }
+                    },
                 )
             }
             composable(Routes.EXCHANGE) {
