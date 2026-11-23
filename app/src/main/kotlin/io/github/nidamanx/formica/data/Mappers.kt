@@ -10,27 +10,29 @@ import io.github.nidamanx.formica.domain.model.ShoppingItem
 import io.github.nidamanx.formica.domain.model.Store
 
 fun LocationEntity.toDomain() = Location(
-    id, name, sortOrder, color, icon, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, sortOrder, color, icon, notes, notesModifiedAt,
+    createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun Location.toEntity() = LocationEntity(
-    id, name, sortOrder, color, icon, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, sortOrder, color, icon, notes, notesModifiedAt,
+    createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun CategoryEntity.toDomain() = Category(
-    id, name, sortOrder, color, icon, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, sortOrder, color, icon, createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun Category.toEntity() = CategoryEntity(
-    id, name, sortOrder, color, icon, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, sortOrder, color, icon, createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun StoreEntity.toDomain() = Store(
-    id, name, type, sortOrder, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, type, sortOrder, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun Store.toEntity() = StoreEntity(
-    id, name, type, sortOrder, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt,
+    id, name, type, sortOrder, notes, notesModifiedAt, createdAt, modifiedAt, modifiedBy, deletedAt, mergedIntoId,
 )
 
 fun ProductEntity.toDomain() = Product(

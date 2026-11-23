@@ -44,6 +44,7 @@ fun editLocation(stored: Location, edited: Location, ctx: OperationContext): Loc
     id = stored.id,
     createdAt = stored.createdAt,
     deletedAt = stored.deletedAt,
+    mergedIntoId = stored.mergedIntoId,
     notesModifiedAt = notesModifiedAt(stored.notes, edited.notes, stored.notesModifiedAt, ctx.now),
     modifiedAt = nextModifiedAt(ctx.now, stored.modifiedAt),
     modifiedBy = ctx.deviceId,
@@ -53,6 +54,7 @@ fun editCategory(stored: Category, edited: Category, ctx: OperationContext): Cat
     id = stored.id,
     createdAt = stored.createdAt,
     deletedAt = stored.deletedAt,
+    mergedIntoId = stored.mergedIntoId,
     modifiedAt = nextModifiedAt(ctx.now, stored.modifiedAt),
     modifiedBy = ctx.deviceId,
 )
@@ -61,6 +63,7 @@ fun editStore(stored: Store, edited: Store, ctx: OperationContext): Store = edit
     id = stored.id,
     createdAt = stored.createdAt,
     deletedAt = stored.deletedAt,
+    mergedIntoId = stored.mergedIntoId,
     notesModifiedAt = notesModifiedAt(stored.notes, edited.notes, stored.notesModifiedAt, ctx.now),
     modifiedAt = nextModifiedAt(ctx.now, stored.modifiedAt),
     modifiedBy = ctx.deviceId,

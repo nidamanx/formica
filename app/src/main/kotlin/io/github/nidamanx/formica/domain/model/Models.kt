@@ -23,6 +23,8 @@ data class Location(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long? = null,
+    /** Set with deletedAt when merged into a duplicate: references move to that record. */
+    val mergedIntoId: String? = null,
 )
 
 data class Category(
@@ -35,6 +37,8 @@ data class Category(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long? = null,
+    /** Set with deletedAt when merged into a duplicate: references move to that record. */
+    val mergedIntoId: String? = null,
 )
 
 data class Store(
@@ -48,6 +52,8 @@ data class Store(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long? = null,
+    /** Set with deletedAt when merged into a duplicate: references move to that record. */
+    val mergedIntoId: String? = null,
 )
 
 data class Product(

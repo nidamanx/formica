@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 // The schema is exported and versioned from the first release on (with explicit migrations)
 @Database(
@@ -18,7 +20,7 @@ import androidx.room.RoomDatabase
         ShoppingItemEntity::class,
         ImportRecordEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class FormicaDatabase : RoomDatabase() {
@@ -32,8 +34,18 @@ abstract class FormicaDatabase : RoomDatabase() {
     abstract fun importRecordDao(): ImportRecordDao
 
     companion object {
+        /** mergedIntoId on locations, categories and stores (SPEC §11.8). */
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                listOf("locations", "categories", "stores").forEach { table ->
+                    db.execSQL("ALTER TABLE `$table` ADD COLUMN `mergedIntoId` TEXT")
+                }
+            }
+        }
+
         fun create(context: Context): FormicaDatabase =
             Room.databaseBuilder(context, FormicaDatabase::class.java, "formica.db")
+                .addMigrations(MIGRATION_1_2)
                 // Development only, until the first release: a schema change recreates the
                 // database. It must be removed before the first release, when every
                 // migration becomes explicit.

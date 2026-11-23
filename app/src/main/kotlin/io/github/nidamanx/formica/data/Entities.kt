@@ -30,6 +30,7 @@ data class LocationEntity(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long?,
+    val mergedIntoId: String?,
 )
 
 @Entity(tableName = "categories")
@@ -43,6 +44,7 @@ data class CategoryEntity(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long?,
+    val mergedIntoId: String?,
 )
 
 @Entity(tableName = "stores")
@@ -57,6 +59,7 @@ data class StoreEntity(
     val modifiedAt: Long,
     val modifiedBy: String,
     val deletedAt: Long?,
+    val mergedIntoId: String?,
 )
 
 @Entity(tableName = "products")
