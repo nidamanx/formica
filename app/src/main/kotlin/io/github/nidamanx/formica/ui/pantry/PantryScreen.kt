@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -60,6 +61,7 @@ import io.github.nidamanx.formica.domain.ExpiryStatus
 import io.github.nidamanx.formica.domain.PantrySort
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.displayedQuantity
+import io.github.nidamanx.formica.ui.components.RestockQuestions
 import io.github.nidamanx.formica.ui.components.SectionTopBar
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.preparedAgo
@@ -93,6 +95,7 @@ fun PantryScreen(
             snackbar.showSnackbar(text)
         }
     }
+    RestockQuestions(viewModel.restockQuestions, snackbar, viewModel::addToList)
 
     Scaffold(
         topBar = { SectionTopBar(stringResource(R.string.nav_pantry), onOpenSettings) },
@@ -134,7 +137,9 @@ fun PantryScreen(
                                 today = state.today,
                                 locationNames = locationNames,
                                 format = format,
+                                inList = card.product.id in state.inList,
                                 onClick = { onOpenProduct(card.product.id) },
+                                onToBuy = { viewModel.toggleToBuy(card) },
                                 onMinus = { viewModel.onMinus(card) },
                                 onPlus = { viewModel.onPlus(card) },
                             )
@@ -245,8 +250,9 @@ private fun PantrySort.label(): Int = when (this) {
     PantrySort.PREPARATION -> R.string.sort_preparation
 }
 
+/** A filter chip that opens a menu of [options] (value and label). */
 @Composable
-private fun <T> MenuChip(
+fun <T> MenuChip(
     label: String,
     selected: Boolean,
     options: List<Pair<T, String>>,
@@ -282,7 +288,9 @@ private fun ProductCard(
     today: Long,
     locationNames: Map<String, String>,
     format: DisplayFormat,
+    inList: Boolean,
     onClick: () -> Unit,
+    onToBuy: () -> Unit,
     onMinus: () -> Unit,
     onPlus: () -> Unit,
 ) {
@@ -366,6 +374,20 @@ private fun ProductCard(
                     modifier = Modifier.padding(end = 8.dp),
                 )
                 Row {
+                    IconButton(onClick = onToBuy) {
+                        if (inList) {
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = stringResource(R.string.action_remove_from_list),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        } else {
+                            Icon(
+                                painterResource(R.drawable.ic_add_shopping_cart),
+                                contentDescription = stringResource(R.string.action_to_buy),
+                            )
+                        }
+                    }
                     IconButton(onClick = onMinus) {
                         Icon(painterResource(R.drawable.ic_remove), contentDescription = stringResource(R.string.cd_use))
                     }

@@ -5,7 +5,7 @@
     <string name="nav_shopping_list">Lista spesa</string>
     <string name="nav_expiries">Scadenze</string>
     <string name="placeholder_pantry">La dispensa è vuota.</string>
-    <string name="placeholder_shopping_list">La lista della spesa è vuota.</string>
+    <string name="placeholder_shopping_list">La lista è vuota. Aggiungi una voce con + o segna \"Da comprare\" un prodotto della dispensa.</string>
     <string name="placeholder_expiries">Nessun prodotto in scadenza.</string>
 
     <string name="action_add">Aggiungi</string>
@@ -228,4 +228,47 @@
     <string name="line_bought_on">comprata il %1$s</string>
     <string name="line_bought_on_at">comprata il %1$s da %2$s</string>
     <string name="line_bought_at">da %1$s</string>
+    <string name="shopping_group_category">Per categoria</string>
+    <string name="shopping_group_store">Per luogo</string>
+    <string name="filter_store">Luogo</string>
+    <string name="shopping_running_low">Stanno per finire</string>
+    <string name="shopping_frequent">Frequenti</string>
+    <string name="cd_add_to_list">Aggiungi %1$s alla lista</string>
+    <string name="shopping_no_category">Senza categoria</string>
+    <string name="shopping_no_store">Senza luogo</string>
+    <string name="shopping_bought">Comprati</string>
+    <string name="shopping_clear_bought">Svuota comprati</string>
+    <string name="badge_min_stock">Scorta minima</string>
+    <string name="line_cheapest_at">Conviene da %1$s</string>
+    <string name="shopping_new_item">Nuova voce</string>
+    <string name="shopping_edit_item">Modifica voce</string>
+    <string name="tick_title">Aggiungere alla dispensa?</string>
+    <string name="action_no">No</string>
+    <string name="action_to_buy">Da comprare</string>
+    <string name="action_remove_from_list">Togli dalla lista</string>
+    <string name="msg_below_min_stock">%1$s è sotto la scorta minima</string>
+    <string name="action_add_to_list">Aggiungi alla lista</string>
+    <string name="best_title">Conviene da</string>
+    <string name="best_noted_on">annotato il %1$s</string>
+    <string name="field_best_store">Dove conviene</string>
+    <string name="field_best_price">Prezzo (€)</string>
+    <string name="field_best_reference">Riferimento</string>
+    <string name="field_best_reference_help">Per esempio: al kg, confezione da 6</string>
+    <string name="error_price">Scrivi un prezzo, per esempio %1$s</string>
+    <string name="settings_shopping">Lista della spesa</string>
+    <string name="settings_on_tick">Quando spunti un prodotto</string>
+    <string name="on_tick_ask">Chiedi se aggiungerlo alla dispensa</string>
+    <string name="on_tick_always">Aggiungilo sempre alla dispensa</string>
+    <string name="on_tick_never">Non aggiungerlo</string>
+    <string name="settings_min_stock">Sotto la scorta minima</string>
+    <string name="min_stock_automatic">Aggiungi alla lista in automatico</string>
+    <string name="min_stock_ask">Chiedi conferma</string>
+    <string name="settings_running_low">Sta per finire</string>
+    <string name="field_days">Giorni</string>
+    <string name="settings_running_low_help">Un prodotto sta per finire quando la durata stimata è più corta.</string>
+    <plurals name="running_low_summary">
+        <item quantity="one">Meno di %1$d giorno</item>
+        <item quantity="many">Meno di %1$d giorni</item>
+        <item quantity="other">Meno di %1$d giorni</item>
+    </plurals>
 </resources>

@@ -13,6 +13,7 @@ import io.github.nidamanx.formica.domain.model.Category
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.Product
+import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.normalizedName
 import io.github.nidamanx.formica.ui.appContainer
 import io.github.nidamanx.formica.ui.settings.NameError
@@ -42,6 +43,9 @@ data class ProductFields(
     val daysAfterOpening: String,
     val warningDays: String,
     val minStock: String,
+    val bestStoreId: String?,
+    val bestPrice: String,
+    val bestReference: String,
     val notes: String,
 )
 
@@ -53,10 +57,11 @@ data class ProductFormErrors(
     val daysAfterOpening: Boolean = false,
     val warningDays: Boolean = false,
     val minStock: Boolean = false,
+    val bestPrice: Boolean = false,
 ) {
     val any: Boolean
         get() = name != null || quantity || shelfLifeDays || daysUntilReady || daysAfterOpening || warningDays ||
-            minStock
+            minStock || bestPrice
 }
 
 data class ProductFormState(
@@ -65,6 +70,7 @@ data class ProductFormState(
     val product: Product? = null,
     val locations: List<Location> = emptyList(),
     val categories: List<Category> = emptyList(),
+    val stores: List<Store> = emptyList(),
     val saved: Boolean = false,
 )
 
@@ -82,9 +88,10 @@ class ProductFormViewModel(
         if (productId == null) flowOf(null) else pantry.observeProduct(productId),
         catalog.locations,
         catalog.categories,
+        catalog.stores,
         saved,
-    ) { product, locations, categories, isSaved ->
-        ProductFormState(true, product, locations, categories, isSaved)
+    ) { product, locations, categories, stores, isSaved ->
+        ProductFormState(true, product, locations, categories, stores, isSaved)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProductFormState())
 
     private var otherNames: Set<String> = emptySet()
@@ -100,10 +107,12 @@ class ProductFormViewModel(
     /**
      * Validates and saves; the screen closes when [ProductFormState.saved] turns true.
      * @param parse locale-aware decimal parser
+     * @param parsePrice locale-aware price parser (cents)
      */
-    fun save(fields: ProductFields, parse: (String) -> Long?): ProductFormErrors {
+    fun save(fields: ProductFields, parse: (String) -> Long?, parsePrice: (String) -> Long?): ProductFormErrors {
         val quantity = fields.quantity.trim().takeIf { it.isNotEmpty() }?.let(parse)
         val minStock = fields.minStock.trim().takeIf { it.isNotEmpty() }?.let(parse)
+        val bestPrice = fields.bestPrice.trim().takeIf { it.isNotEmpty() }?.let(parsePrice)
         val errors = ProductFormErrors(
             name = when {
                 normalizedName(fields.name).isEmpty() -> NameError.Required
@@ -116,6 +125,7 @@ class ProductFormViewModel(
             daysAfterOpening = !fields.daysAfterOpening.isValidDays(),
             warningDays = !fields.warningDays.isValidDays(),
             minStock = fields.minStock.isNotBlank() && minStock == null,
+            bestPrice = fields.bestPrice.isNotBlank() && bestPrice == null,
         )
         if (errors.any) return errors
 
@@ -132,16 +142,16 @@ class ProductFormViewModel(
                         quantity, location, fields.expiresOn, LocalDate.now().toEpochDay(), null,
                     )
                 }
-                pantry.createProduct(fields.applyTo(emptyProduct(), minStock), initial)
+                pantry.createProduct(fields.applyTo(emptyProduct(), minStock, bestPrice), initial)
             } else {
-                pantry.updateProduct(fields.applyTo(stored, minStock))
+                pantry.updateProduct(fields.applyTo(stored, minStock, bestPrice))
             }
             saved.value = true
         }
         return errors
     }
 
-    private fun ProductFields.applyTo(product: Product, minStock: Long?): Product =
+    private fun ProductFields.applyTo(product: Product, minStock: Long?, bestPrice: Long?): Product =
         product.copy(
             name = cleanName(name),
             unit = unit,
@@ -153,6 +163,9 @@ class ProductFormViewModel(
             daysAfterOpening = daysAfterOpening.toDays(),
             expiryWarningDays = warningDays.toDays(),
             minStock = minStock,
+            bestPriceStoreId = bestStoreId,
+            bestPriceCents = bestPrice,
+            bestPriceReference = bestReference.trim().ifEmpty { null },
             notes = notes.trim().ifEmpty { null },
         )
 

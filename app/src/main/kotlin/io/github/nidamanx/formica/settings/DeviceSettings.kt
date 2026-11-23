@@ -5,13 +5,10 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import io.github.nidamanx.formica.domain.model.Device
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-
-private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
 /**
  * Identity of this phone: an id generated once (written into modifiedBy and the

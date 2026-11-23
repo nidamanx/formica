@@ -7,20 +7,23 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.PantryRepository
+import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.PantryFilter
 import io.github.nidamanx.formica.domain.PantrySort
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.filterAndSort
+import io.github.nidamanx.formica.domain.isOpen
 import io.github.nidamanx.formica.domain.model.Category
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
+import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.model.isCountable
-import io.github.nidamanx.formica.domain.summarizeProduct
-import io.github.nidamanx.formica.settings.DisplayDefaults
+import io.github.nidamanx.formica.settings.ShoppingSettings
 import io.github.nidamanx.formica.ui.appContainer
+import io.github.nidamanx.formica.ui.productSummaries
 import java.text.Collator
 import java.time.LocalDate
 import kotlinx.coroutines.channels.Channel
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -44,6 +48,8 @@ data class PantryUiState(
     val stores: List<Store> = emptyList(),
     val filter: PantryFilter = PantryFilter(),
     val sort: PantrySort = PantrySort.EXPIRY,
+    /** Products with an open item in the shopping list. */
+    val inList: Set<String> = emptySet(),
     val today: Long = 0,
 )
 
@@ -63,8 +69,13 @@ sealed interface PantryMessage {
 
 class PantryViewModel(
     private val pantry: PantryRepository,
+    private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
+    settings: ShoppingSettings,
 ) : ViewModel() {
+
+    /** Products below their minimum stock, when the setting asks first. */
+    val restockQuestions: Flow<Product> = pantry.restockQuestions
 
     private val filter = MutableStateFlow(PantryFilter())
     private val sort = MutableStateFlow(PantrySort.EXPIRY)
@@ -74,33 +85,17 @@ class PantryViewModel(
     private val _sheet = MutableStateFlow<PantrySheet?>(null)
     val sheet: StateFlow<PantrySheet?> = _sheet
 
-    private val summaries: Flow<List<ProductSummary>> = combine(
-        pantry.products,
-        pantry.batches,
-        pantry.batchQuantities,
-        pantry.movements,
-    ) { products, batches, quantities, movements ->
-        val today = LocalDate.now().toEpochDay()
-        val now = System.currentTimeMillis()
-        val batchesByProduct = batches.groupBy { it.productId }
-        val productOfBatch = batches.associate { it.id to it.productId }
-        val movementsByProduct = movements.groupBy { productOfBatch[it.batchId] }
-        products.map { product ->
-            summarizeProduct(
-                product = product,
-                productBatches = batchesByProduct[product.id].orEmpty(),
-                quantities = quantities,
-                productMovements = movementsByProduct[product.id].orEmpty(),
-                today = today,
-                now = now,
-                thresholds = DisplayDefaults.thresholds,
-            )
-        }
-    }
+    private val summaries: Flow<List<ProductSummary>> = productSummaries(pantry, settings)
 
     private val catalogs = combine(catalog.locations, catalog.categories, catalog.stores) { l, c, s -> Triple(l, c, s) }
 
-    val state: StateFlow<PantryUiState> = combine(summaries, catalogs, filter, sort) { all, (l, c, s), f, so ->
+    private val inList: Flow<Set<String>> = shopping.items.map { items ->
+        items.filter { it.isOpen }.mapNotNull { it.productId }.toSet()
+    }
+
+    val state: StateFlow<PantryUiState> = combine(
+        summaries, catalogs, filter, sort, inList,
+    ) { all, (l, c, s), f, so, listed ->
         val collator = Collator.getInstance()
         PantryUiState(
             loaded = true,
@@ -111,6 +106,7 @@ class PantryViewModel(
             stores = s,
             filter = f,
             sort = so,
+            inList = listed,
             today = LocalDate.now().toEpochDay(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PantryUiState())
@@ -136,6 +132,17 @@ class PantryViewModel(
     fun onPlus(card: ProductSummary) {
         val id = card.product.id
         _sheet.value = if (card.product.homemade) PantrySheet.Preparation(id) else PantrySheet.Purchase(id)
+    }
+
+    /** The cart button: adds the product to the shopping list, or removes it if already there. */
+    fun toggleToBuy(card: ProductSummary) {
+        val id = card.product.id
+        val listed = id in state.value.inList
+        viewModelScope.launch { if (listed) shopping.removeFromList(id) else shopping.toBuy(id) }
+    }
+
+    fun addToList(productId: String) {
+        viewModelScope.launch { shopping.toBuy(productId, automatic = true) }
     }
 
     fun closeSheet() {
@@ -181,7 +188,10 @@ class PantryViewModel(
 
     companion object {
         val Factory = viewModelFactory {
-            initializer { PantryViewModel(appContainer().pantry, appContainer().catalog) }
+            initializer {
+                val c = appContainer()
+                PantryViewModel(c.pantry, c.shopping, c.catalog, c.shoppingSettings)
+            }
         }
     }
 }

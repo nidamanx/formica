@@ -50,15 +50,17 @@ fun PurchaseSheet(
     format: DisplayFormat,
     onConfirm: (quantity: Long, purchasedOn: Long, expiresOn: Long?, locationId: String, storeId: String?) -> Unit,
     onDismiss: () -> Unit,
+    initialQuantity: Long = ONE_UNIT,
+    initialStoreId: String? = null,
 ) {
     val product = card.product
-    var quantityText by rememberSaveable { mutableStateOf(format.number(ONE_UNIT)) }
+    var quantityText by rememberSaveable { mutableStateOf(format.number(initialQuantity)) }
     var quantityError by rememberSaveable { mutableStateOf(false) }
     var purchasedOn by rememberSaveable { mutableStateOf(today) }
     var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
     var expiryEdited by rememberSaveable { mutableStateOf(false) }
     var locationId by rememberSaveable { mutableStateOf(defaultLocation(card, locations)) }
-    var storeId by rememberSaveable { mutableStateOf<String?>(null) }
+    var storeId by rememberSaveable { mutableStateOf(initialStoreId?.takeIf { id -> stores.any { it.id == id } }) }
     val expiresOn = if (expiryEdited) expiry else proposedExpiry(purchasedOn, product.shelfLifeDays)
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
@@ -239,8 +241,9 @@ fun UseSheet(
     }
 }
 
+/** Title, optional subtitle and content of a bottom panel. */
 @Composable
-private fun SheetColumn(
+fun SheetColumn(
     title: String,
     subtitle: String,
     content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
@@ -256,7 +259,13 @@ private fun SheetColumn(
     ) {
         Column {
             Text(title, style = MaterialTheme.typography.titleLarge)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
         content()
     }

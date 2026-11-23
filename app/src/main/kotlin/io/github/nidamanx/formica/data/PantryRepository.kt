@@ -4,27 +4,34 @@ package io.github.nidamanx.formica.data
 import androidx.room.withTransaction
 import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.GroupKey
+import io.github.nidamanx.formica.domain.MinStockBehavior
 import io.github.nidamanx.formica.domain.OperationContext
 import io.github.nidamanx.formica.domain.StockPlan
+import io.github.nidamanx.formica.domain.droppedBelowMinStock
 import io.github.nidamanx.formica.domain.editBatchNotes
 import io.github.nidamanx.formica.domain.editProduct
 import io.github.nidamanx.formica.domain.groupBatches
+import io.github.nidamanx.formica.domain.model.Batch
+import io.github.nidamanx.formica.domain.model.Movement
+import io.github.nidamanx.formica.domain.model.MovementType
+import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.newProduct
+import io.github.nidamanx.formica.domain.openItemFor
 import io.github.nidamanx.formica.domain.planConsumption
 import io.github.nidamanx.formica.domain.planCorrection
 import io.github.nidamanx.formica.domain.planGroupRemoval
 import io.github.nidamanx.formica.domain.planOpening
 import io.github.nidamanx.formica.domain.planPreparation
 import io.github.nidamanx.formica.domain.planPurchase
+import io.github.nidamanx.formica.domain.planToBuy
 import io.github.nidamanx.formica.domain.planTransfer
-import io.github.nidamanx.formica.domain.softDeleted
+import io.github.nidamanx.formica.domain.productQuantity
 import io.github.nidamanx.formica.domain.quantitiesByBatch
-import io.github.nidamanx.formica.domain.model.Batch
-import io.github.nidamanx.formica.domain.model.Movement
-import io.github.nidamanx.formica.domain.model.MovementType
-import io.github.nidamanx.formica.domain.model.Product
+import io.github.nidamanx.formica.domain.softDeleted
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 
 /** First stock of a new product, entered in the product form. */
 sealed interface InitialStock {
@@ -56,10 +63,20 @@ sealed interface InitialStock {
 class PantryRepository(
     private val db: FormicaDatabase,
     private val context: suspend () -> OperationContext,
+    private val minStockBehavior: suspend () -> MinStockBehavior,
 ) {
     private val productDao = db.productDao()
     private val batchDao = db.batchDao()
     private val movementDao = db.movementDao()
+    private val shoppingDao = db.shoppingItemDao()
+
+    private val restockChannel = Channel<Product>(Channel.BUFFERED)
+
+    /**
+     * Products that dropped under their minimum stock while the setting is "ask first":
+     * each one is received by a single collector (the screen on top).
+     */
+    val restockQuestions: Flow<Product> = restockChannel.receiveAsFlow()
 
     val products: Flow<List<Product>> = productDao.observeAll().map { list -> list.map { it.toDomain() } }
 
@@ -187,17 +204,39 @@ class PantryRepository(
             )
         }
 
+    /**
+     * Applies a stock operation; when it takes a purchased product under its minimum stock
+     * and the product is not in the shopping list, adds it or asks, as set (SPEC §8).
+     */
     private suspend fun withStock(
         productId: String,
         plan: (Product, List<Batch>, Map<String, Long>, OperationContext) -> StockPlan,
     ): StockPlan {
         val ctx = context()
-        return db.withTransaction {
+        val behavior = minStockBehavior()
+        var ask: Product? = null
+        val result = db.withTransaction {
             val product = requireProduct(productId)
             val batches = batchDao.forProduct(productId).map { it.toDomain() }
             val quantities = quantitiesByBatch(movementDao.forProduct(productId).map { it.toDomain() })
-            plan(product, batches, quantities, ctx).also { applyPlan(it) }
+            val stockPlan = plan(product, batches, quantities, ctx)
+            applyPlan(stockPlan)
+            val before = productQuantity(batches, quantities)
+            val after = before + stockPlan.movements.sumOf { it.delta }
+            if (droppedBelowMinStock(product, before, after)) {
+                val items = shoppingDao.active().map { it.toDomain() }
+                if (openItemFor(items, productId) == null) {
+                    when (behavior) {
+                        MinStockBehavior.AUTOMATIC -> planToBuy(productId, null, items, automatic = true, ctx)
+                            ?.let { shoppingDao.upsert(listOf(it.toEntity())) }
+                        MinStockBehavior.ASK -> ask = product
+                    }
+                }
+            }
+            stockPlan
         }
+        ask?.let { restockChannel.trySend(it) }
+        return result
     }
 
     private suspend fun applyPlan(plan: StockPlan) {

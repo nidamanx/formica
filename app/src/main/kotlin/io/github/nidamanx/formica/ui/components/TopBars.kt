@@ -19,10 +19,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import io.github.nidamanx.formica.R
 
-/** Top bar of the bottom-bar sections, with the menu that opens the settings. */
+/**
+ * Top bar of the bottom-bar sections, with the menu that opens the settings; [actions]
+ * (label and action) come before the settings in the menu.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SectionTopBar(title: String, onOpenSettings: () -> Unit) {
+fun SectionTopBar(
+    title: String,
+    onOpenSettings: () -> Unit,
+    actions: List<Pair<String, () -> Unit>> = emptyList(),
+) {
     var menuOpen by remember { mutableStateOf(false) }
     TopAppBar(
         title = { Text(title) },
@@ -31,6 +38,15 @@ fun SectionTopBar(title: String, onOpenSettings: () -> Unit) {
                 Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.cd_more_options))
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                actions.forEach { (label, action) ->
+                    DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            menuOpen = false
+                            action()
+                        },
+                    )
+                }
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_title)) },
                     onClick = {

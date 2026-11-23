@@ -142,6 +142,9 @@ interface ShoppingItemDao {
     @Query("SELECT * FROM shopping_items WHERE id = :id")
     suspend fun get(id: String): ShoppingItemEntity?
 
+    @Query("SELECT * FROM shopping_items WHERE deletedAt IS NULL")
+    suspend fun active(): List<ShoppingItemEntity>
+
     @Upsert
     suspend fun upsert(items: List<ShoppingItemEntity>)
 }

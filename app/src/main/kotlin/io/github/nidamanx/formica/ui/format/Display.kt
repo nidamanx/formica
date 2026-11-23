@@ -9,12 +9,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
+import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
+import java.util.Currency
 import java.util.Locale
 
 /** Number and date conventions of the user's language, read once per configuration. */
@@ -32,6 +35,18 @@ class DisplayFormat(val locale: Locale) {
     fun number(thousandths: Long): String = formatThousandths(thousandths, decimalSeparator)
 
     fun parse(text: String): Long? = parseThousandths(text, decimalSeparator)
+
+    // Euro only (SPEC §3): the symbol and its position follow the language
+    private val priceFormat: NumberFormat = NumberFormat.getCurrencyInstance(locale).apply {
+        currency = Currency.getInstance("EUR")
+    }
+
+    /** 240 → "2,40 €" in Italian, "€2.40" in English. */
+    fun price(cents: Long): String = priceFormat.format(BigDecimal.valueOf(cents, 2))
+
+    fun priceInput(cents: Long): String = formatCentsInput(cents, decimalSeparator)
+
+    fun parsePrice(text: String): Long? = parseCents(text, decimalSeparator)
 }
 
 @Composable

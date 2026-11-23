@@ -52,6 +52,8 @@ import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
 import io.github.nidamanx.formica.ui.settings.NameError
 import java.time.LocalDate
 
+private const val PRICE_EXAMPLE_CENTS = 240L
+
 /** New product ([productId] null) or edit of an existing one. */
 @Composable
 fun ProductFormScreen(
@@ -70,7 +72,7 @@ fun ProductFormScreen(
                 state = state,
                 isNew = productId == null,
                 format = format,
-                onSave = { fields -> viewModel.save(fields, format::parse) },
+                onSave = { fields -> viewModel.save(fields, format::parse, format::parsePrice) },
                 modifier = Modifier.padding(padding),
             )
         }
@@ -103,9 +105,13 @@ private fun ProductForm(
     var afterOpening by rememberSaveable { mutableStateOf(p?.daysAfterOpening?.toString().orEmpty()) }
     var warning by rememberSaveable { mutableStateOf(p?.expiryWarningDays?.toString().orEmpty()) }
     var minStock by rememberSaveable { mutableStateOf(p?.minStock?.let { format.number(it) }.orEmpty()) }
+    var bestStoreId by rememberSaveable { mutableStateOf(p?.bestPriceStoreId) }
+    var bestPrice by rememberSaveable { mutableStateOf(p?.bestPriceCents?.let { format.priceInput(it) }.orEmpty()) }
+    var bestReference by rememberSaveable { mutableStateOf(p?.bestPriceReference.orEmpty()) }
     var notes by rememberSaveable { mutableStateOf(p?.notes.orEmpty()) }
     var moreOpen by rememberSaveable {
-        mutableStateOf(listOf(shelfLife, untilReady, afterOpening, warning, minStock).any { it.isNotEmpty() })
+        val more = listOf(shelfLife, untilReady, afterOpening, warning, minStock, bestPrice, bestReference)
+        mutableStateOf(bestStoreId != null || more.any { it.isNotEmpty() })
     }
     // The first stock's dates follow the durations until the user sets them
     val stockDate = if (homemade) preparedOn else today
@@ -252,6 +258,43 @@ private fun ProductForm(
             )
         }
         if (moreOpen) {
+            val noStore = stringResource(R.string.value_none_m)
+            SelectField(
+                label = stringResource(R.string.field_best_store),
+                options = listOf<String?>(null) + state.stores.map { it.id },
+                selected = bestStoreId,
+                optionLabel = { id -> state.stores.firstOrNull { it.id == id }?.name ?: noStore },
+                onSelect = { bestStoreId = it },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                NumberField(
+                    label = stringResource(R.string.field_best_price),
+                    value = bestPrice,
+                    error = if (errors.bestPrice) {
+                        stringResource(R.string.error_price, format.priceInput(PRICE_EXAMPLE_CENTS))
+                    } else {
+                        null
+                    },
+                    decimal = true,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    bestPrice = it
+                    errors = errors.copy(bestPrice = false)
+                }
+                OutlinedTextField(
+                    value = bestReference,
+                    onValueChange = { bestReference = it },
+                    label = { Text(stringResource(R.string.field_best_reference)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Text(
+                stringResource(R.string.field_best_reference_help),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             val daysError = stringResource(R.string.error_days)
             NumberField(
                 label = stringResource(R.string.field_shelf_life),
@@ -326,6 +369,9 @@ private fun ProductForm(
                         daysAfterOpening = afterOpening,
                         warningDays = warning,
                         minStock = minStock,
+                        bestStoreId = bestStoreId,
+                        bestPrice = bestPrice,
+                        bestReference = bestReference,
                         notes = notes,
                     ),
                 )

@@ -37,6 +37,7 @@ import io.github.nidamanx.formica.ui.product.ProductFormScreen
 import io.github.nidamanx.formica.ui.settings.CatalogKind
 import io.github.nidamanx.formica.ui.settings.CatalogScreen
 import io.github.nidamanx.formica.ui.settings.SettingsScreen
+import io.github.nidamanx.formica.ui.shopping.ShoppingScreen
 
 /** The three sections of the bottom bar. */
 enum class TopLevelDestination(
@@ -107,10 +108,11 @@ fun FormicaApp() {
                     onOpenProduct = { navController.navigate(Routes.productDetail(it)) },
                 )
             }
-            listOf(TopLevelDestination.SHOPPING_LIST, TopLevelDestination.EXPIRIES).forEach { destination ->
-                composable(destination.route) {
-                    PlaceholderScreen(destination) { navController.navigate(Routes.SETTINGS) }
-                }
+            composable(TopLevelDestination.SHOPPING_LIST.route) {
+                ShoppingScreen(onOpenSettings = { navController.navigate(Routes.SETTINGS) })
+            }
+            composable(TopLevelDestination.EXPIRIES.route) {
+                PlaceholderScreen(TopLevelDestination.EXPIRIES) { navController.navigate(Routes.SETTINGS) }
             }
             composable(Routes.PRODUCT_NEW) {
                 ProductFormScreen(productId = null, onDone = { navController.popBackStack() })

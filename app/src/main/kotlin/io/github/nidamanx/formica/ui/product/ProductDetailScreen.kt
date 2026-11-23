@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,10 +55,14 @@ import io.github.nidamanx.formica.domain.DurationEstimate
 import io.github.nidamanx.formica.domain.HistoryEntry
 import io.github.nidamanx.formica.domain.displayedQuantity
 import io.github.nidamanx.formica.domain.effectiveExpiry
+import io.github.nidamanx.formica.domain.isBestPriceStale
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.MovementType
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
 import io.github.nidamanx.formica.domain.model.Origin
+import io.github.nidamanx.formica.domain.model.Product
+import io.github.nidamanx.formica.domain.model.Store
+import io.github.nidamanx.formica.ui.components.RestockQuestions
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.quantityText
 import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
@@ -85,6 +90,7 @@ fun ProductDetailScreen(
     LaunchedEffect(state.loaded, state.summary == null) {
         if (state.loaded && state.summary == null) onBack()
     }
+    RestockQuestions(viewModel.restockQuestions, snackbar, viewModel::addToList)
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message ->
             snackbar.showSnackbar(
@@ -127,6 +133,7 @@ fun ProductDetailScreen(
                             if (product.homemade) {
                                 add(R.string.purchase_title to { viewModel.open(DetailDialog.Purchase) })
                             }
+                            add(listActionLabel(state.inList) to viewModel::toggleToBuy)
                             if (plainGroup != null) addAll(groupActions(plainGroup, viewModel))
                             add(R.string.menu_correct to { viewModel.open(DetailDialog.Correct(null)) })
                             add(R.string.action_delete to { viewModel.open(DetailDialog.Delete) })
@@ -151,6 +158,9 @@ fun ProductDetailScreen(
                         viewModel.open(if (product.homemade) DetailDialog.Preparation else DetailDialog.Purchase)
                     },
                 )
+            }
+            bestPrice(product, state.stores)?.let { best ->
+                item { BestPriceBox(best, isBestPriceStale(product.bestPriceNotedAt, state.today), format) }
             }
             if (state.showGroups) {
                 item { SectionTitle(stringResource(R.string.section_stock)) }
@@ -248,6 +258,9 @@ fun ProductDetailScreen(
         DetailDialog.Delete -> DeleteDialog(product.name, onConfirm = viewModel::delete, onDismiss = viewModel::close)
     }
 }
+
+private fun listActionLabel(inList: Boolean): Int =
+    if (inList) R.string.action_remove_from_list else R.string.action_to_buy
 
 private fun groupActions(group: BatchGroup, viewModel: ProductDetailViewModel): List<Pair<Int, () -> Unit>> = listOf(
     R.string.menu_use to { viewModel.open(DetailDialog.Use(group.key)) },
@@ -403,6 +416,51 @@ private fun GroupRow(
         }
     }
 }
+
+private class BestPrice(val storeName: String?, val cents: Long?, val reference: String?, val notedAt: Long?)
+
+private fun bestPrice(product: Product, stores: List<Store>): BestPrice? {
+    val storeName = product.bestPriceStoreId?.let { id -> stores.firstOrNull { it.id == id }?.name }
+    if (storeName == null && product.bestPriceCents == null && product.bestPriceReference.isNullOrBlank()) return null
+    return BestPrice(storeName, product.bestPriceCents, product.bestPriceReference, product.bestPriceNotedAt)
+}
+
+/** "Cheapest at": store, price and reference, faded when noted more than 6 months ago. */
+@Composable
+private fun BestPriceBox(best: BestPrice, stale: Boolean, format: DisplayFormat) {
+    val line = listOfNotNull(
+        best.storeName,
+        listOfNotNull(best.cents?.let { format.price(it) }, best.reference?.takeIf { it.isNotBlank() })
+            .takeIf { it.isNotEmpty() }?.joinToString(" "),
+    ).joinToString(" · ")
+    val noted = best.notedAt?.let {
+        val day = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
+        stringResource(R.string.best_noted_on, format.date(day))
+    }
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .alpha(if (stale) STALE_ALPHA else 1f),
+    ) {
+        Column(
+            Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text(
+                stringResource(R.string.best_title),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            if (line.isNotEmpty()) Text(line, style = MaterialTheme.typography.bodyLarge)
+            noted?.let { SecondaryText(it) }
+        }
+    }
+}
+
+private const val STALE_ALPHA = 0.55f
 
 /** Purchase date and store, shown only when every batch of the group agrees on them. */
 @Composable

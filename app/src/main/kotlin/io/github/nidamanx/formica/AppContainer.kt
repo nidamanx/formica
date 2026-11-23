@@ -7,8 +7,10 @@ import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.FormicaDatabase
 import io.github.nidamanx.formica.data.InitialData
 import io.github.nidamanx.formica.data.PantryRepository
+import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.OperationContext
 import io.github.nidamanx.formica.settings.DeviceSettings
+import io.github.nidamanx.formica.settings.ShoppingSettings
 import java.time.LocalDate
 import java.util.UUID
 
@@ -18,8 +20,10 @@ class AppContainer(context: Context) {
 
     val database: FormicaDatabase = FormicaDatabase.create(appContext)
     val deviceSettings = DeviceSettings(appContext, defaultName = Build.MODEL.ifBlank { Build.MANUFACTURER })
+    val shoppingSettings = ShoppingSettings(appContext)
     val catalog = CatalogRepository(database, ::operationContext)
-    val pantry = PantryRepository(database, ::operationContext)
+    val pantry = PantryRepository(database, ::operationContext) { shoppingSettings.current().minStock }
+    val shopping = ShoppingRepository(database, ::operationContext)
     private val initialData = InitialData(database, appContext.resources, ::operationContext)
 
     /** Time, date and device of an operation, taken when the operation starts. */

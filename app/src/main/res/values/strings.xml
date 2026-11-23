@@ -7,7 +7,7 @@
     <string name="nav_shopping_list">Shopping list</string>
     <string name="nav_expiries">Expiry dates</string>
     <string name="placeholder_pantry">Your pantry is empty.</string>
-    <string name="placeholder_shopping_list">Your shopping list is empty.</string>
+    <string name="placeholder_shopping_list">The list is empty. Add an item with + or mark a pantry product as to buy.</string>
     <string name="placeholder_expiries">Nothing is about to expire.</string>
 
     <!-- Common actions -->
@@ -228,4 +228,46 @@
     <string name="line_bought_on">bought %1$s</string>
     <string name="line_bought_on_at">bought %1$s at %2$s</string>
     <string name="line_bought_at">from %1$s</string>
+    <string name="shopping_group_category">By category</string>
+    <string name="shopping_group_store">By store</string>
+    <string name="filter_store">Store</string>
+    <string name="shopping_running_low">Running low</string>
+    <string name="shopping_frequent">Frequent</string>
+    <string name="cd_add_to_list">Add %1$s to the list</string>
+    <string name="shopping_no_category">No category</string>
+    <string name="shopping_no_store">No store</string>
+    <string name="shopping_bought">Bought</string>
+    <string name="shopping_clear_bought">Clear bought items</string>
+    <string name="badge_min_stock">Minimum stock</string>
+    <string name="line_cheapest_at">Cheapest at %1$s</string>
+    <string name="shopping_new_item">New item</string>
+    <string name="shopping_edit_item">Edit item</string>
+    <string name="tick_title">Add to the pantry?</string>
+    <string name="action_no">No</string>
+    <string name="action_to_buy">To buy</string>
+    <string name="action_remove_from_list">Remove from the list</string>
+    <string name="msg_below_min_stock">%1$s is below its minimum stock</string>
+    <string name="action_add_to_list">Add to list</string>
+    <string name="best_title">Cheapest at</string>
+    <string name="best_noted_on">noted %1$s</string>
+    <string name="field_best_store">Cheapest store</string>
+    <string name="field_best_price">Price (€)</string>
+    <string name="field_best_reference">Price per</string>
+    <string name="field_best_reference_help">For example: per kg, pack of 6</string>
+    <string name="error_price">Enter a price, for example %1$s</string>
+    <string name="settings_shopping">Shopping list</string>
+    <string name="settings_on_tick">When you tick a product</string>
+    <string name="on_tick_ask">Ask whether to add it to the pantry</string>
+    <string name="on_tick_always">Always add it to the pantry</string>
+    <string name="on_tick_never">Don\'t add it</string>
+    <string name="settings_min_stock">Below minimum stock</string>
+    <string name="min_stock_automatic">Add to the list automatically</string>
+    <string name="min_stock_ask">Ask first</string>
+    <string name="settings_running_low">Running low</string>
+    <string name="field_days">Days</string>
+    <string name="settings_running_low_help">A product is running low when its estimated duration is shorter.</string>
+    <plurals name="running_low_summary">
+        <item quantity="one">Less than %1$d day</item>
+        <item quantity="other">Less than %1$d days</item>
+    </plurals>
 </resources>

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
 import io.github.nidamanx.formica.data.PantryRepository
+import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.DurationEstimate
 import io.github.nidamanx.formica.domain.GroupKey
@@ -21,12 +22,15 @@ import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.MeasureUnit
 import io.github.nidamanx.formica.domain.model.MovementType
 import io.github.nidamanx.formica.domain.model.ONE_UNIT
+import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.model.isCountable
+import io.github.nidamanx.formica.domain.openItemFor
 import io.github.nidamanx.formica.domain.quantitiesByBatch
 import io.github.nidamanx.formica.domain.summarizeProduct
 import io.github.nidamanx.formica.domain.visibleGroups
 import io.github.nidamanx.formica.settings.DisplayDefaults
+import io.github.nidamanx.formica.settings.ShoppingSettings
 import io.github.nidamanx.formica.ui.appContainer
 import java.time.LocalDate
 import kotlinx.coroutines.channels.Channel
@@ -51,6 +55,8 @@ data class ProductDetailState(
     val locations: List<Location> = emptyList(),
     val categories: List<Category> = emptyList(),
     val stores: List<Store> = emptyList(),
+    /** The product has an open item in the shopping list. */
+    val inList: Boolean = false,
     val today: Long = 0,
 )
 
@@ -76,8 +82,12 @@ sealed interface DetailMessage {
 class ProductDetailViewModel(
     private val productId: String,
     private val pantry: PantryRepository,
+    private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
+    settings: ShoppingSettings,
 ) : ViewModel() {
+
+    val restockQuestions: Flow<Product> = pantry.restockQuestions
 
     private val messageChannel = Channel<DetailMessage>(Channel.BUFFERED)
     val messages: Flow<DetailMessage> = messageChannel.receiveAsFlow()
@@ -87,19 +97,25 @@ class ProductDetailViewModel(
 
     private val catalogs = combine(catalog.locations, catalog.categories, catalog.stores) { l, c, s -> Triple(l, c, s) }
 
+    private val listContext = combine(shopping.items, settings.preferences) { items, preferences ->
+        (openItemFor(items, productId) != null) to preferences.runningLowDays
+    }
+
     val state: StateFlow<ProductDetailState> = combine(
         pantry.observeProduct(productId),
         pantry.observeBatches(productId),
         pantry.observeMovements(productId),
         catalogs,
-    ) { product, batches, movements, (locations, categories, stores) ->
+        listContext,
+    ) { product, batches, movements, (locations, categories, stores), (inList, runningLowDays) ->
         val today = LocalDate.now().toEpochDay()
         val now = System.currentTimeMillis()
         if (product == null || product.deletedAt != null) {
             return@combine ProductDetailState(loaded = true)
         }
         val quantities = quantitiesByBatch(movements)
-        val summary = summarizeProduct(product, batches, quantities, movements, today, now, DisplayDefaults.thresholds)
+        val thresholds = DisplayDefaults.thresholds(runningLowDays)
+        val summary = summarizeProduct(product, batches, quantities, movements, today, now, thresholds)
         val groups = visibleGroups(groupBatches(batches, quantities, product.daysAfterOpening))
         val only = groups.singleOrNull()?.key
         val plain = only != null && only.expiresOn == null && only.preparedOn == null &&
@@ -114,6 +130,7 @@ class ProductDetailViewModel(
             locations = locations,
             categories = categories,
             stores = stores,
+            inList = inList,
             today = today,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProductDetailState())
@@ -173,6 +190,15 @@ class ProductDetailViewModel(
             pantry.prepare(productId, quantity, locationId, preparedOn, expiresOn, readyFrom)
         }
 
+    fun toggleToBuy() {
+        val listed = state.value.inList
+        viewModelScope.launch { if (listed) shopping.removeFromList(productId) else shopping.toBuy(productId) }
+    }
+
+    fun addToList(id: String) {
+        viewModelScope.launch { shopping.toBuy(id, automatic = true) }
+    }
+
     /** The notes of a group are written on each of its batches. */
     fun saveNotes(key: GroupKey, notes: String) {
         _dialog.value = null
@@ -209,7 +235,10 @@ class ProductDetailViewModel(
 
     companion object {
         fun factory(productId: String) = viewModelFactory {
-            initializer { ProductDetailViewModel(productId, appContainer().pantry, appContainer().catalog) }
+            initializer {
+                val c = appContainer()
+                ProductDetailViewModel(productId, c.pantry, c.shopping, c.catalog, c.shoppingSettings)
+            }
         }
     }
 }
