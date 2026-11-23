@@ -1,12 +1,24 @@
 # Installs and starts the debug app on emulators (the oldest supported Android, a middle
 # version and recent ones), checks it does not crash and takes a screenshot of every
 # section, in the light and the dark theme.
-# Manual only, to save Actions minutes and keep runs short:
-# Actions > Emulator smoke test > Run workflow, optionally on one API level.
+# Two ways to start it:
+#  - automatically, on a push to dev that changes the app or the build: Android 8
+#    (API 26) only, the oldest supported version;
+#  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one. GitHub
+#    shows this button only once the workflow is on the default branch (main).
 # Experimental levels run only when asked for by name.
 name: Emulator smoke test
 
 on:
+  push:
+    branches: [dev]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/emulator.yml"
+      - "scripts/emulator-smoke.sh"
   workflow_dispatch:
     inputs:
       only:
@@ -17,14 +29,20 @@ on:
 permissions:
   contents: read
 
+# A newer push makes the running automatic test pointless; manual runs are never cancelled
+concurrency:
+  group: emulator-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
 jobs:
   emulator:
     runs-on: ubuntu-24.04
     # Experimental images may fail for reasons outside the app: reported, not blocking
     continue-on-error: ${{ matrix.experimental == true }}
     env:
-      # Jobs not selected start but skip every step (about a minute each)
-      SELECTED: ${{ inputs.only && inputs.only == format('{0}', matrix.api-level) || !inputs.only && matrix.experimental != true }}
+      # Jobs not selected start but skip every step (about a minute each).
+      # Push: API 26 only. Manual: the level asked for, or all but the experimental ones
+      SELECTED: ${{ github.event_name == 'push' && format('{0}', matrix.api-level) == '26' || github.event_name == 'workflow_dispatch' && (inputs.only && inputs.only == format('{0}', matrix.api-level) || !inputs.only && matrix.experimental != true) }}
     strategy:
       fail-fast: false
       matrix:
