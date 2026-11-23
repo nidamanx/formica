@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,9 +59,13 @@ private object Routes {
     fun productDetail(id: String) = "product/$id"
 }
 
+/** @param openExpiries start on the Expiries section (tap on the daily notification) */
 @Composable
-fun FormicaApp() {
+fun FormicaApp(openExpiries: Boolean = false) {
     val navController = rememberNavController()
+    LaunchedEffect(Unit) {
+        if (openExpiries) navController.navigateToSection(TopLevelDestination.EXPIRIES)
+    }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val atTopLevel = TopLevelDestination.entries.any { it.route == currentDestination?.route }

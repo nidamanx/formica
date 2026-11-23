@@ -12,6 +12,13 @@
         android:name="android.permission.ACCESS_NETWORK_STATE"
         tools:node="remove" />
 
+    <!-- The daily notification (SPEC §9); asked for on Android 13+ only -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Added by WorkManager for foreground work, which the app never runs -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+
     <!-- No Android backup or device transfer: data leaves the phone only through the
          export started by the user -->
     <application

@@ -10,6 +10,7 @@ import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.OperationContext
+import io.github.nidamanx.formica.notifications.DailyCheckScheduler
 import io.github.nidamanx.formica.settings.DeviceSettings
 import io.github.nidamanx.formica.settings.NotificationSettings
 import io.github.nidamanx.formica.settings.ShoppingSettings
@@ -27,6 +28,7 @@ class AppContainer(context: Context) {
     val deviceSettings = DeviceSettings(appContext, defaultName = Build.MODEL.ifBlank { Build.MANUFACTURER })
     val shoppingSettings = ShoppingSettings(appContext)
     val notificationSettings = NotificationSettings(appContext)
+    val dailyCheckScheduler = DailyCheckScheduler(appContext)
 
     /** Expiry warning and "running low" days, as set by the user. */
     val listThresholds: Flow<ListThresholds> = combine(

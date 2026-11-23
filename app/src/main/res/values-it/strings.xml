@@ -292,4 +292,43 @@
         <item quantity="other">%1$d giorni prima della scadenza</item>
     </plurals>
     <string name="settings_warning_days_help">Se un prodotto ha un suo preavviso, vale quello.</string>
+    <string name="notification_channel_name">Avvisi delle scadenze</string>
+    <string name="notification_channel_description">Una notifica al giorno con le scadenze e le preparazioni pronte.</string>
+    <string name="notification_title">Scadenze</string>
+    <plurals name="notif_expiring">
+        <item quantity="one">%1$d prodotto scade %2$s</item>
+        <item quantity="many">%1$d prodotti scadono %2$s</item>
+        <item quantity="other">%1$d prodotti scadono %2$s</item>
+    </plurals>
+    <string name="notif_when_today">oggi</string>
+    <string name="notif_when_tomorrow">entro domani</string>
+    <plurals name="notif_when_days">
+        <item quantity="one">entro %1$d giorno</item>
+        <item quantity="many">entro %1$d giorni</item>
+        <item quantity="other">entro %1$d giorni</item>
+    </plurals>
+    <plurals name="notif_expired">
+        <item quantity="one">%1$d prodotto è scaduto</item>
+        <item quantity="many">%1$d prodotti sono scaduti</item>
+        <item quantity="other">%1$d prodotti sono scaduti</item>
+    </plurals>
+    <plurals name="notif_ready">
+        <item quantity="one">%1$d prodotto è pronto</item>
+        <item quantity="many">%1$d prodotti sono pronti</item>
+        <item quantity="other">%1$d prodotti sono pronti</item>
+    </plurals>
+    <string name="notif_status_expired">scaduto</string>
+    <string name="notif_status_today">scade oggi</string>
+    <string name="notif_status_tomorrow">scade domani</string>
+    <plurals name="notif_status_days">
+        <item quantity="one">scade fra %1$d giorno</item>
+        <item quantity="many">scade fra %1$d giorni</item>
+        <item quantity="other">scade fra %1$d giorni</item>
+    </plurals>
+    <string name="notif_status_ready">pronto oggi</string>
+    <plurals name="notif_more">
+        <item quantity="one">+%1$d altro</item>
+        <item quantity="many">+%1$d altri</item>
+        <item quantity="other">+%1$d altri</item>
+    </plurals>
 </resources>

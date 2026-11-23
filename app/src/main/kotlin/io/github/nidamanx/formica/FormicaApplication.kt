@@ -2,6 +2,7 @@
 package io.github.nidamanx.formica
 
 import android.app.Application
+import io.github.nidamanx.formica.notifications.ExpiryNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,6 +18,7 @@ class FormicaApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        ExpiryNotifications.createChannel(this)
         applicationScope.launch { container.initialize() }
     }
 }

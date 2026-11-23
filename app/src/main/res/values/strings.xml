@@ -289,4 +289,37 @@
         <item quantity="other">%1$d days before expiry</item>
     </plurals>
     <string name="settings_warning_days_help">A product\'s own warning, if set, takes precedence.</string>
+    <string name="notification_channel_name">Expiry reminders</string>
+    <string name="notification_channel_description">One notification a day with expiries and ready preparations.</string>
+    <string name="notification_title">Expiries</string>
+    <plurals name="notif_expiring">
+        <item quantity="one">%1$d product expires %2$s</item>
+        <item quantity="other">%1$d products expire %2$s</item>
+    </plurals>
+    <string name="notif_when_today">today</string>
+    <string name="notif_when_tomorrow">by tomorrow</string>
+    <plurals name="notif_when_days">
+        <item quantity="one">within %1$d day</item>
+        <item quantity="other">within %1$d days</item>
+    </plurals>
+    <plurals name="notif_expired">
+        <item quantity="one">%1$d product has expired</item>
+        <item quantity="other">%1$d products have expired</item>
+    </plurals>
+    <plurals name="notif_ready">
+        <item quantity="one">%1$d product is ready</item>
+        <item quantity="other">%1$d products are ready</item>
+    </plurals>
+    <string name="notif_status_expired">expired</string>
+    <string name="notif_status_today">expires today</string>
+    <string name="notif_status_tomorrow">expires tomorrow</string>
+    <plurals name="notif_status_days">
+        <item quantity="one">expires in %1$d day</item>
+        <item quantity="other">expires in %1$d days</item>
+    </plurals>
+    <string name="notif_status_ready">ready today</string>
+    <plurals name="notif_more">
+        <item quantity="one">+%1$d more</item>
+        <item quantity="other">+%1$d more</item>
+    </plurals>
 </resources>
