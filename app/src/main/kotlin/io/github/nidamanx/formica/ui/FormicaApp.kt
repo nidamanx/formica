@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.ui.components.SectionTopBar
 import io.github.nidamanx.formica.ui.pantry.PantryScreen
+import io.github.nidamanx.formica.ui.product.ProductDetailScreen
 import io.github.nidamanx.formica.ui.product.ProductFormScreen
 import io.github.nidamanx.formica.ui.settings.CatalogKind
 import io.github.nidamanx.formica.ui.settings.CatalogScreen
@@ -57,10 +58,12 @@ enum class TopLevelDestination(
 private object Routes {
     const val SETTINGS = "settings"
     const val CATALOG = "settings/catalog/{kind}"
-    const val PRODUCT_NEW = "product/new"
+    const val PRODUCT_NEW = "new-product"
     const val PRODUCT_EDIT = "product/{id}/edit"
+    const val PRODUCT_DETAIL = "product/{id}"
     fun catalog(kind: CatalogKind) = "settings/catalog/${kind.name}"
     fun productEdit(id: String) = "product/$id/edit"
+    fun productDetail(id: String) = "product/$id"
 }
 
 @Composable
@@ -101,7 +104,7 @@ fun FormicaApp() {
                 PantryScreen(
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                     onNewProduct = { navController.navigate(Routes.PRODUCT_NEW) },
-                    onOpenProduct = { navController.navigate(Routes.productEdit(it)) },
+                    onOpenProduct = { navController.navigate(Routes.productDetail(it)) },
                 )
             }
             listOf(TopLevelDestination.SHOPPING_LIST, TopLevelDestination.EXPIRIES).forEach { destination ->
@@ -111,6 +114,14 @@ fun FormicaApp() {
             }
             composable(Routes.PRODUCT_NEW) {
                 ProductFormScreen(productId = null, onDone = { navController.popBackStack() })
+            }
+            composable(Routes.PRODUCT_DETAIL) { entry ->
+                val id = requireNotNull(entry.arguments?.getString("id"))
+                ProductDetailScreen(
+                    productId = id,
+                    onBack = { navController.popBackStack() },
+                    onEdit = { navController.navigate(Routes.productEdit(id)) },
+                )
             }
             composable(Routes.PRODUCT_EDIT) { entry ->
                 ProductFormScreen(

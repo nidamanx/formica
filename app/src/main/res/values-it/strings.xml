@@ -148,6 +148,53 @@
     <string name="field_min_stock">Scorta minima</string>
     <string name="error_days">Scrivi un numero di giorni.</string>
 
+    <string name="estimate_label">Durata stimata: %1$s</string>
+    <plurals name="estimate_days">
+        <item quantity="one">circa %1$d giorno</item>
+        <item quantity="many">circa %1$d giorni</item>
+        <item quantity="other">circa %1$d giorni</item>
+    </plurals>
+    <plurals name="estimate_weeks">
+        <item quantity="one">circa %1$d settimana</item>
+        <item quantity="many">circa %1$d settimane</item>
+        <item quantity="other">circa %1$d settimane</item>
+    </plurals>
+    <plurals name="estimate_months">
+        <item quantity="one">circa %1$d mese</item>
+        <item quantity="many">circa %1$d mesi</item>
+        <item quantity="other">circa %1$d mesi</item>
+    </plurals>
+    <string name="estimate_more_than_year">più di un anno</string>
+    <string name="estimate_insufficient">dati insufficienti</string>
+    <string name="menu_correct">Correggi quantità…</string>
+    <string name="delete_product_message">Il prodotto e le sue confezioni non compariranno più.</string>
+    <string name="section_stock">Confezioni</string>
+    <string name="line_opened">aperto il %1$s</string>
+    <string name="line_made_on">preparata il %1$s</string>
+    <string name="badge_opened">Aperto</string>
+    <string name="menu_use">Consuma…</string>
+    <string name="menu_move">Sposta…</string>
+    <string name="menu_open">Segna aperto…</string>
+    <string name="menu_discard">Scarta…</string>
+    <string name="menu_notes">Note…</string>
+    <string name="discard_title">Scarta</string>
+    <string name="move_title">Sposta</string>
+    <string name="open_title">Segna aperto</string>
+    <string name="notes_title">Note</string>
+    <string name="correct_title">Correggi quantità</string>
+    <string name="open_how_many">Quanti ne apri?</string>
+    <string name="correct_help">Scrivi quanto ce n\'è davvero.</string>
+    <string name="field_new_location">Nuova posizione</string>
+    <string name="msg_only_were">Ce n\'erano solo %1$s.</string>
+    <string name="section_history">Movimenti</string>
+    <string name="history_purchase">Acquisto</string>
+    <string name="history_preparation">Preparazione</string>
+    <string name="history_consumption">Consumo</string>
+    <string name="history_correction">Correzione</string>
+    <string name="history_discard">Scarto</string>
+    <string name="history_opening">Apertura</string>
+    <string name="history_transfer">Spostamento: %1$s → %2$s</string>
+
     <string-array name="initial_locations">
         <item>Frigo</item>
         <item>Freezer</item>

@@ -148,6 +148,51 @@
     <string name="field_min_stock">Minimum stock</string>
     <string name="error_days">Enter a number of days.</string>
 
+    <!-- Product detail -->
+    <string name="estimate_label">Estimated duration: %1$s</string>
+    <plurals name="estimate_days">
+        <item quantity="one">about %1$d day</item>
+        <item quantity="other">about %1$d days</item>
+    </plurals>
+    <plurals name="estimate_weeks">
+        <item quantity="one">about %1$d week</item>
+        <item quantity="other">about %1$d weeks</item>
+    </plurals>
+    <plurals name="estimate_months">
+        <item quantity="one">about %1$d month</item>
+        <item quantity="other">about %1$d months</item>
+    </plurals>
+    <string name="estimate_more_than_year">more than a year</string>
+    <string name="estimate_insufficient">not enough data</string>
+    <string name="menu_correct">Correct quantity…</string>
+    <string name="delete_product_message">The product and its stock will no longer be shown.</string>
+    <string name="section_stock">Stock</string>
+    <string name="line_opened">opened %1$s</string>
+    <string name="line_made_on">made on %1$s</string>
+    <string name="badge_opened">Opened</string>
+    <string name="menu_use">Use…</string>
+    <string name="menu_move">Move…</string>
+    <string name="menu_open">Mark as opened…</string>
+    <string name="menu_discard">Discard…</string>
+    <string name="menu_notes">Notes…</string>
+    <string name="discard_title">Discard</string>
+    <string name="move_title">Move</string>
+    <string name="open_title">Mark as opened</string>
+    <string name="notes_title">Notes</string>
+    <string name="correct_title">Correct quantity</string>
+    <string name="open_how_many">How many are you opening?</string>
+    <string name="correct_help">Enter how much there really is.</string>
+    <string name="field_new_location">New location</string>
+    <string name="msg_only_were">There were only %1$s.</string>
+    <string name="section_history">History</string>
+    <string name="history_purchase">Purchase</string>
+    <string name="history_preparation">Preparation</string>
+    <string name="history_consumption">Use</string>
+    <string name="history_correction">Correction</string>
+    <string name="history_discard">Discarded</string>
+    <string name="history_opening">Opened</string>
+    <string name="history_transfer">Move: %1$s → %2$s</string>
+
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">
