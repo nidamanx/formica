@@ -73,3 +73,6 @@ Releases are built and signed by GitHub Actions only. Details in
 ## License
 
 [GNU Affero General Public License v3.0 or later](LICENSE).
+
+Some icons come from [Material Icons](https://github.com/google/material-design-icons) by Google,
+under the Apache License 2.0.

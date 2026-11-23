@@ -120,6 +120,9 @@ interface MovementDao {
     )
     fun observeForProduct(productId: String): Flow<List<MovementEntity>>
 
+    @Query("SELECT * FROM movements")
+    fun observeAll(): Flow<List<MovementEntity>>
+
     @Query("SELECT batchId AS id, SUM(delta) AS quantity FROM movements GROUP BY batchId")
     fun observeBatchQuantities(): Flow<List<IdQuantity>>
 

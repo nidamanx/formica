@@ -75,3 +75,6 @@ Le release sono compilate e firmate solo da GitHub Actions. Dettagli in
 ## Licenza
 
 [GNU Affero General Public License v3.0 o successiva](LICENSE).
+
+Alcune icone vengono da [Material Icons](https://github.com/google/material-design-icons) di Google,
+con licenza Apache 2.0.

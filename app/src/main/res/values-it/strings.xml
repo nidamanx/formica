@@ -45,6 +45,109 @@
     <string name="error_name_exists">\"%1$s\" esiste già.</string>
     <string name="stores_empty">Nessun luogo d\'acquisto. Aggiungi i supermercati, i negozi, i mercati e i produttori da cui compri.</string>
 
+    <string name="pantry_search">Cerca nei nomi e nelle note</string>
+    <string name="sort_name">Nome</string>
+    <string name="sort_expiry">Scadenza</string>
+    <string name="sort_preparation">Data di preparazione</string>
+    <string name="filter_location">Posizione</string>
+    <string name="filter_category">Categoria</string>
+    <string name="filter_all">Tutte</string>
+    <string name="pantry_no_match">Nessun prodotto corrisponde ai filtri.</string>
+    <string name="badge_expiring">In scadenza</string>
+    <string name="badge_expired">Scaduto</string>
+    <string name="badge_not_ready">In preparazione</string>
+    <string name="badge_running_low">Sta per finire</string>
+    <string name="badge_check">Da verificare</string>
+    <string name="line_expires">scade il %1$s</string>
+    <string name="line_expired">scaduto il %1$s</string>
+    <string name="line_ready_from">pronto dal %1$s</string>
+    <string name="made_today">preparata oggi</string>
+    <plurals name="made_days_ago">
+        <item quantity="one">preparata %1$d giorno fa</item>
+        <item quantity="many">preparata %1$d giorni fa</item>
+        <item quantity="other">preparata %1$d giorni fa</item>
+    </plurals>
+    <plurals name="made_months_ago">
+        <item quantity="one">preparata %1$d mese fa</item>
+        <item quantity="many">preparata %1$d mesi fa</item>
+        <item quantity="other">preparata %1$d mesi fa</item>
+    </plurals>
+    <plurals name="made_years_ago">
+        <item quantity="one">preparata %1$d anno fa</item>
+        <item quantity="many">preparata %1$d anni fa</item>
+        <item quantity="other">preparata %1$d anni fa</item>
+    </plurals>
+    <plurals name="disc_days">
+        <item quantity="one">giorno</item>
+        <item quantity="many">giorni</item>
+        <item quantity="other">giorni</item>
+    </plurals>
+    <plurals name="disc_months">
+        <item quantity="one">mese</item>
+        <item quantity="many">mesi</item>
+        <item quantity="other">mesi</item>
+    </plurals>
+    <string name="disc_today">oggi</string>
+    <string name="disc_expired">scaduto</string>
+    <string name="cd_use">Consuma</string>
+    <string name="cd_add_purchase">Aggiungi acquisto</string>
+    <string name="cd_new_product">Nuovo prodotto</string>
+    <string name="msg_nothing_to_use">Non c\'è niente da consumare.</string>
+    <string name="msg_used_only">Non ce n\'era abbastanza: consumato solo %1$s.</string>
+
+    <string name="unit_piece_short">pz</string>
+    <string name="unit_gram_short">g</string>
+    <string name="unit_kilogram_short">kg</string>
+    <string name="unit_milliliter_short">ml</string>
+    <string name="unit_liter_short">l</string>
+    <plurals name="unit_package">
+        <item quantity="one">confezione</item>
+        <item quantity="many">confezioni</item>
+        <item quantity="other">confezioni</item>
+    </plurals>
+    <plurals name="unit_jar">
+        <item quantity="one">vasetto</item>
+        <item quantity="many">vasetti</item>
+        <item quantity="other">vasetti</item>
+    </plurals>
+    <plurals name="unit_bottle">
+        <item quantity="one">bottiglia</item>
+        <item quantity="many">bottiglie</item>
+        <item quantity="other">bottiglie</item>
+    </plurals>
+    <string name="unit_piece_name">pezzi</string>
+    <string name="unit_gram_name">grammi</string>
+    <string name="unit_kilogram_name">chilogrammi</string>
+    <string name="unit_milliliter_name">millilitri</string>
+    <string name="unit_liter_name">litri</string>
+    <string name="unit_package_name">confezioni</string>
+    <string name="unit_jar_name">vasetti</string>
+    <string name="unit_bottle_name">bottiglie</string>
+
+    <string name="purchase_title">Aggiungi acquisto</string>
+    <string name="use_title">Consuma</string>
+    <string name="field_quantity">Quantità</string>
+    <string name="field_expiry">Scadenza</string>
+    <string name="field_location">Posizione</string>
+    <string name="field_store">Luogo d\'acquisto</string>
+    <string name="value_none_f">Nessuna</string>
+    <string name="value_none_m">Nessuno</string>
+    <string name="cd_clear_date">Togli la data</string>
+    <string name="action_ok">OK</string>
+    <string name="error_quantity">Scrivi una quantità valida.</string>
+
+    <string name="product_new">Nuovo prodotto</string>
+    <string name="product_edit">Modifica prodotto</string>
+    <string name="field_unit">Unità</string>
+    <string name="field_category">Categoria</string>
+    <string name="form_more">Altro</string>
+    <string name="field_shelf_life">Si conserva per (giorni)</string>
+    <string name="field_shelf_life_help">Serve a proporre la scadenza dei nuovi acquisti.</string>
+    <string name="field_days_after_opening">Dopo l\'apertura dura (giorni)</string>
+    <string name="field_warning_days">Avvisami prima della scadenza (giorni)</string>
+    <string name="field_min_stock">Scorta minima</string>
+    <string name="error_days">Scrivi un numero di giorni.</string>
+
     <string-array name="initial_locations">
         <item>Frigo</item>
         <item>Freezer</item>

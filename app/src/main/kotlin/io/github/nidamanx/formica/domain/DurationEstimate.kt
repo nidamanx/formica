@@ -31,20 +31,26 @@ private const val DAYS_PER_MONTH = 365.25 / 12
  * @param now epoch millis
  */
 fun estimateDuration(productMovements: List<Movement>, quantity: Long, now: Long): DurationEstimate {
-    val firstMovement = productMovements.minOfOrNull { it.timestamp } ?: return DurationEstimate.InsufficientData
+    val days = estimatedDays(productMovements, quantity, now) ?: return DurationEstimate.InsufficientData
+    return roundDuration(days)
+}
+
+/** Days the stock lasts, before rounding; null with insufficient data. Used for "running low". */
+fun estimatedDays(productMovements: List<Movement>, quantity: Long, now: Long): Double? {
+    val firstMovement = productMovements.minOfOrNull { it.timestamp } ?: return null
     val periodStart = maxOf(now - WINDOW_DAYS * DAY_MILLIS, firstMovement)
     val consumptions = productMovements.filter {
         it.type == MovementType.CONSUMPTION && it.timestamp >= periodStart && it.timestamp <= now
     }
-    if (consumptions.size < MIN_CONSUMPTIONS) return DurationEstimate.InsufficientData
+    if (consumptions.size < MIN_CONSUMPTIONS) return null
     val spread = consumptions.maxOf { it.timestamp } - consumptions.minOf { it.timestamp }
-    if (spread < MIN_SPREAD_DAYS * DAY_MILLIS) return DurationEstimate.InsufficientData
+    if (spread < MIN_SPREAD_DAYS * DAY_MILLIS) return null
 
     val periodDays = (now - periodStart).toDouble() / DAY_MILLIS
     val dailyConsumption = consumptions.sumOf { abs(it.delta) } / periodDays
-    if (dailyConsumption <= 0.0) return DurationEstimate.InsufficientData
-    if (quantity <= 0) return DurationEstimate.Days(0)
-    return roundDuration(quantity / dailyConsumption)
+    if (dailyConsumption <= 0.0) return null
+    if (quantity <= 0) return 0.0
+    return quantity / dailyConsumption
 }
 
 /** < 14 days → days; < 8 weeks → weeks; < 12 months → months; then "more than a year". */

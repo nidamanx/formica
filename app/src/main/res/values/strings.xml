@@ -49,6 +49,105 @@
     <string name="error_name_exists">\"%1$s\" already exists.</string>
     <string name="stores_empty">No stores yet. Add the supermarkets, shops, markets and producers you buy from.</string>
 
+    <!-- Pantry list -->
+    <string name="pantry_search">Search names and notes</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_expiry">Expiry date</string>
+    <string name="sort_preparation">Preparation date</string>
+    <string name="filter_location">Location</string>
+    <string name="filter_category">Category</string>
+    <string name="filter_all">All</string>
+    <string name="pantry_no_match">No products match the filters.</string>
+    <string name="badge_expiring">Expiring</string>
+    <string name="badge_expired">Expired</string>
+    <string name="badge_not_ready">Not ready yet</string>
+    <string name="badge_running_low">Running low</string>
+    <string name="badge_check">Check quantity</string>
+    <string name="line_expires">expires %1$s</string>
+    <string name="line_expired">expired %1$s</string>
+    <string name="line_ready_from">ready from %1$s</string>
+    <string name="made_today">made today</string>
+    <plurals name="made_days_ago">
+        <item quantity="one">made %1$d day ago</item>
+        <item quantity="other">made %1$d days ago</item>
+    </plurals>
+    <plurals name="made_months_ago">
+        <item quantity="one">made %1$d month ago</item>
+        <item quantity="other">made %1$d months ago</item>
+    </plurals>
+    <plurals name="made_years_ago">
+        <item quantity="one">made %1$d year ago</item>
+        <item quantity="other">made %1$d years ago</item>
+    </plurals>
+    <plurals name="disc_days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="disc_months">
+        <item quantity="one">month</item>
+        <item quantity="other">months</item>
+    </plurals>
+    <string name="disc_today">today</string>
+    <string name="disc_expired">expired</string>
+    <string name="cd_use">Use</string>
+    <string name="cd_add_purchase">Add purchase</string>
+    <string name="cd_new_product">New product</string>
+    <string name="msg_nothing_to_use">Nothing left to use.</string>
+    <string name="msg_used_only">Not enough left: only %1$s used.</string>
+
+    <!-- Units: short form on the cards, full name in the form -->
+    <string name="unit_piece_short">pc</string>
+    <string name="unit_gram_short">g</string>
+    <string name="unit_kilogram_short">kg</string>
+    <string name="unit_milliliter_short">ml</string>
+    <string name="unit_liter_short">l</string>
+    <plurals name="unit_package">
+        <item quantity="one">package</item>
+        <item quantity="other">packages</item>
+    </plurals>
+    <plurals name="unit_jar">
+        <item quantity="one">jar</item>
+        <item quantity="other">jars</item>
+    </plurals>
+    <plurals name="unit_bottle">
+        <item quantity="one">bottle</item>
+        <item quantity="other">bottles</item>
+    </plurals>
+    <string name="unit_piece_name">pieces</string>
+    <string name="unit_gram_name">grams</string>
+    <string name="unit_kilogram_name">kilograms</string>
+    <string name="unit_milliliter_name">milliliters</string>
+    <string name="unit_liter_name">liters</string>
+    <string name="unit_package_name">packages</string>
+    <string name="unit_jar_name">jars</string>
+    <string name="unit_bottle_name">bottles</string>
+
+    <!-- Add purchase and use panels -->
+    <string name="purchase_title">Add purchase</string>
+    <string name="use_title">Use</string>
+    <string name="field_quantity">Quantity</string>
+    <string name="field_expiry">Expiry date</string>
+    <string name="field_location">Location</string>
+    <string name="field_store">Store</string>
+    <string name="value_none_f">None</string>
+    <string name="value_none_m">None</string>
+    <string name="cd_clear_date">Clear date</string>
+    <string name="action_ok">OK</string>
+    <string name="error_quantity">Enter a valid quantity.</string>
+
+    <!-- Product form -->
+    <string name="product_new">New product</string>
+    <string name="product_edit">Edit product</string>
+    <string name="field_unit">Unit</string>
+    <string name="field_category">Category</string>
+    <string name="form_more">More</string>
+    <string name="field_shelf_life">Keeps for (days)</string>
+    <string name="field_shelf_life_help">Used to suggest the expiry date of new purchases.</string>
+    <string name="field_days_after_opening">Lasts after opening (days)</string>
+    <string name="field_warning_days">Warn me before expiry (days)</string>
+    <string name="field_min_stock">Minimum stock</string>
+    <string name="error_days">Enter a number of days.</string>
+
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">

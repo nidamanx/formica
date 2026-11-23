@@ -72,6 +72,9 @@ class PantryRepository(
 
     val batches: Flow<List<Batch>> = batchDao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    /** Every movement: the list needs them for the duration estimate ("running low"). */
+    val movements: Flow<List<Movement>> = movementDao.observeAll().map { list -> list.map { it.toDomain() } }
+
     fun observeProduct(id: String): Flow<Product?> = productDao.observe(id).map { it?.toDomain() }
 
     fun observeBatches(productId: String): Flow<List<Batch>> =

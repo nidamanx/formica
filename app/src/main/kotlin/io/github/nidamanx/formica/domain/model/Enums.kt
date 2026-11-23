@@ -4,6 +4,11 @@ package io.github.nidamanx.formica.domain.model
 // Named MeasureUnit, not Unit, to avoid shadowing kotlin.Unit
 enum class MeasureUnit { PIECE, GRAM, KILOGRAM, MILLILITER, LITER, PACKAGE, JAR, BOTTLE }
 
+/** Pieces, packages, jars and bottles are counted one by one; weights and volumes are measured. */
+val MeasureUnit.isCountable: Boolean
+    get() = this == MeasureUnit.PIECE || this == MeasureUnit.PACKAGE ||
+        this == MeasureUnit.JAR || this == MeasureUnit.BOTTLE
+
 enum class StoreType { SUPERMARKET, SHOP, MARKET, PRODUCER }
 
 enum class Origin { PURCHASED, HOMEMADE }
