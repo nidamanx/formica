@@ -7,4 +7,27 @@
     <string name="placeholder_pantry">La dispensa è vuota.</string>
     <string name="placeholder_shopping_list">La lista della spesa è vuota.</string>
     <string name="placeholder_expiries">Nessun prodotto in scadenza.</string>
+
+    <string-array name="initial_locations">
+        <item>Frigo</item>
+        <item>Freezer</item>
+        <item>Dispensa</item>
+        <item>Cantina</item>
+    </string-array>
+    <string-array name="initial_categories">
+        <item>Frutta e verdura</item>
+        <item>Latticini e uova</item>
+        <item>Carne e pesce</item>
+        <item>Pane e pasta</item>
+        <item>Riso e cereali</item>
+        <item>Farine</item>
+        <item>Conserve</item>
+        <item>Surgelati</item>
+        <item>Bevande</item>
+        <item>Condimenti e spezie</item>
+        <item>Colazione e dolci</item>
+        <item>Pulizia casa</item>
+        <item>Igiene personale</item>
+        <item>Altro</item>
+    </string-array>
 </resources>

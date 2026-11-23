@@ -11,3 +11,5 @@ enum class Origin { PURCHASED, HOMEMADE }
 enum class MovementType { PURCHASE, PREPARATION, CONSUMPTION, CORRECTION, DISCARD, TRANSFER }
 
 enum class ShoppingStatus { TO_BUY, BOUGHT }
+
+enum class ImportMode { MERGE, NEW_PRODUCTS_ONLY, REPLACE_ALL }

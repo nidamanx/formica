@@ -9,4 +9,29 @@
     <string name="placeholder_pantry">Your pantry is empty.</string>
     <string name="placeholder_shopping_list">Your shopping list is empty.</string>
     <string name="placeholder_expiries">Nothing is about to expire.</string>
+
+    <!-- Initial data, created once at the first start in the phone's language; afterwards
+         they are the user's data -->
+    <string-array name="initial_locations">
+        <item>Fridge</item>
+        <item>Freezer</item>
+        <item>Pantry</item>
+        <item>Cellar</item>
+    </string-array>
+    <string-array name="initial_categories">
+        <item>Fruit and vegetables</item>
+        <item>Dairy and eggs</item>
+        <item>Meat and fish</item>
+        <item>Bread and pasta</item>
+        <item>Rice and cereals</item>
+        <item>Flour</item>
+        <item>Preserves</item>
+        <item>Frozen food</item>
+        <item>Drinks</item>
+        <item>Condiments and spices</item>
+        <item>Breakfast and sweets</item>
+        <item>Household cleaning</item>
+        <item>Personal care</item>
+        <item>Other</item>
+    </string-array>
 </resources>

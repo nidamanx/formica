@@ -123,3 +123,6 @@ data class ShoppingItem(
     val modifiedBy: String,
     val deletedAt: Long? = null,
 )
+
+/** This phone: stored locally, not a synced entity (the export only names it). */
+data class Device(val id: String, val name: String)

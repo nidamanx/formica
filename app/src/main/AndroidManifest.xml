@@ -15,6 +15,7 @@
     <!-- No Android backup or device transfer: data leaves the phone only through the
          export started by the user -->
     <application
+        android:name=".FormicaApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
