@@ -12,6 +12,14 @@ val keystoreFile: String? = System.getenv("FORMICA_KEYSTORE_FILE")
 val keystorePassword: String? = System.getenv("FORMICA_KEYSTORE_PASSWORD")
 val hasReleaseSigning = !keystoreFile.isNullOrBlank() && !keystorePassword.isNullOrBlank()
 
+// Debug signing: the fixed debug key only where its environment variables are set (the
+// Build workflow on pushes, from the repository secrets), so test builds install over
+// each other. Elsewhere (pull requests, forks, local builds) the SDK's own debug key of
+// that machine is used.
+val debugKeystoreFile: String? = System.getenv("FORMICA_DEBUG_KEYSTORE_FILE")
+val debugKeystorePassword: String? = System.getenv("FORMICA_DEBUG_KEYSTORE_PASSWORD")
+val hasDebugSigning = !debugKeystoreFile.isNullOrBlank() && !debugKeystorePassword.isNullOrBlank()
+
 android {
     namespace = "io.github.nidamanx.formica"
     // Android 17 with its minor update 37.2: required by Compose 1.13 (BOM 2026.11.01)
@@ -33,6 +41,15 @@ android {
     }
 
     signingConfigs {
+        if (hasDebugSigning) {
+            getByName("debug") {
+                storeFile = file(debugKeystoreFile!!)
+                storeType = "pkcs12"
+                storePassword = debugKeystorePassword
+                keyAlias = "formica-debug"
+                keyPassword = debugKeystorePassword
+            }
+        }
         if (hasReleaseSigning) {
             create("release") {
                 storeFile = file(keystoreFile!!)
