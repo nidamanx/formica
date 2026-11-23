@@ -142,4 +142,43 @@ class PantryListTest {
         assertEquals(listOf("c", "b", "a"), sorted.map { it.product.id })
         assertNull(sorted.last().nearestExpiry)
     }
+
+    @Test
+    fun `a homemade product strictly under its minimum stock is to make`() {
+        val pesto = product("pesto").copy(homemade = true, minStock = units(2))
+        val b = listOf(batch("b", productId = "pesto", origin = Origin.HOMEMADE, preparedOn = TODAY - 60))
+        assertTrue(summary(pesto, b, mapOf("b" to units(1))).toMake)
+        assertFalse(summary(pesto, b, mapOf("b" to units(2))).toMake)
+        assertTrue(summary(pesto, emptyList(), emptyMap()).toMake)
+        assertFalse(summary(pesto.copy(minStock = null), emptyList(), emptyMap()).toMake)
+        assertFalse(summary(pesto.copy(homemade = false), b, mapOf("b" to units(1))).toMake)
+    }
+
+    @Test
+    fun `the homemade filter keeps only homemade products`() {
+        val bought = summary(product("milk"), emptyList(), emptyMap())
+        val made = summary(product("jam").copy(homemade = true), emptyList(), emptyMap())
+        assertEquals(
+            listOf("jam"),
+            filterAndSort(listOf(bought, made), PantryFilter(homemadeOnly = true), PantrySort.NAME, naturalOrder())
+                .map { it.product.id },
+        )
+    }
+
+    @Test
+    fun `sort by preparation date puts the oldest first and the rest last`() {
+        val bought = summary(product("a", name = "Aceto"), emptyList(), emptyMap())
+        val recent = summary(
+            product("b", name = "Burro"),
+            listOf(batch("1", productId = "b", origin = Origin.HOMEMADE, preparedOn = TODAY - 5)),
+            mapOf("1" to units(1)),
+        )
+        val old = summary(
+            product("c", name = "Crauti"),
+            listOf(batch("2", productId = "c", origin = Origin.HOMEMADE, preparedOn = TODAY - 50)),
+            mapOf("2" to units(1)),
+        )
+        val sorted = filterAndSort(listOf(bought, recent, old), PantryFilter(), PantrySort.PREPARATION, naturalOrder())
+        assertEquals(listOf("c", "b", "a"), sorted.map { it.product.id })
+    }
 }

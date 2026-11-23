@@ -41,6 +41,9 @@ fun proposedExpiry(date: Long, shelfLifeDays: Int?): Long? = shelfLifeDays?.let 
 
 fun proposedReadyFrom(preparedOn: Long, daysUntilReady: Int?): Long? = daysUntilReady?.let { preparedOn + it }
 
+/** Strictly under the minimum stock (owner, 2026-11-23): exactly the minimum is still enough. */
+fun isBelowMinStock(quantity: Long, minStock: Long?): Boolean = minStock != null && quantity < minStock
+
 /** "In preparation": counted in the total, never consumed automatically. */
 fun isInPreparation(batch: Batch, today: Long): Boolean = batch.readyFrom != null && batch.readyFrom > today
 

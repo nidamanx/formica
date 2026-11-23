@@ -19,6 +19,8 @@ data class ProductSummary(
     /** Oldest preparation date among the batches with stock (epoch day). */
     val oldestPreparedOn: Long?,
     val runningLow: Boolean,
+    /** Homemade product under its minimum stock. */
+    val toMake: Boolean,
     val needsCheck: Boolean,
     /** Locations of the batches with stock, in consumption order, without repetitions. */
     val locationIds: List<String>,
@@ -60,6 +62,7 @@ fun summarizeProduct(
         readyFrom = withStock.filter { isInPreparation(it, today) }.mapNotNull { it.readyFrom }.minOrNull(),
         oldestPreparedOn = withStock.mapNotNull { it.preparedOn }.minOrNull(),
         runningLow = days != null && days < thresholds.runningLowDays,
+        toMake = product.homemade && isBelowMinStock(quantity, product.minStock),
         needsCheck = needsCheck(active, quantities),
         locationIds = withStock.map { it.locationId }.distinct(),
         hasNotes = !product.notes.isNullOrBlank(),
@@ -75,6 +78,7 @@ data class PantryFilter(
     val query: String = "",
     val locationId: String? = null,
     val categoryId: String? = null,
+    val homemadeOnly: Boolean = false,
 )
 
 /**
@@ -103,5 +107,6 @@ fun filterAndSort(
                 (s.locationIds.isEmpty() && s.product.defaultLocationId == filter.locationId)
         }
         .filter { filter.categoryId == null || it.product.categoryId == filter.categoryId }
+        .filter { !filter.homemadeOnly || it.product.homemade }
         .sortedWith(comparator)
 }
