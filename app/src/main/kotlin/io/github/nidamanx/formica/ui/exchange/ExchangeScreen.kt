@@ -1,0 +1,183 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+package io.github.nidamanx.formica.ui.exchange
+
+import android.content.ActivityNotFoundException
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.nidamanx.formica.R
+import io.github.nidamanx.formica.domain.model.ImportRecord
+import io.github.nidamanx.formica.sync.Exporter
+import io.github.nidamanx.formica.ui.components.BackTopBar
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+
+/** Export, import, backups, exchange log and clean-up (SPEC §11.8, option A). */
+@Composable
+fun ExchangeScreen(
+    onBack: () -> Unit,
+    viewModel: ExchangeViewModel = viewModel(factory = ExchangeViewModel.Factory),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val resources = LocalResources.current
+    val snackbar = remember { SnackbarHostState() }
+    var exporting by rememberSaveable { mutableStateOf(false) }
+    val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(Exporter.MIME)) { uri ->
+        if (uri != null) viewModel.saveTo(uri)
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ExchangeEvent.Share -> context.startActivity(event.chooser)
+                is ExchangeEvent.SaveAs -> try {
+                    saveLauncher.launch(event.fileName)
+                } catch (_: ActivityNotFoundException) {
+                    snackbar.showSnackbar(resources.getString(R.string.msg_save_failed))
+                }
+                ExchangeEvent.Saved -> snackbar.showSnackbar(resources.getString(R.string.msg_file_saved))
+                ExchangeEvent.SaveFailed -> snackbar.showSnackbar(resources.getString(R.string.msg_save_failed))
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = { BackTopBar(stringResource(R.string.settings_exchange), onBack) },
+        snackbarHost = { SnackbarHost(snackbar) },
+    ) { padding ->
+        Column(
+            Modifier
+                .padding(padding)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            if (state.loaded) {
+                LastExchangeCard(state.lastImport, onExport = { exporting = true })
+            }
+        }
+    }
+
+    if (exporting) {
+        ExportSheet(
+            onShare = {
+                exporting = false
+                viewModel.share()
+            },
+            onSave = {
+                exporting = false
+                viewModel.chooseSaveLocation()
+            },
+            onDismiss = { exporting = false },
+        )
+    }
+}
+
+@Composable
+private fun LastExchangeCard(last: ImportRecord?, onExport: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                stringResource(R.string.exchange_last),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                if (last == null) {
+                    stringResource(R.string.exchange_never)
+                } else {
+                    stringResource(R.string.exchange_last_with, last.deviceName, daysAgo(last.importedAt))
+                },
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Button(onClick = onExport, modifier = Modifier.padding(top = 6.dp)) {
+                Text(stringResource(R.string.action_export))
+            }
+        }
+    }
+}
+
+@Composable
+private fun daysAgo(millis: Long): String {
+    val zone = ZoneId.systemDefault()
+    val day = Instant.ofEpochMilli(millis).atZone(zone).toLocalDate().toEpochDay()
+    val days = (LocalDate.now(zone).toEpochDay() - day).coerceAtLeast(0).toInt()
+    return when (days) {
+        0 -> stringResource(R.string.exchange_today)
+        1 -> stringResource(R.string.exchange_yesterday)
+        else -> pluralStringResource(R.plurals.exchange_days_ago, days, days)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExportSheet(onShare: () -> Unit, onSave: () -> Unit, onDismiss: () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
+            Text(stringResource(R.string.action_export), style = MaterialTheme.typography.headlineSmall)
+            Text(
+                stringResource(R.string.export_text),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            )
+            val colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.action_share)) },
+                leadingContent = { Icon(Icons.Filled.Share, contentDescription = null) },
+                colors = colors,
+                modifier = Modifier.clickable(onClick = onShare),
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.action_save_to)) },
+                leadingContent = { Icon(painterResource(R.drawable.ic_save), contentDescription = null) },
+                colors = colors,
+                modifier = Modifier.clickable(onClick = onSave),
+            )
+        }
+    }
+}

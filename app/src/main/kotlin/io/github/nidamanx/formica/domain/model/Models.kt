@@ -132,3 +132,12 @@ data class ShoppingItem(
 
 /** This phone: stored locally, not a synced entity (the export only names it). */
 data class Device(val id: String, val name: String)
+
+/** One imported file, in the local log (not synced). */
+data class ImportRecord(
+    val deviceId: String,
+    val deviceName: String,
+    val exportedAt: Long,
+    val importedAt: Long,
+    val mode: ImportMode,
+)

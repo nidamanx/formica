@@ -75,6 +75,9 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :id")
     suspend fun get(id: String): ProductEntity?
 
+    @Query("SELECT * FROM products")
+    suspend fun all(): List<ProductEntity>
+
     @Upsert
     suspend fun upsert(items: List<ProductEntity>)
 }
@@ -89,6 +92,9 @@ interface BatchDao {
 
     @Query("SELECT * FROM batches WHERE deletedAt IS NULL")
     fun observeAll(): Flow<List<BatchEntity>>
+
+    @Query("SELECT * FROM batches")
+    suspend fun all(): List<BatchEntity>
 
     /** Batches with stock left in a location, among the products that are not deleted. */
     @Query(
@@ -123,6 +129,9 @@ interface MovementDao {
     @Query("SELECT * FROM movements")
     fun observeAll(): Flow<List<MovementEntity>>
 
+    @Query("SELECT * FROM movements")
+    suspend fun all(): List<MovementEntity>
+
     @Query("SELECT batchId AS id, SUM(delta) AS quantity FROM movements GROUP BY batchId")
     fun observeBatchQuantities(): Flow<List<IdQuantity>>
 
@@ -144,6 +153,9 @@ interface ShoppingItemDao {
 
     @Query("SELECT * FROM shopping_items WHERE deletedAt IS NULL")
     suspend fun active(): List<ShoppingItemEntity>
+
+    @Query("SELECT * FROM shopping_items")
+    suspend fun all(): List<ShoppingItemEntity>
 
     @Upsert
     suspend fun upsert(items: List<ShoppingItemEntity>)

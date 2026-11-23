@@ -55,6 +55,7 @@ import java.util.Calendar
 fun SettingsScreen(
     onBack: () -> Unit,
     onOpenCatalog: (CatalogKind) -> Unit,
+    onOpenExchange: () -> Unit,
     viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory),
 ) {
     val deviceName by viewModel.deviceName.collectAsStateWithLifecycle()
@@ -81,6 +82,15 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_device_name)) },
                 supportingContent = { Text(deviceName.orEmpty()) },
                 modifier = Modifier.clickable(enabled = deviceName != null) { renaming = true },
+            )
+            HorizontalDivider()
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_exchange)) },
+                supportingContent = { Text(stringResource(R.string.settings_exchange_hint)) },
+                trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onOpenExchange),
             )
             notifications?.let { prefs ->
                 HorizontalDivider()

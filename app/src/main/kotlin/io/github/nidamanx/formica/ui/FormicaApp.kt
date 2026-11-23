@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.nidamanx.formica.R
+import io.github.nidamanx.formica.ui.exchange.ExchangeScreen
 import io.github.nidamanx.formica.ui.expiries.ExpiriesScreen
 import io.github.nidamanx.formica.ui.pantry.PantryScreen
 import io.github.nidamanx.formica.ui.product.ProductDetailScreen
@@ -51,6 +52,7 @@ enum class TopLevelDestination(
 private object Routes {
     const val SETTINGS = "settings"
     const val CATALOG = "settings/catalog/{kind}"
+    const val EXCHANGE = "settings/exchange"
     const val PRODUCT_NEW = "new-product"
     const val PRODUCT_EDIT = "product/{id}/edit"
     const val PRODUCT_DETAIL = "product/{id}"
@@ -134,7 +136,11 @@ fun FormicaApp(openExpiries: Boolean = false) {
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
                     onOpenCatalog = { navController.navigate(Routes.catalog(it)) },
+                    onOpenExchange = { navController.navigate(Routes.EXCHANGE) },
                 )
+            }
+            composable(Routes.EXCHANGE) {
+                ExchangeScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.CATALOG) { entry ->
                 val kind = CatalogKind.valueOf(requireNotNull(entry.arguments?.getString("kind")))

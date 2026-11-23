@@ -328,4 +328,21 @@
     <string name="action_no_thanks">No, thanks</string>
     <string name="notif_permission_denied">Notifications are blocked. You can allow them in the Android settings.</string>
     <string name="action_open_settings">Open settings</string>
+    <string name="settings_exchange">Data exchange</string>
+    <string name="settings_exchange_hint">Export, import, backups</string>
+    <string name="exchange_last">Last exchange</string>
+    <string name="exchange_last_with">With %1$s, %2$s</string>
+    <string name="exchange_today">today</string>
+    <string name="exchange_yesterday">yesterday</string>
+    <plurals name="exchange_days_ago">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <string name="exchange_never">No exchange yet</string>
+    <string name="action_export">Export</string>
+    <string name="export_text">All the data of this phone, in a file to open with Formica on the other phone.</string>
+    <string name="action_share">Share</string>
+    <string name="action_save_to">Save to…</string>
+    <string name="msg_file_saved">File saved</string>
+    <string name="msg_save_failed">Could not save the file.</string>
 </resources>

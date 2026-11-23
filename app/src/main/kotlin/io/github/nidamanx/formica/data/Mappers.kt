@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.data
 
 import io.github.nidamanx.formica.domain.model.Batch
 import io.github.nidamanx.formica.domain.model.Category
+import io.github.nidamanx.formica.domain.model.ImportRecord
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.Movement
 import io.github.nidamanx.formica.domain.model.Product
@@ -164,3 +165,5 @@ fun ShoppingItem.toEntity() = ShoppingItemEntity(
     modifiedBy = modifiedBy,
     deletedAt = deletedAt,
 )
+
+fun ImportRecordEntity.toDomain() = ImportRecord(deviceId, deviceName, exportedAt, importedAt, mode)
