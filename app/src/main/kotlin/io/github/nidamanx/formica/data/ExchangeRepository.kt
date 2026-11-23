@@ -15,6 +15,10 @@ class ExchangeRepository(private val db: FormicaDatabase) {
     /** Every synced record, deleted ones included, read in one transaction. */
     suspend fun snapshot(): Snapshot = db.withTransaction { readSnapshot() }
 
+    /** The local "notes to review" marks (SPEC §11.8). */
+    val notesToReview: Flow<Set<RecordRef>> =
+        db.notesReviewDao().observeAll().map { list -> list.mapTo(HashSet()) { RecordRef(it.type, it.id) } }
+
     /** The imported files, newest first. */
     val importLog: Flow<List<ImportRecord>> =
         db.importRecordDao().observeAll().map { list -> list.map { it.toDomain() } }

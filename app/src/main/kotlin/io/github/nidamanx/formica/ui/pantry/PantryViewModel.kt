@@ -11,10 +11,12 @@ import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.PantryFilter
 import io.github.nidamanx.formica.domain.PantrySort
+import io.github.nidamanx.formica.domain.RecordRef
 import io.github.nidamanx.formica.domain.ProductSummary
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.filterAndSort
 import io.github.nidamanx.formica.domain.isOpen
+import io.github.nidamanx.formica.domain.reviewedProducts
 import io.github.nidamanx.formica.domain.model.Category
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.MeasureUnit
@@ -50,6 +52,8 @@ data class PantryUiState(
     val sort: PantrySort = PantrySort.EXPIRY,
     /** Products with an open item in the shopping list. */
     val inList: Set<String> = emptySet(),
+    /** Products whose notes, or the notes of one of their batches, are to review. */
+    val review: Set<String> = emptySet(),
     val today: Long = 0,
 )
 
@@ -72,6 +76,7 @@ class PantryViewModel(
     private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
     thresholds: Flow<ListThresholds>,
+    notesToReview: Flow<Set<RecordRef>>,
 ) : ViewModel() {
 
     /** Products below their minimum stock, when the setting asks first. */
@@ -93,9 +98,15 @@ class PantryViewModel(
         items.filter { it.isOpen }.mapNotNull { it.productId }.toSet()
     }
 
+    private val review: Flow<Set<String>> = combine(notesToReview, pantry.batches) { marks, batches ->
+        reviewedProducts(marks, batches)
+    }
+
+    private val marks = combine(inList, review) { listed, reviewed -> listed to reviewed }
+
     val state: StateFlow<PantryUiState> = combine(
-        summaries, catalogs, filter, sort, inList,
-    ) { all, (l, c, s), f, so, listed ->
+        summaries, catalogs, filter, sort, marks,
+    ) { all, (l, c, s), f, so, (listed, reviewed) ->
         val collator = Collator.getInstance()
         PantryUiState(
             loaded = true,
@@ -107,6 +118,7 @@ class PantryViewModel(
             filter = f,
             sort = so,
             inList = listed,
+            review = reviewed,
             today = LocalDate.now().toEpochDay(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PantryUiState())
@@ -190,7 +202,7 @@ class PantryViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val c = appContainer()
-                PantryViewModel(c.pantry, c.shopping, c.catalog, c.listThresholds)
+                PantryViewModel(c.pantry, c.shopping, c.catalog, c.listThresholds, c.exchange.notesToReview)
             }
         }
     }

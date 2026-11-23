@@ -14,6 +14,8 @@ import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.HistoryEntry
 import io.github.nidamanx.formica.domain.ListThresholds
 import io.github.nidamanx.formica.domain.ProductSummary
+import io.github.nidamanx.formica.domain.RecordRef
+import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.buildHistory
 import io.github.nidamanx.formica.domain.estimateDuration
@@ -56,6 +58,9 @@ data class ProductDetailState(
     val stores: List<Store> = emptyList(),
     /** The product has an open item in the shopping list. */
     val inList: Boolean = false,
+    /** "Notes to review" marks: on the product, and the batches that have one. */
+    val reviewProduct: Boolean = false,
+    val reviewBatches: Set<String> = emptySet(),
     val today: Long = 0,
 )
 
@@ -84,6 +89,7 @@ class ProductDetailViewModel(
     private val shopping: ShoppingRepository,
     catalog: CatalogRepository,
     thresholds: Flow<ListThresholds>,
+    notesToReview: Flow<Set<RecordRef>>,
 ) : ViewModel() {
 
     val restockQuestions: Flow<Product> = pantry.restockQuestions
@@ -96,8 +102,8 @@ class ProductDetailViewModel(
 
     private val catalogs = combine(catalog.locations, catalog.categories, catalog.stores) { l, c, s -> Triple(l, c, s) }
 
-    private val listContext = combine(shopping.items, thresholds) { items, limits ->
-        (openItemFor(items, productId) != null) to limits
+    private val listContext = combine(shopping.items, thresholds, notesToReview) { items, limits, marks ->
+        Triple(openItemFor(items, productId) != null, limits, marks)
     }
 
     val state: StateFlow<ProductDetailState> = combine(
@@ -106,7 +112,7 @@ class ProductDetailViewModel(
         pantry.observeMovements(productId),
         catalogs,
         listContext,
-    ) { product, batches, movements, (locations, categories, stores), (inList, limits) ->
+    ) { product, batches, movements, (locations, categories, stores), (inList, limits, marks) ->
         val today = LocalDate.now().toEpochDay()
         val now = System.currentTimeMillis()
         if (product == null || product.deletedAt != null) {
@@ -129,6 +135,8 @@ class ProductDetailViewModel(
             categories = categories,
             stores = stores,
             inList = inList,
+            reviewProduct = RecordRef(RecordType.PRODUCT, product.id) in marks,
+            reviewBatches = batches.filter { RecordRef(RecordType.BATCH, it.id) in marks }.mapTo(HashSet()) { it.id },
             today = today,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProductDetailState())
@@ -235,7 +243,14 @@ class ProductDetailViewModel(
         fun factory(productId: String) = viewModelFactory {
             initializer {
                 val c = appContainer()
-                ProductDetailViewModel(productId, c.pantry, c.shopping, c.catalog, c.listThresholds)
+                ProductDetailViewModel(
+                    productId,
+                    c.pantry,
+                    c.shopping,
+                    c.catalog,
+                    c.listThresholds,
+                    c.exchange.notesToReview,
+                )
             }
         }
     }

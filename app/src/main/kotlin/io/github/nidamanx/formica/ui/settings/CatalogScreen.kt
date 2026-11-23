@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.ui.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -31,6 +33,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -197,8 +200,13 @@ private fun CatalogRow(
     ).joinToString(" · ")
     ListItem(
         headlineContent = { Text(item.name) },
-        supportingContent = if (supporting.isNotEmpty()) {
-            { Text(supporting, maxLines = 1) }
+        supportingContent = if (supporting.isNotEmpty() || item.review) {
+            {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    if (item.review) ReviewBadge()
+                    if (supporting.isNotEmpty()) Text(supporting, maxLines = 1)
+                }
+            }
         } else {
             null
         },
@@ -331,4 +339,19 @@ private fun CatalogEditDialog(
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
+}
+
+@Composable
+private fun ReviewBadge() {
+    Surface(
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+    ) {
+        Text(
+            stringResource(R.string.badge_notes_review),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+    }
 }

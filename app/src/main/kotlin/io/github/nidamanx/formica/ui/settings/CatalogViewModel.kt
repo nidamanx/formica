@@ -6,11 +6,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.nidamanx.formica.data.CatalogRepository
+import io.github.nidamanx.formica.domain.RecordRef
+import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.model.StoreType
 import io.github.nidamanx.formica.domain.normalizedName
 import io.github.nidamanx.formica.ui.appContainer
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,7 +26,14 @@ enum class CatalogKind(val hasNotes: Boolean, val hasType: Boolean) {
     STORES(hasNotes = true, hasType = true),
 }
 
-data class CatalogItem(val id: String, val name: String, val type: StoreType?, val notes: String?)
+data class CatalogItem(
+    val id: String,
+    val name: String,
+    val type: StoreType?,
+    val notes: String?,
+    /** Its notes were appended in an import and are to review. */
+    val review: Boolean = false,
+)
 
 sealed interface NameError {
     data object Required : NameError
@@ -32,17 +43,18 @@ sealed interface NameError {
 class CatalogViewModel(
     private val kind: CatalogKind,
     private val catalog: CatalogRepository,
+    notesToReview: Flow<Set<RecordRef>>,
 ) : ViewModel() {
 
     val items: StateFlow<List<CatalogItem>> = when (kind) {
-        CatalogKind.LOCATIONS -> catalog.locations.map { list ->
-            list.map { CatalogItem(it.id, it.name, null, it.notes) }
+        CatalogKind.LOCATIONS -> combine(catalog.locations, notesToReview) { list, marks ->
+            list.map { CatalogItem(it.id, it.name, null, it.notes, RecordRef(RecordType.LOCATION, it.id) in marks) }
         }
         CatalogKind.CATEGORIES -> catalog.categories.map { list ->
             list.map { CatalogItem(it.id, it.name, null, null) }
         }
-        CatalogKind.STORES -> catalog.stores.map { list ->
-            list.map { CatalogItem(it.id, it.name, it.type, it.notes) }
+        CatalogKind.STORES -> combine(catalog.stores, notesToReview) { list, marks ->
+            list.map { CatalogItem(it.id, it.name, it.type, it.notes, RecordRef(RecordType.STORE, it.id) in marks) }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -112,7 +124,10 @@ class CatalogViewModel(
 
     companion object {
         fun factory(kind: CatalogKind) = viewModelFactory {
-            initializer { CatalogViewModel(kind, appContainer().catalog) }
+            initializer {
+                val c = appContainer()
+                CatalogViewModel(kind, c.catalog, c.exchange.notesToReview)
+            }
         }
     }
 }

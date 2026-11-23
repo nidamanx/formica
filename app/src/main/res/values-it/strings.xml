@@ -444,4 +444,5 @@
         <item quantity="other">%1$d elementi cancellati</item>
     </plurals>
     <string name="clean_up_nothing">Nessun elemento da pulire.</string>
+    <string name="badge_notes_review">Note da rivedere</string>
 </resources>

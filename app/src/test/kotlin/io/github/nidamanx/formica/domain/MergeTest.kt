@@ -340,4 +340,15 @@ class MergeTest {
         val arrived = Snapshot(products = listOf(jam, pesto))
         assertEquals(listOf("jam"), productsDroppedBelowMinStock(Snapshot(), arrived))
     }
+
+    @Test
+    fun `a review mark on a batch marks its product`() {
+        val marks = setOf(
+            RecordRef(RecordType.PRODUCT, "milk"),
+            RecordRef(RecordType.BATCH, "jar"),
+            RecordRef(RecordType.STORE, "farm"),
+        )
+        val batches = listOf(batch("jar", productId = "pesto"), batch("other", productId = "rice"))
+        assertEquals(setOf("milk", "pesto"), reviewedProducts(marks, batches))
+    }
 }

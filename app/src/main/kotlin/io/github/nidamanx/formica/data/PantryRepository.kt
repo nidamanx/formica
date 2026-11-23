@@ -6,6 +6,7 @@ import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.MinStockBehavior
 import io.github.nidamanx.formica.domain.OperationContext
+import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.droppedBelowMinStock
 import io.github.nidamanx.formica.domain.editBatchNotes
@@ -117,6 +118,7 @@ class PantryRepository(
         db.withTransaction {
             val stored = requireProduct(edited.id)
             productDao.upsert(listOf(editProduct(stored, edited, ctx).toEntity()))
+            if (stored.notes != edited.notes) db.notesReviewDao().delete(RecordType.PRODUCT, stored.id)
         }
     }
 
@@ -136,6 +138,7 @@ class PantryRepository(
             val stored = batchDao.forProduct(productId).firstOrNull { it.id == batchId }?.toDomain()
                 ?: error("batch $batchId not found")
             batchDao.upsert(listOf(editBatchNotes(stored, notes, ctx).toEntity()))
+            if (stored.notes != notes) db.notesReviewDao().delete(RecordType.BATCH, stored.id)
         }
     }
 

@@ -135,6 +135,7 @@ fun PantryScreen(
                                 locationNames = locationNames,
                                 format = format,
                                 inList = card.product.id in state.inList,
+                                review = card.product.id in state.review,
                                 onClick = { onOpenProduct(card.product.id) },
                                 onToBuy = { viewModel.toggleToBuy(card) },
                                 onMinus = { viewModel.onMinus(card) },
@@ -286,6 +287,7 @@ private fun ProductCard(
     locationNames: Map<String, String>,
     format: DisplayFormat,
     inList: Boolean,
+    review: Boolean,
     onClick: () -> Unit,
     onToBuy: () -> Unit,
     onMinus: () -> Unit,
@@ -309,6 +311,7 @@ private fun ProductCard(
         if (card.toMake) R.string.badge_to_make else null,
         if (card.runningLow) R.string.badge_running_low else null,
         if (card.needsCheck) R.string.badge_check else null,
+        if (review) R.string.badge_notes_review else null,
     )
 
     Surface(

@@ -426,4 +426,5 @@
         <item quantity="other">%1$d items removed</item>
     </plurals>
     <string name="clean_up_nothing">Nothing to clean up.</string>
+    <string name="badge_notes_review">Notes to review</string>
 </resources>

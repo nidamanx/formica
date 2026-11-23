@@ -167,6 +167,7 @@ fun ProductDetailScreen(
                 items(state.groups, key = { it.batches.first().id }) { group ->
                     GroupRow(
                         group, product.unit, product.daysAfterOpening, state.today, locationNames, storeNames, format,
+                        review = group.batches.any { it.id in state.reviewBatches },
                     ) {
                         OverflowMenu(groupActions(group, viewModel))
                     }
@@ -334,7 +335,10 @@ private fun Header(
             }
         }
         SecondaryText(stringResource(R.string.estimate_label, resources.estimateText(state.estimate)))
-        product.notes?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+        product.notes?.takeIf { it.isNotBlank() }?.let { notes ->
+            if (state.reviewProduct) SmallBadge(stringResource(R.string.badge_notes_review))
+            Text(notes, style = MaterialTheme.typography.bodyMedium)
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
             Button(onClick = onUse) {
                 Text(stringResource(R.string.use_title))
@@ -371,6 +375,7 @@ private fun GroupRow(
     locationNames: Map<String, String>,
     storeNames: Map<String, String>,
     format: DisplayFormat,
+    review: Boolean,
     menu: @Composable () -> Unit,
 ) {
     val resources = LocalResources.current
@@ -390,6 +395,7 @@ private fun GroupRow(
     val badges = listOfNotNull(
         if (key.openedOn != null) R.string.badge_opened else null,
         if (key.readyFrom != null && key.readyFrom > today) R.string.badge_not_ready else null,
+        if (review) R.string.badge_notes_review else null,
     )
     Surface(
         shape = RoundedCornerShape(16.dp),

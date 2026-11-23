@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.data
 
 import androidx.room.withTransaction
 import io.github.nidamanx.formica.domain.OperationContext
+import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.cleanName
 import io.github.nidamanx.formica.domain.editCategory
 import io.github.nidamanx.formica.domain.editLocation
@@ -54,6 +55,7 @@ class CatalogRepository(
             val stored = locationDao.get(id)?.toDomain() ?: error("location $id not found")
             val edited = change(stored)
             locationDao.upsert(listOf(editLocation(stored, edited.copy(name = cleanName(edited.name)), ctx).toEntity()))
+            if (stored.notes != edited.notes) db.notesReviewDao().delete(RecordType.LOCATION, id)
         }
     }
 
@@ -163,6 +165,7 @@ class CatalogRepository(
             val stored = storeDao.get(id)?.toDomain() ?: error("store $id not found")
             val edited = change(stored)
             storeDao.upsert(listOf(editStore(stored, edited.copy(name = cleanName(edited.name)), ctx).toEntity()))
+            if (stored.notes != edited.notes) db.notesReviewDao().delete(RecordType.STORE, id)
         }
     }
 

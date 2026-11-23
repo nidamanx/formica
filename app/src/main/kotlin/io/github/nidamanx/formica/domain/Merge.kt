@@ -543,3 +543,15 @@ fun productsDroppedBelowMinStock(before: Snapshot, after: Snapshot): List<String
         }
         .map { it.id }
 }
+
+/** The products with a "notes to review" mark on themselves or on one of their batches. */
+fun reviewedProducts(marks: Set<RecordRef>, batches: List<Batch>): Set<String> {
+    val batchProduct = batches.associate { it.id to it.productId }
+    return marks.mapNotNullTo(HashSet()) { ref ->
+        when (ref.type) {
+            RecordType.PRODUCT -> ref.id
+            RecordType.BATCH -> batchProduct[ref.id]
+            else -> null
+        }
+    }
+}
