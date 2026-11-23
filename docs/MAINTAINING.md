@@ -6,9 +6,10 @@ are needed.
 ## Branches
 
 - `develop`: work in progress. Every push runs the Build workflow and, when the app or
-  the build changes, the emulator smoke test on Android 8 (API 26).
-- `main`: the default branch. It only receives verified, working states, one commit
-  each, made identical to `develop`. Releases are built from `main` only.
+  the build changes, the emulator smoke test.
+- `main`: the default branch. It only receives usable, released versions: one commit
+  for each release, made identical to `develop` just before releasing. Releases are
+  built from `main` only.
 
 ## Signing keys
 
@@ -55,7 +56,8 @@ without showing its value.
 3. In `CHANGELOG.md` move the `[Unreleased]` entries to `## [X.Y.Z] - YYYY-MM-DD`. Set
    the same version in the badges of `README.md` and `README.it.md`, and `version` and
    `date-released` in `CITATION.cff`. `scripts/check-version.sh --release` checks it all.
-4. Bring the change to `main` with a green Build.
+4. With Build and emulator test green on `develop`, make `main` identical to `develop`
+   in one commit.
 5. *Actions → Release → Run workflow* on `main`. The workflow checks the version, the
    key and the permissions, builds and signs the APK, checks its certificate against
    `keystore/certificate-sha256.txt`, writes `SHA256SUMS`, attests the build provenance
@@ -70,6 +72,8 @@ fixed with a new version.
 - Every push to `main` or `develop` runs the Build workflow: lint, unit tests, debug and
   release builds, permission check (`config/allowed-permissions.txt`), debug APK as an
   artifact. On a Gradle failure the errors are also written as an annotation.
-- *Actions → Emulator smoke test → Run workflow*: installs and starts the debug app on
-  Android 8, 11, 16 and 17 (experimental), opens every section in the light and the
-  dark theme and keeps screenshots. Try one API level first (input `only`).
+- Emulator smoke test: installs and starts the debug app on Android 8, 11 and 16,
+  opens every section in the light and the dark theme and keeps screenshots. It runs on
+  every push to `develop` that changes the app or the build; by hand (*Actions →
+  Emulator smoke test → Run workflow*, once the workflow is on `main`) also on one level
+  only (input `only`) or on Android 17 (experimental).
