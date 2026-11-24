@@ -1,4 +1,4 @@
-Formica tient en ordre le garde-manger de la maison et la liste de courses, et les partage avec la famille en échangeant un fichier entre les téléphones. Fonctionne sans internet, sans compte et sans serveur.
+Formica tient en ordre le garde-manger de la maison et la liste de courses, et les partage avec la famille en échangeant un fichier entre les téléphones. Fonctionne sans internet, sans compte et sans serveur. Pour téléphones et tablettes.
 
 <b>Garde-manger</b>
 • Produits avec quantités (décimales aussi), unités, catégorie, emplacement et notes

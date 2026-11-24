@@ -1,4 +1,4 @@
-Formica keeps the household pantry and the shopping list in order, and shares them with the family by exchanging a file between phones. It works without internet, without an account and without a server.
+Formica keeps the household pantry and the shopping list in order, and shares them with the family by exchanging a file between phones. It works without internet, without an account and without a server. For phones and tablets.
 
 <b>Pantry</b>
 • Products with quantities (decimals too), units, category, location and notes

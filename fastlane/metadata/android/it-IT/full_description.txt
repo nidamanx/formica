@@ -1,4 +1,4 @@
-Formica tiene in ordine la dispensa di casa e la lista della spesa, e le condivide con la famiglia scambiando un file tra i telefoni. Funziona senza internet, senza account e senza server.
+Formica tiene in ordine la dispensa di casa e la lista della spesa, e le condivide con la famiglia scambiando un file tra i telefoni. Funziona senza internet, senza account e senza server. Per telefoni e tablet.
 
 <b>Dispensa</b>
 • Prodotti con quantità anche decimali, unità, categoria, posizione e note

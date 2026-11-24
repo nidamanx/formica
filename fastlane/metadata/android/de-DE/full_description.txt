@@ -1,4 +1,4 @@
-Formica hält den Vorrat zu Hause und die Einkaufsliste in Ordnung und teilt sie mit der Familie, indem die Handys eine Datei austauschen. Funktioniert ohne Internet, ohne Konto und ohne Server.
+Formica hält den Vorrat zu Hause und die Einkaufsliste in Ordnung und teilt sie mit der Familie, indem die Handys eine Datei austauschen. Funktioniert ohne Internet, ohne Konto und ohne Server. Für Smartphones und Tablets.
 
 <b>Vorrat</b>
 • Produkte mit Mengen (auch mit Kommastellen), Einheiten, Kategorie, Lagerort und Notizen

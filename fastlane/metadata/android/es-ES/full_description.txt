@@ -1,4 +1,4 @@
-Formica mantiene en orden la despensa de casa y la lista de la compra, y las comparte con la familia intercambiando un archivo entre los teléfonos. Funciona sin internet, sin cuenta y sin servidor.
+Formica mantiene en orden la despensa de casa y la lista de la compra, y las comparte con la familia intercambiando un archivo entre los teléfonos. Funciona sin internet, sin cuenta y sin servidor. Para teléfonos y tabletas.
 
 <b>Despensa</b>
 • Productos con cantidades (también con decimales), unidades, categoría, ubicación y notas

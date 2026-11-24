@@ -1,1 +1,1 @@
-Development version: project setup. Not a release.
+First release: pantry with packs and expiry dates, homemade products and products from producers, shopping list with minimum stock and best price, a daily expiry notification, sharing with the family by exchanging a file. In English, Italian, French, German and Spanish.
