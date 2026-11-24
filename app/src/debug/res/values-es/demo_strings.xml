@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Spanish translation of values/demo_strings.xml: every string, in sync with the English ones -->
+<resources>
+    <string name="demo_store_supermarket">Supermercado</string>
+    <string name="demo_store_market">Mercado del sábado</string>
+    <string name="demo_store_bakery">Panadería</string>
+    <string name="demo_store_farm">Granja</string>
+    <string name="demo_store_oil_mill">Almazara</string>
+    <string name="demo_milk">Leche fresca</string>
+    <string name="demo_yogurt">Yogur</string>
+    <string name="demo_eggs">Huevos</string>
+    <string name="demo_ricotta">Ricotta</string>
+    <string name="demo_spinach">Espinacas frescas</string>
+    <string name="demo_ragu">Ragú</string>
+    <string name="demo_peas">Guisantes congelados</string>
+    <string name="demo_passata">Tomate triturado</string>
+    <string name="demo_apricot_jam">Mermelada de albaricoque</string>
+    <string name="demo_honey">Miel</string>
+    <string name="demo_olive_oil">Aceite de oliva virgen extra</string>
+    <string name="demo_wholemeal_flour">Harina integral</string>
+    <string name="demo_brown_rice">Arroz integral</string>
+    <string name="demo_lentils">Lentejas</string>
+    <string name="demo_sauerkraut">Chucrut</string>
+    <string name="demo_potatoes">Patatas</string>
+    <string name="demo_apples">Manzanas</string>
+    <string name="demo_wholemeal_bread">Pan integral</string>
+    <string name="demo_lemons">Limones</string>
+    <string name="demo_tomatoes">Tomates</string>
+    <string name="demo_price_each">la unidad</string>
+    <string name="demo_price_per_litre">el litro</string>
+    <string name="demo_note_ragu">Receta de la abuela</string>
+    <string name="demo_note_oil">La almazara vende de noviembre a enero</string>
+</resources>

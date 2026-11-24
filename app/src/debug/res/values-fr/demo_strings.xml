@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- French translation of values/demo_strings.xml: every string, in sync with the English ones -->
+<resources>
+    <string name="demo_store_supermarket">Supermarché</string>
+    <string name="demo_store_market">Marché du samedi</string>
+    <string name="demo_store_bakery">Boulangerie</string>
+    <string name="demo_store_farm">Ferme</string>
+    <string name="demo_store_oil_mill">Moulin à huile</string>
+    <string name="demo_milk">Lait frais</string>
+    <string name="demo_yogurt">Yaourt</string>
+    <string name="demo_eggs">Œufs</string>
+    <string name="demo_ricotta">Ricotta</string>
+    <string name="demo_spinach">Épinards frais</string>
+    <string name="demo_ragu">Sauce bolognaise</string>
+    <string name="demo_peas">Petits pois surgelés</string>
+    <string name="demo_passata">Coulis de tomate</string>
+    <string name="demo_apricot_jam">Confiture d\'abricots</string>
+    <string name="demo_honey">Miel</string>
+    <string name="demo_olive_oil">Huile d\'olive vierge extra</string>
+    <string name="demo_wholemeal_flour">Farine complète</string>
+    <string name="demo_brown_rice">Riz complet</string>
+    <string name="demo_lentils">Lentilles</string>
+    <string name="demo_sauerkraut">Choucroute</string>
+    <string name="demo_potatoes">Pommes de terre</string>
+    <string name="demo_apples">Pommes</string>
+    <string name="demo_wholemeal_bread">Pain complet</string>
+    <string name="demo_lemons">Citrons</string>
+    <string name="demo_tomatoes">Tomates</string>
+    <string name="demo_price_each">pièce</string>
+    <string name="demo_price_per_litre">le litre</string>
+    <string name="demo_note_ragu">Recette de grand-mère</string>
+    <string name="demo_note_oil">Le moulin vend de novembre à janvier</string>
+</resources>

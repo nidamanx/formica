@@ -1,0 +1,30 @@
+Formica mantiene en orden la despensa de casa y la lista de la compra, y las comparte con la familia intercambiando un archivo entre los teléfonos. Funciona sin internet, sin cuenta y sin servidor.
+
+<b>Despensa</b>
+• Productos con cantidades (también con decimales), unidades, categoría, ubicación y notas
+• Varios paquetes del mismo producto, con distintas fechas de caducidad
+• «Abierto el», con los días que dura después de abrir
+• Una estimación de cuánto durarán tus provisiones
+
+<b>Casero y de productores</b>
+• Conservas, yogur, fermentados y mucho más, con la fecha de preparación
+• El día en que una preparación está lista
+• Compras en grandes cantidades a productores
+
+<b>Lista de la compra</b>
+• Artículos vinculados a la despensa o texto libre
+• Stock mínimo: por debajo de la cantidad elegida, el producto entra solo en la lista
+• Productos que compras a menudo, agrupados por categoría o por tienda
+• Más barato en: la tienda y el mejor precio de cada producto
+
+<b>Caducidad</b>
+• Una notificación al día con lo que caduca y lo que está listo
+
+<b>En familia</b>
+• Exporta un archivo y ábrelo en otro teléfono: los cambios se combinan
+• Vista previa y copia de seguridad antes de cada importación, que se puede deshacer
+
+<b>Privacidad</b>
+• Sin acceso a internet, sin cuenta, sin publicidad ni rastreadores
+• Copia de seguridad automática de Android desactivada: los datos solo salen del teléfono cuando los exportas
+• Software libre (AGPL-3.0)
