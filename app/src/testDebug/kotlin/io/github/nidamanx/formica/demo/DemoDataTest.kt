@@ -84,6 +84,8 @@ class DemoDataTest {
     @Test
     fun `estimate, running low and frequent`() {
         assertTrue(estimateDuration(movementsOf("OLIVE_OIL"), 2_500L, now) is DurationEstimate.Weeks)
+        // The passata is in the store screenshots: its estimate must not say "not enough data"
+        assertTrue(estimateDuration(movementsOf("PASSATA"), 6_000L, now) is DurationEstimate.Months)
         val summaries = data.products.map { summary(it.name) }
         assertEquals(listOf("WHOLEMEAL_FLOUR"), runningLowSuggestions(summaries, data.shoppingItems, naturalOrder()).map { it.name })
         val batchProduct = data.batches.associate { it.id to it.productId }

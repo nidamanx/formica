@@ -186,7 +186,8 @@ class DemoData(
         // Pantry
         val passata = product(DemoText.PASSATA, MeasureUnit.BOTTLE, PRESERVES, PANTRY, homemade = true)
         batch(passata, 12 * ONE_UNIT, 465, expiresIn = 265, consumed = listOf(
-            400L to 2 * ONE_UNIT, 300L to 2 * ONE_UNIT, 200L to 2 * ONE_UNIT, 150L to 2 * ONE_UNIT, 40L to 2 * ONE_UNIT,
+            // Three uses in the last 90 days (with the newer batch's): the estimate is shown
+            400L to 2 * ONE_UNIT, 300L to 2 * ONE_UNIT, 150L to 2 * ONE_UNIT, 70L to 2 * ONE_UNIT, 40L to 2 * ONE_UNIT,
         ))
         batch(passata, 6 * ONE_UNIT, 100, expiresIn = 630, consumed = listOf(20L to 2 * ONE_UNIT))
         val jam = product(DemoText.APRICOT_JAM, MeasureUnit.JAR, BREAKFAST, PANTRY, homemade = true)
