@@ -93,6 +93,9 @@ for entry in "${languages[@]}"; do
   sleep 2
   adb shell am start -W -n "$package/$namespace.demo.DemoDataActivity" >/dev/null
   sleep 5
+  # Started again: a list that was open while the data arrived may keep a later item at
+  # the top
+  start_app
 
   shot "$out/1.png"
   passata=$(res_string "$demo_strings" demo_passata)
