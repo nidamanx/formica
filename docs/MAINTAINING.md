@@ -72,9 +72,10 @@ fixed with a new version.
 `art/formica_art.py` draws the ant once; `python3 art/generate_icon.py` (needs the Debian
 packages `python3-shapely` and `python3-cairosvg`) writes every icon file from it: the
 adaptive icon with its monochrome layer for themed icons in `app/src/main/res`, the debug
-variant ("Formica-D": draft greys and a "D" badge) in `app/src/debug/res`, `art/icon.svg`
-and the store icon `fastlane/metadata/android/en-US/images/icon.png`. The generated files
-are committed; change the drawing, never the generated files.
+variant ("Formica-D": draft greys and a "D" badge) in `app/src/debug/res`, `art/icon.svg`,
+the store icon `fastlane/metadata/android/en-US/images/icon.png` and the notification icon
+(a simpler ant, readable at 18-24 px). The generated files are committed; change the
+drawing, never the generated files.
 
 ## Changing the database
 

@@ -9,7 +9,9 @@ Outputs:
   themed icons (Android 13+), background colour; the welcome screen shows the foreground too;
 - app/src/debug/res: the same for debug builds ("Formica-D"): draft greys and a "D" badge,
   also in the monochrome layer, so themed icons tell the two apps apart;
-- art/icon.svg and fastlane/metadata/android/en-US/images/icon.png (512x512).
+- art/icon.svg and fastlane/metadata/android/en-US/images/icon.png (512x512);
+- app/src/main/res/drawable/ic_notification.xml: the status bar icon, a simpler ant drawn
+  for 18-24 px (big smile, thick legs, full box with food coming out).
 """
 import math
 import re
@@ -251,6 +253,71 @@ def mono_vector(inner):
     ])
 
 
+# ---------- Notification icon: a simpler ant on a 24x24 grid ----------
+
+def notification_shape():
+    """The ant of the status bar, facing left, as one shape: holes for eyes, smile and tape."""
+    def ellipse(cx, cy, rx, ry):
+        return affinity.scale(Point(cx, cy).buffer(1, 32), rx, ry)
+
+    def line(points, width):
+        return LineString(points).buffer(width / 2, cap_style=1, join_style=1)
+
+    def rounded_box(x0, y0, x1, y1, r):
+        return box(x0 + r, y0 + r, x1 - r, y1 - r).buffer(r, 8)
+
+    body = unary_union([
+        Point(7, 12.6).buffer(4.3, 32), ellipse(12.2, 14.6, 2.3, 1.9), ellipse(17.6, 15.0, 4.4, 3.4),
+        line([(6, 9), (4.4, 5)], 1.3), Point(4.2, 4.6).buffer(1.2, 16),
+        line([(8.6, 8.8), (9.6, 5.2)], 1.3), Point(9.8, 4.8).buffer(1.2, 16),
+        line([(11, 16.2), (9.2, 21)], 1.4), line([(13.2, 16.4), (13.8, 21)], 1.4),
+        line([(17.6, 18), (19.6, 21)], 1.4),
+    ])
+    smile = ellipse(7, 13.9, 2.4, 1.9).intersection(box(4, 13.9, 10, 17))
+    face = unary_union([ellipse(5.6, 11.6, 0.9, 1.1), ellipse(8.4, 11.6, 0.9, 1.1), smile])
+    x0, y0, x1, y1 = 11.2, 6.2, 20.6, 11.4
+    outer = rounded_box(x0, y0, x1, y1, 0.6)
+    flaps = unary_union([
+        Polygon([(x0, y0), (x0 - 1.6, y0 - 1.6), (x0 + 0.4, y0 - 2.0), (x0 + 1.6, y0)]),
+        Polygon([(x1, y0), (x1 + 1.6, y0 - 1.6), (x1 - 0.4, y0 - 2.0), (x1 - 1.6, y0)]),
+    ])
+    food = unary_union([
+        line([(17.2, 6.4), (19.6, 1.6)], 2.4),  # baguette
+        Point(15.0, 4.6).buffer(1.9, 24),  # apple
+        line([(12.8, 6.2), (12.0, 2.6)], 0.9), line([(13.2, 6.2), (13.4, 2.2)], 0.9),  # carrot leaves
+    ])
+    shape = unary_union([body, food.difference(outer.buffer(0.5)), outer.difference(box(15.3, y0, 16.5, y1)), flaps])
+    # Thin gaps keep head, box and body apart at 18 px
+    shape = shape.difference(outer.buffer(0.45).difference(outer).intersection(body.buffer(0.1))).difference(face)
+    shape = shape.difference(line([(x0 - 0.4, y1 + 0.55), (x1 + 0.4, y1 + 0.55)], 0.6))
+    return shape.simplify(0.02)
+
+
+def notification_vector():
+    shape = notification_shape()
+    polygons = shape.geoms if isinstance(shape, MultiPolygon) else [shape]
+    ring = lambda coords: "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in list(coords)[:-1]) + " Z"
+    data = " ".join(ring(r.coords) for p in polygons for r in [p.exterior, *p.interiors])
+    return "\n".join([
+        '<?xml version="1.0" encoding="utf-8"?>',
+        "<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->",
+        HEADER,
+        '<vector xmlns:android="http://schemas.android.com/apk/res/android"',
+        '    xmlns:tools="http://schemas.android.com/tools"',
+        '    android:width="24dp"',
+        '    android:height="24dp"',
+        '    android:viewportWidth="24"',
+        '    android:viewportHeight="24"',
+        '    tools:ignore="VectorPath">',
+        "    <path",
+        '        android:fillColor="#FFFFFFFF"',
+        '        android:fillType="evenOdd"',
+        f'        android:pathData="{data}" />',
+        "</vector>",
+        "",
+    ])
+
+
 # ---------- Output ----------
 
 def write(path, text):
@@ -281,6 +348,7 @@ def main():
         "</adaptive-icon>",
         "",
     ]))
+    write(main_res / "drawable/ic_notification.xml", notification_vector())
     write(debug_res / "drawable/ic_launcher_foreground.xml",
           colour_vector(art.foreground(art.DEBUG, debug=True)))
     write(debug_res / "drawable/ic_launcher_monochrome.xml",

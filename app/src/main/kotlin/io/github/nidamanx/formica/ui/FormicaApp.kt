@@ -2,14 +2,11 @@
 package io.github.nidamanx.formica.ui
 
 import android.net.Uri
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,7 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -51,15 +48,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/** The three sections of the bottom bar. */
+/** The three sections of the bottom bar: filled icon when selected, outlined otherwise (Material 3). */
 enum class TopLevelDestination(
     val route: String,
     @param:StringRes val label: Int,
-    val icon: ImageVector,
+    @param:DrawableRes val icon: Int,
+    @param:DrawableRes val selectedIcon: Int,
 ) {
-    PANTRY("pantry", R.string.nav_pantry, Icons.Filled.Home),
-    SHOPPING_LIST("shopping_list", R.string.nav_shopping_list, Icons.Filled.ShoppingCart),
-    EXPIRIES("expiries", R.string.nav_expiries, Icons.Filled.DateRange),
+    PANTRY("pantry", R.string.nav_pantry, R.drawable.ic_nav_shelves, R.drawable.ic_nav_shelves_filled),
+    SHOPPING_LIST(
+        "shopping_list",
+        R.string.nav_shopping_list,
+        R.drawable.ic_nav_shopping_cart,
+        R.drawable.ic_nav_shopping_cart_filled,
+    ),
+    EXPIRIES("expiries", R.string.nav_expiries, R.drawable.ic_nav_event, R.drawable.ic_nav_event_filled),
 }
 
 private object Routes {
@@ -119,7 +122,12 @@ fun FormicaApp(
                             selected = selected,
                             onClick = { navController.navigateToSection(destination) },
                             // The label already names the item for TalkBack
-                            icon = { Icon(destination.icon, contentDescription = null) },
+                            icon = {
+                                Icon(
+                                    painterResource(if (selected) destination.selectedIcon else destination.icon),
+                                    contentDescription = null,
+                                )
+                            },
                             label = { Text(stringResource(destination.label)) },
                         )
                     }
