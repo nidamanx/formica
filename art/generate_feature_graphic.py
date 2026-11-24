@@ -1,17 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Generates the store feature graphic (1024x500) in the five languages, and on request
-the repository's social preview (1280x640, English).
+"""Generates the store feature graphic (1024x500) in the five languages and the
+repository's social preview (1280x640, English).
 
 Design "B2, scene" (owner's choice, 2026-11-24): the ant carries its groceries to the
 anthill pantry, with the name and the slogan in the sky. The slogan is split at its comma
 into two lines, so the longest language still fits.
 
-Usage: python3 art/generate_feature_graphic.py [--social FILE]
+Usage: python3 art/generate_feature_graphic.py
 Needs cairosvg and the Roboto font (Debian packages python3-cairosvg and fonts-roboto).
-Outputs: fastlane/metadata/android/<locale>/images/featureGraphic.png; with --social, the
-social preview at FILE (uploaded by hand in the GitHub settings, not kept in the repository).
+Outputs: fastlane/metadata/android/<locale>/images/featureGraphic.png and
+art/social-preview.png (uploaded by hand in the GitHub settings: Social preview).
 """
-import argparse
 import sys
 from pathlib import Path
 
@@ -51,9 +50,6 @@ def banner(width: int, height: int, slogan: str) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Store feature graphic and social preview")
-    parser.add_argument("--social", type=Path, help="also write the social preview (PNG) here")
-    args = parser.parse_args()
     try:
         import cairosvg
     except (ImportError, OSError) as e:
@@ -63,9 +59,9 @@ def main() -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         cairosvg.svg2png(bytestring=banner(1024, 500, slogan).encode(), write_to=str(out))
         print(out.relative_to(ROOT))
-    if args.social:
-        cairosvg.svg2png(bytestring=banner(1280, 640, SLOGANS["en-US"]).encode(), write_to=str(args.social))
-        print(args.social)
+    social = ROOT / "art/social-preview.png"
+    cairosvg.svg2png(bytestring=banner(1280, 640, SLOGANS["en-US"]).encode(), write_to=str(social))
+    print(social.relative_to(ROOT))
     return 0
 
 

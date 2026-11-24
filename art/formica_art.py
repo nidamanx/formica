@@ -12,34 +12,32 @@ and may cut it to a circle of radius 33 around (54, 54), the safe zone.
 INK, PAPER = "#000000", "#FFFFFF"
 
 BASE = dict(line="#4A2A1C", box="#F0CF98", box2="#DDAE6E", tape="#FFF4DC", eye="#FFFFFF",
-            pupil="#2A1A12", cheek="#FF8F8F", tongue="#F2727A", mouth="#5A2A22", bread="#E3A857",
+            pupil="#2A1A12", cheek="#FF8F8F", bread="#E3A857",
             bread2="#C9853A", leaf="#5FAE5A", apple="#E5534B")
 RELEASE = dict(BASE, bg="#BFE3F4", body="#E0A042", hi="#F7CC85")
 DEBUG = dict(BASE, bg="#4A4A55", body="#B9B9C2", hi="#D8D8DF", line="#2A2A31", box="#E2E2E8",
-             box2="#C4C4CC", tape="#F4F4F7", cheek="#9A9AA4", tongue="#8E8E98", mouth="#3A3A42",
-             bread="#CFCFD6", bread2="#A9A9B2", leaf="#9EA3A0", apple="#8F8F98", pupil="#22222A")
+             box2="#C4C4CC", tape="#F4F4F7", cheek="#9A9AA4", bread="#CFCFD6", bread2="#A9A9B2",
+             leaf="#9EA3A0", apple="#8F8F98", pupil="#22222A")
 BADGE = dict(fill="#FFD15C", letter="#2A2A31")
 
 # Monochrome (themed icons): the launcher paints every opaque pixel in one colour, so the
 # drawing is reduced to ink, and the details that must stay visible become holes (paper)
 MONO = {key: INK for key in RELEASE}
-MONO.update(bg=PAPER, eye=PAPER, pupil=PAPER, box=PAPER, tape=PAPER, tongue=PAPER, bread=PAPER,
-            mouth=PAPER)
+MONO.update(bg=PAPER, eye=PAPER, pupil=PAPER, box=PAPER, tape=PAPER, bread=PAPER, smile=PAPER)
 MONO_BADGE = dict(fill=INK, letter=PAPER, ring=PAPER)
 
 # Whole ant scaled into the safe zone, slightly below the centre (the antennae go up)
 ICON_TRANSFORM = "translate(54 57) scale(0.78) translate(-54 -54)"
 
 
-def _stroke(p, d, width, colour=None, opacity=None):
-    extra = f' opacity="{opacity}"' if opacity else ""
+def _stroke(p, d, width, colour=None):
     return (f'<path d="{d}" fill="none" stroke="{colour or p["line"]}" stroke-width="{width}" '
-            f'stroke-linecap="round" stroke-linejoin="round"{extra}/>')
+            f'stroke-linecap="round" stroke-linejoin="round"/>')
 
 
-def _leg(p, points, width=2.2, back=False):
+def _leg(p, points, width=2.2):
     d = "M" + " L".join(f"{x},{y}" for x, y in points)
-    return _stroke(p, d, width, opacity=".45" if back else None)
+    return _stroke(p, d, width)
 
 
 def _eye(p, x, y):
@@ -54,8 +52,9 @@ def ant(p):
     """The ant, drawn facing right and mirrored: it walks to the left, toward the reader."""
     s = []
     line = p["line"]
-    s.append(_leg(p, [(52, 61), (47, 69), (45, 76)], 1.8, back=True))
-    s.append(_leg(p, [(57, 62), (61, 69), (62, 76)], 1.8, back=True))
+    # Legs on the far side: thinner, same colour (drawn first, behind the body)
+    s.append(_leg(p, [(52, 61), (47, 69), (45, 76)], 1.8))
+    s.append(_leg(p, [(57, 62), (61, 69), (62, 76)], 1.8))
     s.append(f'<ellipse cx="37" cy="61" rx="12.5" ry="9.5" transform="rotate(-12 37 61)" '
              f'fill="{p["body"]}" stroke="{line}" stroke-width="1.5"/>')
     s.append(f'<ellipse cx="33" cy="57" rx="5" ry="2.6" transform="rotate(-20 33 57)" fill="{p["hi"]}"/>')
@@ -94,9 +93,10 @@ def ant(p):
     s.append(_eye(p, 74.6, 47.2))
     s.append(f'<circle cx="62.8" cy="54" r="2" fill="{p["cheek"]}" opacity=".85"/>')
     s.append(f'<circle cx="78.6" cy="54" r="2" fill="{p["cheek"]}" opacity=".85"/>')
-    s.append(f'<path d="M65.4,53.4 Q70.7,61.5 76,53.4 Z" fill="{p["mouth"]}" stroke="{line}" '
-             f'stroke-width="1" stroke-linejoin="round"/>')
-    s.append(f'<path d="M67.6,57.2 Q70.7,59.8 73.8,57.2 Q70.7,55.6 67.6,57.2 Z" fill="{p["tongue"]}"/>')
+    # Closed smile, a deep arc with its tips curling up (owner's choice, 2026-11-24); a hole
+    # in the monochrome layer
+    smile = p.get("smile", line)
+    s.append(_stroke(p, "M64.9,53.9 Q65.4,55.0 66.2,55.4 Q70.7,60.4 75.2,55.4 Q76.0,55.0 76.5,53.9", 1.35, smile))
     return f'<g transform="translate(108 0) scale(-1 1)">{"".join(s)}</g>'
 
 

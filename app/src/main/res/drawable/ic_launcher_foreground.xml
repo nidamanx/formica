@@ -15,13 +15,13 @@
                     <group android:scaleX="-1" android:scaleY="1">
                         <path
                             android:pathData="M52,61 L47,69 L45,76"
-                            android:strokeColor="#734A2A1C"
+                            android:strokeColor="#FF4A2A1C"
                             android:strokeWidth="1.8"
                             android:strokeLineCap="round"
                             android:strokeLineJoin="round" />
                         <path
                             android:pathData="M57,62 L61,69 L62,76"
-                            android:strokeColor="#734A2A1C"
+                            android:strokeColor="#FF4A2A1C"
                             android:strokeWidth="1.8"
                             android:strokeLineCap="round"
                             android:strokeLineJoin="round" />
@@ -217,14 +217,11 @@
                             android:pathData="M76.6,54 A2,2 0 1,0 80.6,54 A2,2 0 1,0 76.6,54 Z"
                             android:fillColor="#D9FF8F8F" />
                         <path
-                            android:pathData="M65.4,53.4 Q70.7,61.5 76,53.4 Z"
-                            android:fillColor="#FF5A2A22"
+                            android:pathData="M64.9,53.9 Q65.4,55.0 66.2,55.4 Q70.7,60.4 75.2,55.4 Q76.0,55.0 76.5,53.9"
                             android:strokeColor="#FF4A2A1C"
-                            android:strokeWidth="1"
+                            android:strokeWidth="1.35"
+                            android:strokeLineCap="round"
                             android:strokeLineJoin="round" />
-                        <path
-                            android:pathData="M67.6,57.2 Q70.7,59.8 73.8,57.2 Q70.7,55.6 67.6,57.2 Z"
-                            android:fillColor="#FFF2727A" />
                     </group>
                 </group>
             </group>

@@ -79,9 +79,8 @@ drawing, never the generated files.
 
 `python3 art/generate_feature_graphic.py` writes the store banner
 (`fastlane/metadata/android/<locale>/images/featureGraphic.png`, one per language, with the
-slogans written in the script); with `--social FILE` it also writes the social preview
-(1280x640), which is uploaded by hand in *Settings → General → Social preview* and not kept
-in the repository. `python3 art/generate_badges.py` writes the README install badges in
+slogans written in the script) and the social preview `art/social-preview.png` (1280x640),
+uploaded by hand in *Settings → General → Social preview*. `python3 art/generate_badges.py` writes the README install badges in
 `art/badges/`. Both need `fonts-roboto` besides `python3-cairosvg`.
 
 ## Changing the database
