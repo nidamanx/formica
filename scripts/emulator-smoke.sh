@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Smoke test on a running emulator: install the debug APK, start the app, check it is
-# alive, open each section of the bottom bar and take a screenshot of it (also in the
-# dark theme on Android 10+), and fail on any crash or ANR (not responding) of the app.
+# Smoke test on a running emulator: install the debug APK, start the app, pass the welcome
+# screen, load the sample data, open each section of the bottom bar and take a screenshot
+# of it (also in the dark theme on Android 10+ and with large text), and fail on any crash
+# or ANR (not responding) of the app.
 set -euo pipefail
 
 usage() {
@@ -12,8 +13,10 @@ Usage: scripts/emulator-smoke.sh [-h] <name> [apk]
   name  label used in the screenshot file names (e.g. api26-phone)
   apk   debug APK to install (default: app/build/outputs/apk/debug/app-debug.apk)
 
-Screenshots: screenshots/<name>-<section>.png and, on Android 10+,
-screenshots/<name>-dark-<section>.png. Full log: screenshots/<name>-logcat.txt.
+Screenshots: screenshots/<name>-welcome.png, screenshots/<name>-<section>.png, on
+Android 10+ screenshots/<name>-dark-<section>.png, and with large text
+screenshots/<name>-font13-<section>.png and <name>-font20-<section>.png.
+Full log: screenshots/<name>-logcat.txt.
 USAGE
 }
 
@@ -80,6 +83,17 @@ pass_welcome() {  # prefix for the file names
   sleep 3
 }
 
+# Sample data (debug builds only), once, after the welcome screen: the screenshots show
+# a pantry in use. The activity closes itself when the data is written
+demo_loaded=false
+load_demo() {
+  [[ $demo_loaded == true ]] && return 0
+  adb shell am start -W -n "$package/$namespace.demo.DemoDataActivity"
+  sleep 5
+  adb logcat -d -s FormicaDemo:I | tail -n 1
+  demo_loaded=true
+}
+
 # Start the app (again, with -S), check it is alive, screenshot every section
 capture() {  # prefix for the file names
   local attempt section label file
@@ -91,6 +105,7 @@ capture() {  # prefix for the file names
   sleep 5
   adb shell pidof "$package"
   pass_welcome "$1"
+  load_demo
   for section in "${sections[@]}"; do
     label=${section%%:*}
     file=${section#*:}
@@ -109,6 +124,14 @@ if (( $(adb shell getprop ro.build.version.sdk | tr -d '\r') >= 29 )); then
   capture "$name-dark"
   adb shell cmd uimode night no
 fi
+
+# Large text (Settings > Display > Font size): nothing may be cut or overlap
+for scale in 1.3 2.0; do
+  adb shell settings put system font_scale "$scale"
+  sleep 2
+  capture "$name-font${scale/./}"
+done
+adb shell settings put system font_scale 1.0
 
 adb shell dumpsys package "$package" | grep -i "permission" || true
 if adb logcat -d -b crash | grep -F "$package"; then

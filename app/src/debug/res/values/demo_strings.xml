@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Sample data of debug builds (Formica-D), in every language of the app -->
+<resources>
+    <string name="demo_store_supermarket">Supermarket</string>
+    <string name="demo_store_market">Saturday market</string>
+    <string name="demo_store_bakery">Bakery</string>
+    <string name="demo_store_farm">Farm</string>
+    <string name="demo_store_oil_mill">Oil mill</string>
+    <string name="demo_milk">Fresh milk</string>
+    <string name="demo_yogurt">Yogurt</string>
+    <string name="demo_eggs">Eggs</string>
+    <string name="demo_ricotta">Ricotta</string>
+    <string name="demo_spinach">Fresh spinach</string>
+    <string name="demo_ragu">Ragù</string>
+    <string name="demo_peas">Frozen peas</string>
+    <string name="demo_passata">Tomato passata</string>
+    <string name="demo_apricot_jam">Apricot jam</string>
+    <string name="demo_honey">Honey</string>
+    <string name="demo_olive_oil">Extra virgin olive oil</string>
+    <string name="demo_wholemeal_flour">Wholemeal flour</string>
+    <string name="demo_brown_rice">Brown rice</string>
+    <string name="demo_lentils">Lentils</string>
+    <string name="demo_sauerkraut">Sauerkraut</string>
+    <string name="demo_potatoes">Potatoes</string>
+    <string name="demo_apples">Apples</string>
+    <string name="demo_wholemeal_bread">Wholemeal bread</string>
+    <string name="demo_lemons">Lemons</string>
+    <string name="demo_tomatoes">Tomatoes</string>
+    <string name="demo_price_each">each</string>
+    <string name="demo_price_per_litre">per litre</string>
+    <string name="demo_note_ragu">Grandma\'s recipe</string>
+    <string name="demo_note_oil">The oil mill sells from November to January</string>
+</resources>

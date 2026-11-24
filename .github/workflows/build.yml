@@ -106,6 +106,22 @@ jobs:
           scripts/check-permissions.sh app/build/outputs/apk/release/app-release-unsigned.apk
           scripts/check-permissions.sh app/build/outputs/apk/debug/app-debug.apk
 
+      - name: Sample data only in the debug APK
+        # The sample data loader lives in the debug source set: the release APK must not
+        # declare it, and the debug one must (or this check would prove nothing)
+        run: |
+          aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -n 1)
+          release=$("$aapt2" dump xmltree --file AndroidManifest.xml app/build/outputs/apk/release/app-release-unsigned.apk)
+          debug=$("$aapt2" dump xmltree --file AndroidManifest.xml app/build/outputs/apk/debug/app-debug.apk)
+          if grep -qF DemoDataActivity <<<"$release"; then
+            echo "::error::The release APK declares the sample data loader (DemoDataActivity)"
+            exit 1
+          fi
+          if ! grep -qF DemoDataActivity <<<"$debug"; then
+            echo "::error::DemoDataActivity not found in the debug APK: the check above proves nothing"
+            exit 1
+          fi
+
       - name: Name the debug APK
         # e.g. formica-debug-0.1.0-a4f9da7.apk: version and commit, to tell test builds apart
         id: debug_apk
