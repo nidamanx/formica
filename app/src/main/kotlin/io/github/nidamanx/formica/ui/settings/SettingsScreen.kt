@@ -56,6 +56,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenCatalog: (CatalogKind) -> Unit,
     onOpenExchange: () -> Unit,
+    onOpenAbout: () -> Unit,
     viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory),
 ) {
     val deviceName by viewModel.deviceName.collectAsStateWithLifecycle()
@@ -135,6 +136,8 @@ fun SettingsScreen(
                     pluralStringResource(R.plurals.running_low_summary, prefs.runningLowDays, prefs.runningLowDays),
                 ) { choosing = Choice.RUNNING_LOW }
             }
+            HorizontalDivider()
+            NavigationRow(stringResource(R.string.about_title), onOpenAbout)
         }
     }
 

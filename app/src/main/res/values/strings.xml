@@ -435,4 +435,24 @@
     <string name="welcome_notification_hint">At %1$s, only if something expires or is ready. You can change it in Settings.</string>
     <string name="welcome_initial_data">Locations and categories are ready: you can change them in Settings.</string>
     <string name="action_start">Start</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_how_title">How it works</string>
+    <string name="about_how_text">Formica manages your household pantry and shopping list: what you have, where it is, when it expires and what to buy again. It also takes care of homemade products and those bought from producers.</string>
+    <string name="about_family_title">With the family</string>
+    <string name="about_family_text">To use it on several phones, export a file and open it on the other phone: Formica merges the data of the two phones. Before every import it saves a copy, which you can restore.</string>
+    <string name="about_name_title">The name</string>
+    <string name="about_name_text">Formica is Latin, as well as Italian, for ant: ants are among the living beings that keep the best pantries.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_text">No internet access, no account, no data collection, no ads or trackers. Your data stays on the phone and is excluded from Android backups: it only leaves with an export you start.</string>
+    <string name="about_permissions_title">Permissions</string>
+    <string name="about_perm_notifications">Notifications: for the daily expiry reminder.</string>
+    <string name="about_perm_boot">Run at startup: to schedule the reminder again after the phone restarts.</string>
+    <string name="about_perm_wake_lock">Keep the device awake: to complete the daily check.</string>
+    <string name="about_perm_receiver">Formica\'s internal permission: stops other apps from sending messages to the internal parts of Formica and gives no access to any data. It is needed up to Android 12; later versions offer the same protection themselves and the permission stays unused.</string>
+    <string name="about_author">Author: %1$s</string>
+    <string name="about_license">Free software, licensed under the GNU AGPL v3 or later</string>
+    <string name="about_source">Source code and issue reports: %1$s</string>
 </resources>

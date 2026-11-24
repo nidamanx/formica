@@ -453,4 +453,24 @@
     <string name="welcome_notification_hint">Alle %1$s, solo se qualcosa scade o è pronto. Puoi cambiarla nelle Impostazioni.</string>
     <string name="welcome_initial_data">Posizioni e categorie sono già pronte: puoi cambiarle nelle Impostazioni.</string>
     <string name="action_start">Inizia</string>
+
+    <!-- About -->
+    <string name="about_title">Informazioni</string>
+    <string name="about_version">Versione %1$s</string>
+    <string name="about_how_title">Come funziona</string>
+    <string name="about_how_text">Formica gestisce la dispensa e la lista della spesa di casa: cosa c\'è, dove si trova, quando scade e cosa ricomprare. Pensa anche ai prodotti fatti in casa e a quelli comprati dai produttori.</string>
+    <string name="about_family_title">In famiglia</string>
+    <string name="about_family_text">Per usarla su più telefoni, esporta un file e aprilo sull\'altro telefono: Formica unisce i dati dei due telefoni. Prima di ogni importazione salva una copia, che puoi ripristinare.</string>
+    <string name="about_name_title">Il nome</string>
+    <string name="about_name_text">Formica in latino, come in italiano: le formiche sono tra gli esseri viventi che fanno le migliori dispense.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_text">Nessun accesso a internet, nessun account, nessuna raccolta di dati, niente pubblicità né tracker. I dati restano sul telefono e sono esclusi dai backup di Android: escono solo con l\'esportazione che avvii tu.</string>
+    <string name="about_permissions_title">Autorizzazioni</string>
+    <string name="about_perm_notifications">Notifiche: per il promemoria giornaliero delle scadenze.</string>
+    <string name="about_perm_boot">Avvio all\'accensione: per ripianificare il promemoria dopo il riavvio del telefono.</string>
+    <string name="about_perm_wake_lock">Mantenere attivo il dispositivo: per completare il controllo giornaliero.</string>
+    <string name="about_perm_receiver">Autorizzazione interna di Formica: impedisce ad altre app di mandare messaggi alle parti interne di Formica e non dà accesso a nessun dato. Serve fino ad Android 12; dalle versioni successive Android offre la stessa protezione da sé e l\'autorizzazione resta inutilizzata.</string>
+    <string name="about_author">Autore: %1$s</string>
+    <string name="about_license">Software libero, licenza GNU AGPL v3 o successiva</string>
+    <string name="about_source">Codice sorgente e segnalazioni: %1$s</string>
 </resources>

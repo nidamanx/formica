@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 
-/** versionName of the installed app, written into every exported file. */
+/** versionName of the installed app: written into every exported file, shown in About. */
 fun appVersionName(context: Context): String {
     val manager = context.packageManager
     val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

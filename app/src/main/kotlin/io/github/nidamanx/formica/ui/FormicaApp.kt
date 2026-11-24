@@ -42,6 +42,7 @@ import io.github.nidamanx.formica.ui.expiries.ExpiriesScreen
 import io.github.nidamanx.formica.ui.pantry.PantryScreen
 import io.github.nidamanx.formica.ui.product.ProductDetailScreen
 import io.github.nidamanx.formica.ui.product.ProductFormScreen
+import io.github.nidamanx.formica.ui.settings.AboutScreen
 import io.github.nidamanx.formica.ui.settings.CatalogKind
 import io.github.nidamanx.formica.ui.settings.CatalogScreen
 import io.github.nidamanx.formica.ui.settings.SettingsScreen
@@ -65,6 +66,7 @@ private object Routes {
     const val SETTINGS = "settings"
     const val CATALOG = "settings/catalog/{kind}"
     const val EXCHANGE = "settings/exchange"
+    const val ABOUT = "settings/about"
     const val IMPORT = "import"
     const val BACKUPS = "settings/exchange/backups"
     const val PRODUCT_NEW = "new-product"
@@ -170,7 +172,11 @@ fun FormicaApp(
                     onBack = { navController.popBackStack() },
                     onOpenCatalog = { navController.navigate(Routes.catalog(it)) },
                     onOpenExchange = { navController.navigate(Routes.EXCHANGE) },
+                    onOpenAbout = { navController.navigate(Routes.ABOUT) },
                 )
+            }
+            composable(Routes.ABOUT) {
+                AboutScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.IMPORT) {
                 ImportScreen(
