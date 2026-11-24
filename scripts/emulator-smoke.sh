@@ -60,13 +60,27 @@ if (( $(adb shell getprop ro.build.version.sdk | tr -d '\r') >= 33 )); then
 fi
 adb logcat -c || { sleep 2 && adb logcat -c; } || echo "logcat not cleared, continuing"
 
-# Tap the view showing this exact text, found in the uiautomator dump
+# Bounds of the lowest view showing this exact text, from a fresh uiautomator dump. The
+# lowest, because the same word can appear higher up too (a product in the "Pantry"
+# location shows "Pantry" on its card): the bottom bar is at the bottom
+find_text() {  # text
+  adb shell uiautomator dump /sdcard/formica-ui.xml >/dev/null
+  adb shell cat /sdcard/formica-ui.xml | tr '>' '\n' | grep -F "text=\"$1\"" \
+    | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' \
+    | sort -n -k2 | tail -n 1 || true
+}
+
+# Tap the view showing this exact text; if it is missing, the screen and its layout are kept
+# as <phase>-FAILED.png/.xml and the annotation names the phase
 tap_text() {  # text
   local bounds x1 y1 x2 y2
-  adb shell uiautomator dump /sdcard/formica-ui.xml >/dev/null
-  bounds=$(adb shell cat /sdcard/formica-ui.xml | tr '>' '\n' | grep -F "text=\"$1\"" \
-    | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' | head -n 1 || true)
-  [[ -n $bounds ]] || { echo "::error::\"$1\" not found on screen ($name)"; exit 1; }
+  bounds=$(find_text "$1")
+  if [[ -z $bounds ]]; then
+    adb exec-out screencap -p > "screenshots/$phase-FAILED.png" || true
+    adb shell cat /sdcard/formica-ui.xml > "screenshots/$phase-FAILED.xml" || true
+    echo "::error::\"$1\" not found on screen ($phase; see screenshots/$phase-FAILED.png)"
+    exit 1
+  fi
   read -r x1 y1 x2 y2 <<<"$bounds"
   adb shell input tap "$(((x1 + x2) / 2))" "$(((y1 + y2) / 2))"
 }
@@ -86,6 +100,7 @@ pass_welcome() {  # prefix for the file names
 # Sample data (debug builds only), once, after the welcome screen: the screenshots show
 # a pantry in use. The activity closes itself when the data is written
 demo_loaded=false
+phase=$name
 load_demo() {
   [[ $demo_loaded == true ]] && return 0
   adb shell am start -W -n "$package/$namespace.demo.DemoDataActivity"
@@ -97,6 +112,7 @@ load_demo() {
 # Start the app (again, with -S), check it is alive, screenshot every section
 capture() {  # prefix for the file names
   local attempt section label file
+  phase=$1
   for attempt in 1 2 3; do
     adb shell am start -S -W -n "$package/$namespace.MainActivity" && break
     (( attempt < 3 )) || exit 1
