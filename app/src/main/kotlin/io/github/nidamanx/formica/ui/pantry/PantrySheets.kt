@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,7 +57,7 @@ fun PurchaseSheet(
     val product = card.product
     var quantityText by rememberSaveable { mutableStateOf(format.number(initialQuantity)) }
     var quantityError by rememberSaveable { mutableStateOf(false) }
-    var purchasedOn by rememberSaveable { mutableStateOf(today) }
+    var purchasedOn by rememberSaveable { mutableLongStateOf(today) }
     var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
     var expiryEdited by rememberSaveable { mutableStateOf(false) }
     var locationId by rememberSaveable { mutableStateOf(defaultLocation(card, locations)) }
@@ -132,7 +133,7 @@ fun PreparationSheet(
     val product = card.product
     var quantityText by rememberSaveable { mutableStateOf(format.number(ONE_UNIT)) }
     var quantityError by rememberSaveable { mutableStateOf(false) }
-    var preparedOn by rememberSaveable { mutableStateOf(today) }
+    var preparedOn by rememberSaveable { mutableLongStateOf(today) }
     var ready by rememberSaveable { mutableStateOf<Long?>(null) }
     var readyEdited by rememberSaveable { mutableStateOf(false) }
     var expiry by rememberSaveable { mutableStateOf<Long?>(null) }

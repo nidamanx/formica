@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -95,7 +96,7 @@ private fun ProductForm(
     var categoryId by rememberSaveable { mutableStateOf(p?.categoryId) }
     var homemade by rememberSaveable { mutableStateOf(p?.homemade ?: false) }
     val today = remember { LocalDate.now().toEpochDay() }
-    var preparedOn by rememberSaveable { mutableStateOf(today) }
+    var preparedOn by rememberSaveable { mutableLongStateOf(today) }
     var ready by rememberSaveable { mutableStateOf<Long?>(null) }
     var readyEdited by rememberSaveable { mutableStateOf(false) }
     var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -304,6 +305,7 @@ private fun ProductForm(
                 value = shelfLife,
                 error = if (errors.shelfLifeDays) daysError else null,
                 help = stringResource(R.string.field_shelf_life_help),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 shelfLife = it
                 errors = errors.copy(shelfLifeDays = false)
@@ -314,6 +316,7 @@ private fun ProductForm(
                     value = untilReady,
                     error = if (errors.daysUntilReady) daysError else null,
                     help = stringResource(R.string.field_days_until_ready_help),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     untilReady = it
                     errors = errors.copy(daysUntilReady = false)
@@ -323,6 +326,7 @@ private fun ProductForm(
                 label = stringResource(R.string.field_days_after_opening),
                 value = afterOpening,
                 error = if (errors.daysAfterOpening) daysError else null,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 afterOpening = it
                 errors = errors.copy(daysAfterOpening = false)
@@ -331,6 +335,7 @@ private fun ProductForm(
                 label = stringResource(R.string.field_warning_days),
                 value = warning,
                 error = if (errors.warningDays) daysError else null,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 warning = it
                 errors = errors.copy(warningDays = false)
@@ -340,6 +345,7 @@ private fun ProductForm(
                 value = minStock,
                 error = if (errors.minStock) stringResource(R.string.error_quantity) else null,
                 decimal = true,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 minStock = it
                 errors = errors.copy(minStock = false)
@@ -389,7 +395,7 @@ private fun NumberField(
     label: String,
     value: String,
     error: String?,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     decimal: Boolean = false,
     help: String? = null,
     onChange: (String) -> Unit,
