@@ -3,7 +3,6 @@ package io.github.nidamanx.formica.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -11,14 +10,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.nidamanx.formica.R
+import kotlin.math.ceil
+import kotlin.math.hypot
 
 private const val DAYS_SHOWN_AS_DAYS = 60
+private val MIN_DISC_SIZE = 52.dp
 
 enum class DiscTone { EXPIRED, EXPIRING, PREPARING, NEUTRAL }
 
@@ -50,7 +55,7 @@ fun DaysDisc(days: Long?, tone: DiscTone, statusText: String) {
         color = background,
         contentColor = foreground,
         modifier = Modifier
-            .size(52.dp)
+            .circleAround(MIN_DISC_SIZE)
             .clearAndSetSemantics { if (statusText.isNotEmpty()) contentDescription = statusText },
     ) {
         Column(
@@ -65,4 +70,18 @@ fun DaysDisc(days: Long?, tone: DiscTone, statusText: String) {
             }
         }
     }
+}
+
+/**
+ * A square of at least [min] that grows with its content, for a circle that keeps the text
+ * inside with large font sizes. The side is between the content's longer side and its
+ * diagonal: text lines are narrower at the top and bottom than a full rectangle.
+ */
+private fun Modifier.circleAround(min: Dp) = layout { measurable, _ ->
+    val width = measurable.maxIntrinsicWidth(Constraints.Infinity)
+    val height = measurable.maxIntrinsicHeight(width)
+    val content = (maxOf(width, height) + hypot(width.toFloat(), height.toFloat())) / 2
+    val side = maxOf(min.roundToPx(), ceil(content).toInt())
+    val placeable = measurable.measure(Constraints.fixed(side, side))
+    layout(side, side) { placeable.place(0, 0) }
 }

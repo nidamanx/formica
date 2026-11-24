@@ -347,7 +347,7 @@ private fun ProductCard(
                     if (card.hasNotes) {
                         Icon(
                             painterResource(R.drawable.ic_notes),
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.field_notes),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp),
                         )

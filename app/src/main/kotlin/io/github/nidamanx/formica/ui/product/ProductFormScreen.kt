@@ -242,7 +242,10 @@ private fun ProductForm(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(role = Role.Button) { moreOpen = !moreOpen }
+                .clickable(
+                    role = Role.Button,
+                    onClickLabel = stringResource(if (moreOpen) R.string.action_hide else R.string.action_show),
+                ) { moreOpen = !moreOpen }
                 .padding(vertical = 8.dp),
         ) {
             Text(
