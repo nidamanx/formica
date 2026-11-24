@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Store screenshots on a running emulator (Android 13+, the debug app already installed by
 # emulator-smoke.sh): for each language, a fresh app with the sample data, then the pantry,
-# the detail of the tomato passata, the shopping list, the expiry dates and the pantry in
-# the dark theme. The status bar is in demo mode (fixed time, full battery, no icons).
+# the detail of the tomato passata, the shopping list and the expiry dates, in the light
+# and then the dark theme. The status bar is in demo mode (fixed time, Wi-Fi, no icons).
 set -euo pipefail
 
 usage() {
@@ -11,7 +11,7 @@ usage() {
 Usage: scripts/store-screenshots.sh [-h]
 
 Run after scripts/emulator-smoke.sh, on Android 13 or later (per-app language).
-Screenshots: screenshots/store/<locale>/1.png … 5.png, in the layout of
+Screenshots: screenshots/store/<locale>/1.png … 8.png (1-4 light, 5-8 dark), in the layout of
 fastlane/metadata/android/<locale>/images/phoneScreenshots/.
 USAGE
 }
@@ -76,6 +76,22 @@ demo network -e wifi show -e level 4
 demo network -e mobile hide
 demo notifications -e visible false
 
+# Pantry, detail of the tomato passata, shopping list, expiry dates: <first>.png to <first+3>.png
+four_screens() {  # number of the first file
+  local passata
+  shot "$out/$1.png"
+  passata=$(res_string "$demo_strings" demo_passata)
+  scroll_to_text "$passata"
+  tap_text "$passata"
+  shot "$out/$(($1 + 1)).png"
+  adb shell input keyevent KEYCODE_BACK
+  sleep 1
+  tap_text "$(res_string "$strings" nav_shopping_list)"
+  shot "$out/$(($1 + 2)).png"
+  tap_text "$(res_string "$strings" nav_expiries)"
+  shot "$out/$(($1 + 3)).png"
+}
+
 for entry in "${languages[@]}"; do
   IFS=: read -r lang suffix locale <<<"$entry"
   strings=app/src/main/res/values$suffix/strings.xml
@@ -97,20 +113,11 @@ for entry in "${languages[@]}"; do
   # the top
   start_app
 
-  shot "$out/1.png"
-  passata=$(res_string "$demo_strings" demo_passata)
-  scroll_to_text "$passata"
-  tap_text "$passata"
-  shot "$out/2.png"
-  adb shell input keyevent KEYCODE_BACK
-  sleep 1
-  tap_text "$(res_string "$strings" nav_shopping_list)"
-  shot "$out/3.png"
-  tap_text "$(res_string "$strings" nav_expiries)"
-  shot "$out/4.png"
+  four_screens 1
+  # The same four screens in the dark theme, from a fresh start (the list at the top)
   adb shell cmd uimode night yes
   start_app
-  shot "$out/5.png"
+  four_screens 5
   adb shell cmd uimode night no
 done
 
