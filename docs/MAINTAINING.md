@@ -67,6 +67,15 @@ without showing its value.
 A published tag is never moved or deleted (repository ruleset): a wrong release is
 fixed with a new version.
 
+## Icon
+
+`art/formica_art.py` draws the ant once; `python3 art/generate_icon.py` (needs the Debian
+packages `python3-shapely` and `python3-cairosvg`) writes every icon file from it: the
+adaptive icon with its monochrome layer for themed icons in `app/src/main/res`, the debug
+variant ("Formica-D": draft greys and a "D" badge) in `app/src/debug/res`, `art/icon.svg`
+and the store icon `fastlane/metadata/android/en-US/images/icon.png`. The generated files
+are committed; change the drawing, never the generated files.
+
 ## Changing the database
 
 Users' data must survive every update, so a schema change always comes with:
