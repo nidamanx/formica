@@ -8,7 +8,8 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-// The schema is exported and versioned from the first release on (with explicit migrations)
+// Every version's schema is exported to app/schemas/ and versioned: a schema change needs a
+// new version, its explicit migration and the new schema file (checked by the Build workflow)
 @Database(
     entities = [
         LocationEntity::class,
@@ -22,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         NotesReviewEntity::class,
     ],
     version = 3,
-    exportSchema = false,
+    exportSchema = true,
 )
 abstract class FormicaDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDao
@@ -58,10 +59,6 @@ abstract class FormicaDatabase : RoomDatabase() {
         fun create(context: Context): FormicaDatabase =
             Room.databaseBuilder(context, FormicaDatabase::class.java, "formica.db")
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                // Development only, until the first release: a schema change recreates the
-                // database. It must be removed before the first release, when every
-                // migration becomes explicit.
-                .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
     }
 }

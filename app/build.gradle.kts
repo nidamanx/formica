@@ -110,6 +110,12 @@ android {
     }
 }
 
+// Room writes the schema of every database version here; the files are versioned and
+// describe what each migration must do
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

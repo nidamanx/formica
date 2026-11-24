@@ -67,6 +67,20 @@ without showing its value.
 A published tag is never moved or deleted (repository ruleset): a wrong release is
 fixed with a new version.
 
+## Changing the database
+
+Users' data must survive every update, so a schema change always comes with:
+
+1. `version` increased by 1 in `FormicaDatabase`;
+2. an explicit `Migration(old, new)` added to the builder (there is no destructive
+   fallback: a missing migration stops the app instead of deleting the data);
+3. the new schema file `app/schemas/<package>.FormicaDatabase/<version>.json`, written by
+   the build. The Build workflow fails while it is missing or different, and keeps the
+   generated files as the artifact `room-schemas`: commit them unchanged.
+
+The previous schema files are never edited: comparing them shows what a migration must
+do.
+
 ## Testing builds
 
 - Every push to `main` or `develop` runs the Build workflow: lint, unit tests, debug and
