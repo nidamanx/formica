@@ -427,4 +427,12 @@
     </plurals>
     <string name="clean_up_nothing">Nothing to clean up.</string>
     <string name="badge_notes_review">Notes to review</string>
+
+    <!-- First start -->
+    <string name="welcome_title">Welcome to Formica</string>
+    <string name="welcome_text">Your household pantry and shopping list. It works without internet and without an account: your data stays on the phone.</string>
+    <string name="welcome_notification">Daily expiry notification</string>
+    <string name="welcome_notification_hint">At %1$s, only if something expires or is ready. You can change it in Settings.</string>
+    <string name="welcome_initial_data">Locations and categories are ready: you can change them in Settings.</string>
+    <string name="action_start">Start</string>
 </resources>

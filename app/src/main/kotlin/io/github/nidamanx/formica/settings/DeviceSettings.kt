@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.settings
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.nidamanx.formica.domain.model.Device
@@ -30,6 +31,13 @@ class DeviceSettings(context: Context, private val defaultName: String) {
         }
     }.toDevice()!!.also { cached = it }
 
+    /** The welcome screen has been completed (SPEC §12, first start). */
+    val firstRunDone: Flow<Boolean> = store.data.map { it[FIRST_RUN_DONE] ?: false }
+
+    suspend fun finishFirstRun() {
+        store.edit { it[FIRST_RUN_DONE] = true }
+    }
+
     suspend fun rename(name: String) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "empty device name" }
@@ -45,5 +53,6 @@ class DeviceSettings(context: Context, private val defaultName: String) {
     private companion object {
         val ID = stringPreferencesKey("device_id")
         val NAME = stringPreferencesKey("device_name")
+        val FIRST_RUN_DONE = booleanPreferencesKey("first_run_done")
     }
 }

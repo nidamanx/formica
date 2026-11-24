@@ -445,4 +445,12 @@
     </plurals>
     <string name="clean_up_nothing">Nessun elemento da pulire.</string>
     <string name="badge_notes_review">Note da rivedere</string>
+
+    <!-- First start -->
+    <string name="welcome_title">Ti diamo il benvenuto in Formica</string>
+    <string name="welcome_text">La dispensa e la lista della spesa di casa. Funziona senza internet e senza account: i dati restano sul telefono.</string>
+    <string name="welcome_notification">Notifica giornaliera delle scadenze</string>
+    <string name="welcome_notification_hint">Alle %1$s, solo se qualcosa scade o è pronto. Puoi cambiarla nelle Impostazioni.</string>
+    <string name="welcome_initial_data">Posizioni e categorie sono già pronte: puoi cambiarle nelle Impostazioni.</string>
+    <string name="action_start">Inizia</string>
 </resources>

@@ -7,10 +7,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
 import androidx.core.content.IntentCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import io.github.nidamanx.formica.ui.FormicaApp
 import io.github.nidamanx.formica.ui.theme.FormicaTheme
+import io.github.nidamanx.formica.ui.welcome.WelcomeScreen
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -26,11 +29,19 @@ class MainActivity : ComponentActivity() {
         val container = (application as FormicaApplication).container
         setContent {
             FormicaTheme {
-                FormicaApp(
-                    openExpiries = openExpiries,
-                    pendingImport = container.pendingImport,
-                    undoImport = container.importer::undoLastImport,
-                )
+                // null while the setting is read: nothing is drawn for that moment
+                val firstRunDone by container.deviceSettings.firstRunDone
+                    .collectAsStateWithLifecycle(initialValue = null)
+                when (firstRunDone) {
+                    null -> Unit
+                    // A file opened at the very first start waits for the welcome screen
+                    false -> WelcomeScreen()
+                    true -> FormicaApp(
+                        openExpiries = openExpiries,
+                        pendingImport = container.pendingImport,
+                        undoImport = container.importer::undoLastImport,
+                    )
+                }
             }
         }
     }

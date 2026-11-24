@@ -51,6 +51,10 @@ for _ in $(seq 30); do
 done
 sleep 10
 adb install -r "$apk"
+# Android 13+: granted beforehand, so "Start" does not open the permission dialog
+if (( $(adb shell getprop ro.build.version.sdk | tr -d '\r') >= 33 )); then
+  adb shell pm grant "$package" android.permission.POST_NOTIFICATIONS
+fi
 adb logcat -c || { sleep 2 && adb logcat -c; } || echo "logcat not cleared, continuing"
 
 # Tap the view showing this exact text, found in the uiautomator dump
@@ -64,6 +68,18 @@ tap_text() {  # text
   adb shell input tap "$(((x1 + x2) / 2))" "$(((y1 + y2) / 2))"
 }
 
+# The welcome screen of the first start, if shown: screenshot, then "Start"
+pass_welcome() {  # prefix for the file names
+  local ui
+  adb shell uiautomator dump /sdcard/formica-ui.xml >/dev/null
+  # Read first: "grep -q" stopping early would fail the pipe under pipefail
+  ui=$(adb shell cat /sdcard/formica-ui.xml)
+  [[ $ui == *'text="Start"'* ]] || return 0
+  adb exec-out screencap -p > "screenshots/$1-welcome.png"
+  tap_text "Start"
+  sleep 3
+}
+
 # Start the app (again, with -S), check it is alive, screenshot every section
 capture() {  # prefix for the file names
   local attempt section label file
@@ -74,6 +90,7 @@ capture() {  # prefix for the file names
   done
   sleep 5
   adb shell pidof "$package"
+  pass_welcome "$1"
   for section in "${sections[@]}"; do
     label=${section%%:*}
     file=${section#*:}

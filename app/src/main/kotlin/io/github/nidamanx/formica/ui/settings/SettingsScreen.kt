@@ -49,7 +49,7 @@ import io.github.nidamanx.formica.domain.TickBehavior
 import io.github.nidamanx.formica.ui.components.BackTopBar
 import io.github.nidamanx.formica.ui.components.NotificationAccess
 import io.github.nidamanx.formica.ui.components.rememberNotificationAccess
-import java.util.Calendar
+import io.github.nidamanx.formica.ui.format.timeOfDayText
 
 @Composable
 fun SettingsScreen(
@@ -113,7 +113,7 @@ fun SettingsScreen(
                         },
                     )
                 }
-                ValueRow(stringResource(R.string.settings_notification_time), timeText(prefs.minuteOfDay)) {
+                ValueRow(stringResource(R.string.settings_notification_time), timeOfDayText(prefs.minuteOfDay)) {
                     choosing = Choice.TIME
                 }
                 ValueRow(
@@ -208,17 +208,6 @@ fun SettingsScreen(
 }
 
 private enum class Choice { TIME, WARNING_DAYS, ON_TICK, MIN_STOCK, RUNNING_LOW }
-
-/** The time in the phone's format (9:00 or 9:00 AM). */
-@Composable
-private fun timeText(minuteOfDay: Int): String {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, minuteOfDay / 60)
-        set(Calendar.MINUTE, minuteOfDay % 60)
-    }
-    return android.text.format.DateFormat.getTimeFormat(context).format(calendar.time)
-}
 
 @Composable
 private fun SectionTitle(text: String) {
