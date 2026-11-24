@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +67,9 @@ import io.github.nidamanx.formica.ui.format.DisplayFormat
 import io.github.nidamanx.formica.ui.format.preparedAgo
 import io.github.nidamanx.formica.ui.format.quantityText
 import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
+
+/** From this font scale on, the cards put their quick actions under the text. */
+private const val LARGE_TEXT_SCALE = 1.5f
 
 @Composable
 fun PantryScreen(
@@ -321,18 +325,16 @@ private fun ProductCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 4.dp),
-        ) {
-            ExpiryDisc(card, today)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        // Very large text: the quantity and the quick actions move under the name, which then
+        // has the whole width (beside them, it would wrap inside dates and numbers)
+        val largeText = LocalDensity.current.fontScale >= LARGE_TEXT_SCALE
+        val nameAndDetails: @Composable (Modifier) -> Unit = { modifier ->
+            Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
                         product.name,
                         style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
+                        maxLines = if (largeText) 2 else 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false),
                     )
@@ -366,35 +368,66 @@ private fun ProductCard(
                     }
                 }
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    resources.quantityText(displayedQuantity(card.quantity), product.unit, format),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
-                Row {
-                    IconButton(onClick = onToBuy) {
-                        if (inList) {
-                            Icon(
-                                Icons.Filled.ShoppingCart,
-                                contentDescription = stringResource(R.string.action_remove_from_list),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        } else {
-                            Icon(
-                                painterResource(R.drawable.ic_add_shopping_cart),
-                                contentDescription = stringResource(R.string.action_to_buy),
-                            )
-                        }
+        }
+        val quantity: @Composable () -> Unit = {
+            Text(
+                resources.quantityText(displayedQuantity(card.quantity), product.unit, format),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+        }
+        val actions: @Composable () -> Unit = {
+            Row {
+                IconButton(onClick = onToBuy) {
+                    if (inList) {
+                        Icon(
+                            Icons.Filled.ShoppingCart,
+                            contentDescription = stringResource(R.string.action_remove_from_list),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        Icon(
+                            painterResource(R.drawable.ic_add_shopping_cart),
+                            contentDescription = stringResource(R.string.action_to_buy),
+                        )
                     }
-                    IconButton(onClick = onMinus) {
-                        Icon(painterResource(R.drawable.ic_remove), contentDescription = stringResource(R.string.cd_use))
-                    }
-                    IconButton(onClick = onPlus) {
-                        val plus = if (product.homemade) R.string.preparation_title else R.string.cd_add_purchase
-                        Icon(Icons.Filled.Add, contentDescription = stringResource(plus))
-                    }
+                }
+                IconButton(onClick = onMinus) {
+                    Icon(painterResource(R.drawable.ic_remove), contentDescription = stringResource(R.string.cd_use))
+                }
+                IconButton(onClick = onPlus) {
+                    val plus = if (product.homemade) R.string.preparation_title else R.string.cd_add_purchase
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(plus))
+                }
+            }
+        }
+        if (largeText) {
+            Column(Modifier.padding(start = 10.dp, top = 10.dp, bottom = 6.dp, end = 4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ExpiryDisc(card, today)
+                    nameAndDetails(Modifier.weight(1f))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    quantity()
+                    actions()
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 4.dp),
+            ) {
+                ExpiryDisc(card, today)
+                nameAndDetails(Modifier.weight(1f))
+                Column(horizontalAlignment = Alignment.End) {
+                    quantity()
+                    actions()
                 }
             }
         }
