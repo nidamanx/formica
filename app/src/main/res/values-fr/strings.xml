@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <!-- French translation of values/strings.xml: every string, in sync with the English ones -->
-<resources>
+<!-- ImpliedQuantity ignored on the plurals without a number: French "one" also covers 0,
+     and these words stand next to a number shown apart, where "0 jour" is correct -->
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_pantry">Garde-manger</string>
     <string name="nav_shopping_list">Courses</string>
     <string name="nav_expiries">Dates limites</string>
@@ -78,12 +80,12 @@
         <item quantity="many">préparé il y a %1$d ans</item>
         <item quantity="other">préparé il y a %1$d ans</item>
     </plurals>
-    <plurals name="disc_days">
+    <plurals name="disc_days" tools:ignore="ImpliedQuantity">
         <item quantity="one">jour</item>
         <item quantity="many">jours</item>
         <item quantity="other">jours</item>
     </plurals>
-    <plurals name="disc_months">
+    <plurals name="disc_months" tools:ignore="ImpliedQuantity">
         <item quantity="one">mois</item>
         <item quantity="many">mois</item>
         <item quantity="other">mois</item>
@@ -101,17 +103,17 @@
     <string name="unit_kilogram_short">kg</string>
     <string name="unit_milliliter_short">ml</string>
     <string name="unit_liter_short">l</string>
-    <plurals name="unit_package">
+    <plurals name="unit_package" tools:ignore="ImpliedQuantity">
         <item quantity="one">paquet</item>
         <item quantity="many">paquets</item>
         <item quantity="other">paquets</item>
     </plurals>
-    <plurals name="unit_jar">
+    <plurals name="unit_jar" tools:ignore="ImpliedQuantity">
         <item quantity="one">bocal</item>
         <item quantity="many">bocaux</item>
         <item quantity="other">bocaux</item>
     </plurals>
-    <plurals name="unit_bottle">
+    <plurals name="unit_bottle" tools:ignore="ImpliedQuantity">
         <item quantity="one">bouteille</item>
         <item quantity="many">bouteilles</item>
         <item quantity="other">bouteilles</item>
