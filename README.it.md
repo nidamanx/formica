@@ -38,11 +38,16 @@ io.github.nidamanx.formica
 ```
 
 <p align="center">
-  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/1.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/1.png" width="180" alt="Dispensa: ricotta scaduta, latte e spinaci in scadenza, yogurt fatto in casa"></a>
-  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/2.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/2.png" width="180" alt="Passata di pomodoro fatta in casa: due preparazioni e i movimenti"></a>
-  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/3.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/3.png" width="180" alt="Lista della spesa con i prodotti che stanno per finire e quelli frequenti"></a>
-  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/4.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/4.png" width="180" alt="Scadenze: scaduti, in scadenza, in preparazione"></a>
-  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/5.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/5.png" width="180" alt="Dispensa in tema scuro"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/1.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/1.png" width="170" alt="Dispensa: ricotta scaduta, latte e spinaci in scadenza, yogurt fatto in casa"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/2.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/2.png" width="170" alt="Passata di pomodoro fatta in casa: due preparazioni e i movimenti"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/3.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/3.png" width="170" alt="Lista della spesa con i prodotti che stanno per finire e quelli frequenti"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/4.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/4.png" width="170" alt="Scadenze: scaduti, in scadenza, in preparazione"></a>
+</p>
+<p align="center">
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/5.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/5.png" width="170" alt="Dispensa: ricotta scaduta, latte e spinaci in scadenza, yogurt fatto in casa, tema scuro"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/6.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/6.png" width="170" alt="Passata di pomodoro fatta in casa: due preparazioni e i movimenti, tema scuro"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/7.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/7.png" width="170" alt="Lista della spesa con i prodotti che stanno per finire e quelli frequenti, tema scuro"></a>
+  <a href="fastlane/metadata/android/it-IT/images/phoneScreenshots/8.png"><img src="fastlane/metadata/android/it-IT/images/phoneScreenshots/8.png" width="170" alt="Scadenze: scaduti, in scadenza, in preparazione, tema scuro"></a>
 </p>
 
 ## Perché

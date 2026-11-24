@@ -39,11 +39,16 @@ io.github.nidamanx.formica
 ```
 
 <p align="center">
-  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="180" alt="Pantry: expired ricotta, milk and spinach expiring soon, homemade yogurt"></a>
-  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="180" alt="Homemade tomato passata: two preparations and the history"></a>
-  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="180" alt="Shopping list with the products running low and the frequent ones"></a>
-  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="180" alt="Expiry dates: expired, expiring soon, getting ready"></a>
-  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="180" alt="Pantry in the dark theme"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="170" alt="Pantry: expired ricotta, milk and spinach expiring soon, homemade yogurt"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="170" alt="Homemade tomato passata: two preparations and the history"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="170" alt="Shopping list with the products running low and the frequent ones"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="170" alt="Expiry dates: expired, expiring soon, getting ready"></a>
+</p>
+<p align="center">
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="170" alt="Pantry: expired ricotta, milk and spinach expiring soon, homemade yogurt, dark theme"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="170" alt="Homemade tomato passata: two preparations and the history, dark theme"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" width="170" alt="Shopping list with the products running low and the frequent ones, dark theme"></a>
+  <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/8.png"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/8.png" width="170" alt="Expiry dates: expired, expiring soon, getting ready, dark theme"></a>
 </p>
 
 ## Why
