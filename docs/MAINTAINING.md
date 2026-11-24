@@ -67,7 +67,7 @@ without showing its value.
 A published tag is never moved or deleted (repository ruleset): a wrong release is
 fixed with a new version.
 
-## Icon
+## Icon and store graphics
 
 `art/formica_art.py` draws the ant once; `python3 art/generate_icon.py` (needs the Debian
 packages `python3-shapely` and `python3-cairosvg`) writes every icon file from it: the
@@ -76,6 +76,13 @@ variant ("Formica-D": draft greys and a "D" badge) in `app/src/debug/res`, `art/
 the store icon `fastlane/metadata/android/en-US/images/icon.png` and the notification icon
 (a simpler ant, readable at 18-24 px). The generated files are committed; change the
 drawing, never the generated files.
+
+`python3 art/generate_feature_graphic.py` writes the store banner
+(`fastlane/metadata/android/<locale>/images/featureGraphic.png`, one per language, with the
+slogans written in the script); with `--social FILE` it also writes the social preview
+(1280x640), which is uploaded by hand in *Settings → General → Social preview* and not kept
+in the repository. `python3 art/generate_badges.py` writes the README install badges in
+`art/badges/`. Both need `fonts-roboto` besides `python3-cairosvg`.
 
 ## Changing the database
 

@@ -118,6 +118,34 @@ def foreground(p, debug=False, badge_colours=None):
     return body
 
 
+# Store graphics: the ant walking to its anthill pantry, on a 240x140 scene
+SCENE = dict(RELEASE, mound="#C98B55", door="#4A2C1E", shelf="#8C5A34", jar="#8EC3E6", jar2="#F2B24A",
+             ground="#A9784A", sun="#FFF6D8", title="#0F3D57", slogan="#805611")
+SCENE_WIDTH, SCENE_HEIGHT, SCENE_GROUND = 230, 140, 118
+
+
+def pantry(p, x):
+    """Anthill with an arched door and shelves of jars inside, standing on the ground (y 120)."""
+    line = p["line"]
+    jar = lambda x0, y0, w, h, rx, fill, stroke=True: (
+        f'<rect x="{x + x0}" y="{y0}" width="{w}" height="{h}" rx="{rx}" fill="{fill}"'
+        + (f' stroke="{line}"' if stroke else "") + "/>")
+    return (f'<path d="M{x},120 Q{x + 10},52 {x + 55},46 Q{x + 100},52 {x + 110},120 Z" '
+            f'fill="{p["mound"]}" stroke="{line}" stroke-width="1.6"/>'
+            f'<path d="M{x + 30},120 L{x + 30},88 Q{x + 30},70 {x + 55},70 Q{x + 80},70 {x + 80},88 L{x + 80},120 Z" '
+            f'fill="{p["door"]}" stroke="{line}" stroke-width="1.6"/>'
+            + jar(34, 96, 42, 2.6, 0, p["shelf"], stroke=False)
+            + jar(38, 86, 8, 10, 2, p["jar"]) + jar(38.5, 84, 7, 3, 1, p["jar2"])
+            + jar(50, 88, 9, 8, 2, p["jar2"]) + jar(63, 85, 8, 11, 2, p["box"])
+            + jar(34, 110, 42, 2.6, 0, p["shelf"], stroke=False)
+            + jar(40, 101, 10, 9, 1.5, p["box"]) + jar(56, 102, 8, 8, 2, p["jar"]))
+
+
+def scene(p=SCENE):
+    """The anthill pantry on the left and the ant walking to it, without sky or ground."""
+    return f'{pantry(p, 6)}<g transform="translate(96 4) scale(1.48)">{ant(p)}</g>'
+
+
 def svg(inner, background=None, view_box="0 0 108 108", size=None):
     size_attr = f' width="{size}" height="{size}"' if size else ""
     back = f'<rect width="108" height="108" fill="{background}"/>' if background else ""
