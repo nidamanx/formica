@@ -1,6 +1,7 @@
 # Installs and starts the debug app on emulators (the oldest supported Android, a middle
 # version and recent ones), checks it does not crash and takes a screenshot of every
-# section, in the light and the dark theme.
+# section, in the light and the dark theme and with large text; on Android 16 it also
+# takes the store screenshots in every language (scripts/store-screenshots.sh).
 # Two ways to start it:
 #  - automatically, on a push to develop that changes the app or the build: every level
 #    but the experimental ones (public repository: free minutes, jobs in parallel);
@@ -19,6 +20,8 @@ on:
       - "gradle.properties"
       - ".github/workflows/emulator.yml"
       - "scripts/emulator-smoke.sh"
+      - "scripts/emulator-common.sh"
+      - "scripts/store-screenshots.sh"
       - "scripts/run-gradle.sh"
   workflow_dispatch:
     inputs:
@@ -99,7 +102,10 @@ jobs:
           # Recent system images may take longer than the default 600 s to boot
           emulator-boot-timeout: 1200
           disk-size: 4000M
-          script: scripts/emulator-smoke.sh api${{ matrix.api-level }}-phone
+          # Store screenshots (5 languages) on Android 16 only: one set is enough
+          script: |
+            scripts/emulator-smoke.sh api${{ matrix.api-level }}-phone
+            if [ "${{ matrix.api-level }}" = "36" ]; then scripts/store-screenshots.sh; fi
 
       - name: Upload screenshots
         if: always() && env.SELECTED == 'true'

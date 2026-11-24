@@ -102,9 +102,13 @@ do.
 - Every push to `main` or `develop` runs the Build workflow: lint, unit tests, debug and
   release builds, permission check (`config/allowed-permissions.txt`), debug APK as an
   artifact. On a Gradle failure the errors are also written as an annotation.
-- Emulator smoke test: installs and starts the debug app on Android 8, 11 and 16,
-  opens every section in the light and the dark theme and keeps screenshots. It runs on
-  every push to `develop` that changes the app or the build; by hand (*Actions →
+- Emulator smoke test: installs and starts the debug app on Android 8, 11 and 16, passes
+  the welcome screen, loads the sample data, opens every section in the light and the dark
+  theme and with large text, and keeps screenshots. On Android 16 it also takes the store
+  screenshots in every language (`scripts/store-screenshots.sh`), kept in the artifact
+  `screenshots-api36` under `store/`: copy them to
+  `fastlane/metadata/android/<locale>/images/phoneScreenshots/` when the screens change.
+  It runs on every push to `develop` that changes the app or the build; by hand (*Actions →
   Emulator smoke test → Run workflow*, once the workflow is on `main`) also on one level
   only (input `only`) or on Android 17 (experimental).
 - CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,

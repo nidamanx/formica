@@ -38,14 +38,13 @@ namespace=io.github.nidamanx.formica
 sections=("Pantry:pantry" "Shopping list:shopping-list" "Expiry dates:expiry-dates")
 
 mkdir -p screenshots
+# shellcheck source=scripts/emulator-common.sh
+source "$(dirname "$0")/emulator-common.sh"
 trap 'adb logcat -d > "screenshots/$name-logcat.txt" 2>/dev/null || true' EXIT
 
 # A slow emulator often shows "System UI isn't responding" for other apps: hide those
 # dialogs so they do not cover the screenshots. An ANR of this app is still detected
 adb shell settings put global hide_error_dialogs 1 || true
-close_system_dialogs() {
-  adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS >/dev/null || true
-}
 
 # "Boot completed" may come before the system can start apps: wait for the activity manager
 for _ in $(seq 30); do
@@ -59,31 +58,6 @@ if (( $(adb shell getprop ro.build.version.sdk | tr -d '\r') >= 33 )); then
   adb shell pm grant "$package" android.permission.POST_NOTIFICATIONS
 fi
 adb logcat -c || { sleep 2 && adb logcat -c; } || echo "logcat not cleared, continuing"
-
-# Bounds of the lowest view showing this exact text, from a fresh uiautomator dump. The
-# lowest, because the same word can appear higher up too (a product in the "Pantry"
-# location shows "Pantry" on its card): the bottom bar is at the bottom
-find_text() {  # text
-  adb shell uiautomator dump /sdcard/formica-ui.xml >/dev/null
-  adb shell cat /sdcard/formica-ui.xml | tr '>' '\n' | grep -F "text=\"$1\"" \
-    | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' \
-    | sort -n -k2 | tail -n 1 || true
-}
-
-# Tap the view showing this exact text; if it is missing, the screen and its layout are kept
-# as <phase>-FAILED.png/.xml and the annotation names the phase
-tap_text() {  # text
-  local bounds x1 y1 x2 y2
-  bounds=$(find_text "$1")
-  if [[ -z $bounds ]]; then
-    adb exec-out screencap -p > "screenshots/$phase-FAILED.png" || true
-    adb shell cat /sdcard/formica-ui.xml > "screenshots/$phase-FAILED.xml" || true
-    echo "::error::\"$1\" not found on screen ($phase; see screenshots/$phase-FAILED.png)"
-    exit 1
-  fi
-  read -r x1 y1 x2 y2 <<<"$bounds"
-  adb shell input tap "$(((x1 + x2) / 2))" "$(((y1 + y2) / 2))"
-}
 
 # The welcome screen of the first start, if shown: screenshot, then "Start"
 pass_welcome() {  # prefix for the file names
