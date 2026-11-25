@@ -7,9 +7,9 @@ are needed.
 
 - `develop`: work in progress. Every push runs the Build and CodeQL workflows and, when
   the app or the build changes, the emulator smoke test.
-- `main`: the default branch. It only receives usable, released versions: one commit
-  for each release, made identical to `develop` just before releasing. Releases are
-  built from `main` only.
+- `main`: the default branch. It only receives released versions: `develop` is merged
+  into it (`git merge --no-ff`) just before each release, then `develop` is
+  fast-forwarded to `main`. Releases are built from `main` only.
 
 ## Signing keys
 
@@ -66,15 +66,16 @@ without showing its value.
 3. In `CHANGELOG.md` move the `[Unreleased]` entries to `## [X.Y.Z] - YYYY-MM-DD`. Set
    the same version in the badges of `README.md` and `README.it.md`, and `version` and
    `date-released` in `CITATION.cff`. `scripts/check-version.sh --release` checks it all.
-4. With Build and emulator test green on `develop`, make `main` identical to `develop`
-   in one commit.
+4. With Build and emulator test green on `develop`, merge `develop` into `main`
+   (`git merge --no-ff develop -m "Release X.Y.Z"`).
 5. *Actions → Release → Run workflow* on `main`. The `build` job checks the version and
    builds the unsigned APK (lint, tests, permissions) from a clean state; the `sign` job
    (environment `release`) decrypts the key, signs with `scripts/sign-apk.sh`, removes
    the key, checks the certificate against `keystore/certificate-sha256.txt`, writes
    `SHA256SUMS` and attests the build provenance; the `publish` job creates the tag
    `v<versionName>` with the release.
-6. Locally: `git fetch origin --tags`, then check the release page and the files.
+6. Locally: `git fetch origin --tags`, then check the release page and the files, and
+   bring `develop` up to `main` (`git merge --ff-only main`, push).
 
 A published tag is never moved or deleted (repository ruleset): a wrong release is
 fixed with a new version.
