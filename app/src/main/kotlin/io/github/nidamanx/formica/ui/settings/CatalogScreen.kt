@@ -150,8 +150,10 @@ fun CatalogScreen(
         }
     }
 
-    if (editorOpen) {
-        val editing = items.firstOrNull { it.id == editingId }
+    val editing = items.firstOrNull { it.id == editingId }
+    // Editing an item not (or no longer) in the list, e.g. deleted by an import or not loaded
+    // yet: no dialog, so that "Save" can never create a new item instead
+    if (editorOpen && (editingId == null || editing != null)) {
         CatalogEditDialog(
             kind = kind,
             initial = editing,

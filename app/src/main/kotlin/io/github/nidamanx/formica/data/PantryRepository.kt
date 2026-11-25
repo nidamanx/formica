@@ -15,8 +15,10 @@ import io.github.nidamanx.formica.domain.editGroup
 import io.github.nidamanx.formica.domain.editProduct
 import io.github.nidamanx.formica.domain.groupBatches
 import io.github.nidamanx.formica.domain.model.Batch
+import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.Movement
 import io.github.nidamanx.formica.domain.model.MovementType
+import io.github.nidamanx.formica.domain.model.Origin
 import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.newProduct
 import io.github.nidamanx.formica.domain.openItemFor
@@ -84,10 +86,6 @@ class PantryRepository(
 
     val products: Flow<List<Product>> = productDao.observeAll().map { list -> list.map { it.toDomain() } }
 
-    /** Total of every product, in thousandths (may be negative after a merge). */
-    val productQuantities: Flow<Map<String, Long>> =
-        movementDao.observeProductQuantities().map { rows -> rows.associate { it.id to it.quantity } }
-
     val batchQuantities: Flow<Map<String, Long>> =
         movementDao.observeBatchQuantities().map { rows -> rows.associate { it.id to it.quantity } }
 
@@ -139,7 +137,7 @@ class PantryRepository(
         val ctx = context()
         db.withTransaction {
             val stored = batchDao.forProduct(productId).firstOrNull { it.id == batchId }?.toDomain()
-                ?: error("batch $batchId not found")
+                ?: return@withTransaction
             batchDao.upsert(listOf(editBatchNotes(stored, notes, ctx).toEntity()))
             if (stored.notes != notes) db.notesReviewDao().delete(RecordType.BATCH, stored.id)
         }
@@ -189,33 +187,51 @@ class PantryRepository(
     /** Consumption or discard from one group chosen in the product detail. */
     suspend fun removeFromGroup(productId: String, key: GroupKey, amount: Long, type: MovementType): StockPlan =
         withStock(productId) { product, batches, quantities, ctx ->
-            val group = findGroup(batches, quantities, product, key)
+            val group = findGroup(batches, quantities, product, key) ?: return@withStock StockPlan()
             planGroupRemoval(group, quantities, amount, type, product.daysAfterOpening, ctx)
         }
 
     suspend fun transfer(productId: String, key: GroupKey, amount: Long, toLocationId: String): StockPlan =
         withStock(productId) { product, batches, quantities, ctx ->
-            val group = findGroup(batches, quantities, product, key)
+            val group = findGroup(batches, quantities, product, key) ?: return@withStock StockPlan()
             planTransfer(group, quantities, amount, toLocationId, batches, product.daysAfterOpening, ctx)
         }
 
     suspend fun open(productId: String, key: GroupKey, amount: Long, openedOn: Long): StockPlan =
         withStock(productId) { product, batches, quantities, ctx ->
-            val group = findGroup(batches, quantities, product, key)
+            val group = findGroup(batches, quantities, product, key) ?: return@withStock StockPlan()
             planOpening(group, quantities, amount, openedOn, batches, product.daysAfterOpening, ctx)
         }
 
     /** Real quantity of a group ([key] given) or of the whole product ([key] null). */
-    suspend fun correct(productId: String, key: GroupKey?, realQuantity: Long): StockPlan =
-        withStock(productId) { product, batches, quantities, ctx ->
-            val target = if (key == null) batches else findGroup(batches, quantities, product, key).batches
-            planCorrection(target, quantities, realQuantity, ctx)
+    suspend fun correct(productId: String, key: GroupKey?, realQuantity: Long): StockPlan {
+        val locations = db.locationDao().all().map { it.toDomain() }
+        return withStock(productId) { product, batches, quantities, ctx ->
+            val target = if (key == null) {
+                batches
+            } else {
+                findGroup(batches, quantities, product, key)?.batches ?: return@withStock StockPlan()
+            }
+            planCorrection(target, quantities, realQuantity, ctx, newBatchKey(product, locations, ctx.today))
         }
+    }
+
+    /** Where a product without batches gets one: its usual location, otherwise the first one. */
+    private fun newBatchKey(product: Product, locations: List<Location>, today: Long): GroupKey? {
+        val active = locations.filter { it.deletedAt == null }
+        val location = active.firstOrNull { it.id == product.defaultLocationId }
+            ?: active.minWithOrNull(compareBy<Location> { it.sortOrder }.thenBy { it.name })
+            ?: return null
+        val origin = if (product.homemade) Origin.HOMEMADE else Origin.PURCHASED
+        val preparedOn = if (product.homemade) today else null
+        return GroupKey(product.id, location.id, origin, null, preparedOn, null, null)
+    }
 
     /** Undo of a purchase or preparation from the history (SPEC §4). */
     suspend fun undoAddition(productId: String, movementId: String): StockPlan =
         withStockAndMovements(productId) { _, _, movements, quantities, ctx ->
-            val original = movements.firstOrNull { it.id == movementId } ?: error("movement $movementId not found")
+            // Gone or changed meanwhile (an import with the dialog open): nothing to do
+            val original = movements.firstOrNull { it.id == movementId } ?: return@withStockAndMovements StockPlan()
             planUndoAddition(original, movements, quantities, ctx)
         }
 
@@ -313,6 +329,5 @@ class PantryRepository(
         quantities: Map<String, Long>,
         product: Product,
         key: GroupKey,
-    ): BatchGroup = groupBatches(batches, quantities, product.daysAfterOpening).firstOrNull { it.key == key }
-        ?: error("group not found")
+    ): BatchGroup? = groupBatches(batches, quantities, product.daysAfterOpening).firstOrNull { it.key == key }
 }

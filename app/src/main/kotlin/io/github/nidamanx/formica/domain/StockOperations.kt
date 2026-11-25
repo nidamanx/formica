@@ -128,16 +128,24 @@ fun planOpening(
  * The user enters the real quantity of a group or product: a CORRECTION records the
  * difference, never overwriting. An increase goes to the newest batch; a decrease is
  * taken from the newest batches first, never bringing a batch below zero.
+ * A product without batches gets a new one with the key [newBatchKey] (nothing if null).
  */
 fun planCorrection(
     batches: List<Batch>,
     quantities: Map<String, Long>,
     realQuantity: Long,
     ctx: OperationContext,
+    newBatchKey: GroupKey? = null,
 ): StockPlan {
     require(realQuantity >= 0) { "real quantity must not be negative" }
     val active = batches.filter { it.deletedAt == null }.sortedWith(newestFirst)
-    require(active.isNotEmpty()) { "no batch to correct" }
+    if (active.isEmpty()) {
+        return if (realQuantity == 0L || newBatchKey == null) {
+            StockPlan()
+        } else {
+            addToKey(emptyList(), newBatchKey, realQuantity, MovementType.CORRECTION, ctx) { it }
+        }
+    }
     val delta = realQuantity - active.sumOf { quantities.of(it) }
     return when {
         delta == 0L -> StockPlan()

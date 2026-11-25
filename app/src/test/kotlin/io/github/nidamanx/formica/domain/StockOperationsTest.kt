@@ -283,6 +283,26 @@ class StockOperationsTest {
         assertEquals(StockPlan(), plan)
     }
 
+    @Test
+    fun `correcting a product without batches creates one with the correction`() {
+        val key = GroupKey("p1", "pantry", Origin.PURCHASED, null, null, null, null)
+        val plan = planCorrection(emptyList(), emptyMap(), units(3), context(), key)
+
+        val created = plan.newBatches.single()
+        assertEquals(key, created.groupKey)
+        val m = plan.movements.single()
+        assertEquals(created.id, m.batchId)
+        assertEquals(units(3), m.delta)
+        assertEquals(MovementType.CORRECTION, m.type)
+    }
+
+    @Test
+    fun `correcting a product without batches to zero, or without a location, does nothing`() {
+        val key = GroupKey("p1", "pantry", Origin.PURCHASED, null, null, null, null)
+        assertEquals(StockPlan(), planCorrection(emptyList(), emptyMap(), 0L, context(), key))
+        assertEquals(StockPlan(), planCorrection(emptyList(), emptyMap(), units(3), context(), null))
+    }
+
     // Undo of a purchase or preparation
 
     @Test

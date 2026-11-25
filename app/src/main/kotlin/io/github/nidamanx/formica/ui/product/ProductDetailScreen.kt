@@ -54,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.DurationEstimate
+import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.HistoryEntry
 import io.github.nidamanx.formica.domain.displayedQuantity
 import io.github.nidamanx.formica.domain.effectiveExpiry
@@ -201,7 +202,12 @@ fun ProductDetailScreen(
         }
     }
 
-    when (val current = dialog) {
+    // A dialog about a pack or a history row that no longer exists (e.g. an import while it was
+    // open) closes instead of acting on outdated data
+    val stale = dialog?.let { isStale(it, state) } == true
+    LaunchedEffect(stale) { if (stale) viewModel.close() }
+
+    when (val current = dialog?.takeUnless { stale }) {
         null -> Unit
         DetailDialog.Purchase -> PurchaseSheet(
             card = summary,
@@ -256,18 +262,14 @@ fun ProductDetailScreen(
             )
         }
         is DetailDialog.Move -> {
-            val group = state.groups.firstOrNull { it.key == current.key }
-            if (group == null) {
-                LaunchedEffect(current) { viewModel.close() }
-            } else {
-                MoveDialog(
-                    group = group,
-                    locations = state.locations.filter { it.id != group.key.locationId },
-                    format = format,
-                    onConfirm = { amount, to -> viewModel.move(current.key, amount, to) },
-                    onDismiss = viewModel::close,
-                )
-            }
+            val group = state.groups.first { it.key == current.key }
+            MoveDialog(
+                group = group,
+                locations = state.locations.filter { it.id != group.key.locationId },
+                format = format,
+                onConfirm = { amount, to -> viewModel.move(current.key, amount, to) },
+                onDismiss = viewModel::close,
+            )
         }
         is DetailDialog.Notes -> NotesDialog(
             initial = state.groups.firstOrNull { it.key == current.key }
@@ -276,21 +278,14 @@ fun ProductDetailScreen(
             onDismiss = viewModel::close,
         )
         DetailDialog.Delete -> DeleteDialog(product.name, onConfirm = viewModel::delete, onDismiss = viewModel::close)
-        is DetailDialog.EditPack -> {
-            val group = state.groups.firstOrNull { it.key == current.key }
-            if (group == null) {
-                LaunchedEffect(current) { viewModel.close() }
-            } else {
-                EditPackSheet(
-                    group = group,
-                    productName = product.name,
-                    stores = state.stores,
-                    format = format,
-                    onConfirm = { viewModel.editPack(current.key, it) },
-                    onDismiss = viewModel::close,
-                )
-            }
-        }
+        is DetailDialog.EditPack -> EditPackSheet(
+            group = state.groups.first { it.key == current.key },
+            productName = product.name,
+            stores = state.stores,
+            format = format,
+            onConfirm = { viewModel.editPack(current.key, it) },
+            onDismiss = viewModel::close,
+        )
         is DetailDialog.Undo -> {
             val entry = current.entry
             val preparation = entry.type == MovementType.PREPARATION
@@ -308,6 +303,21 @@ fun ProductDetailScreen(
                 onDismiss = viewModel::close,
             )
         }
+    }
+}
+
+private fun isStale(dialog: DetailDialog, state: ProductDetailState): Boolean {
+    fun missing(key: GroupKey?) = key != null && state.groups.none { it.key == key }
+    return when (dialog) {
+        is DetailDialog.Use -> missing(dialog.key)
+        is DetailDialog.Discard -> missing(dialog.key)
+        is DetailDialog.Move -> missing(dialog.key)
+        is DetailDialog.Open -> missing(dialog.key)
+        is DetailDialog.Correct -> missing(dialog.key)
+        is DetailDialog.Notes -> missing(dialog.key)
+        is DetailDialog.EditPack -> missing(dialog.key)
+        is DetailDialog.Undo -> state.history.none { it.id == dialog.entry.id && it.undoable }
+        DetailDialog.Purchase, DetailDialog.Preparation, DetailDialog.Delete -> false
     }
 }
 

@@ -84,6 +84,9 @@ class ProductFormViewModel(
 
     private val saved = MutableStateFlow(false)
 
+    /** Set by the first valid save: a second tap before the screen closes does nothing. */
+    private var saving = false
+
     val state: StateFlow<ProductFormState> = combine(
         if (productId == null) flowOf(null) else pantry.observeProduct(productId),
         catalog.locations,
@@ -127,7 +130,8 @@ class ProductFormViewModel(
             minStock = fields.minStock.isNotBlank() && minStock == null,
             bestPrice = fields.bestPrice.isNotBlank() && bestPrice == null,
         )
-        if (errors.any) return errors
+        if (errors.any || saving) return errors
+        saving = true
 
         val stored = state.value.product
         viewModelScope.launch {
