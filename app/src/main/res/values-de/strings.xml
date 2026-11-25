@@ -416,6 +416,7 @@
     <string name="undo_import_text">Die Daten kehren zum Stand vom %1$s zurück, vor dem Import von %2$s. Spätere Änderungen gehen verloren.</string>
     <string name="backup_before_import">Vor dem Import von %1$s</string>
     <string name="no_saved_copies">Keine gespeicherten Kopien.</string>
+    <string name="backups_note">Die Kopien bleiben auf diesem Telefon und werden beim Deinstallieren von Formica gelöscht. Für eine Sicherung an einem anderen Ort mit „Speichern unter…“ exportieren; zum Zurückholen die Datei mit „Alles ersetzen“ importieren.</string>
     <string name="restore_title">Diese Kopie wiederherstellen?</string>
     <string name="restore_text">Alle aktuellen Daten dieses Handys werden durch die vom %1$s ersetzt.</string>
     <string name="action_restore">Wiederherstellen</string>

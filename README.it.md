@@ -192,6 +192,10 @@ chat, per email, con un cavo…); sull'altro apri il file con Formica.
   da tutti e due restano una sotto l'altra.
 - Prima di ogni importazione Formica salva una **copia dei dati** (le ultime 5), e
   l'ultima importazione si può **annullare**.
+- Le copie restano nella memoria dell'app su questo telefono: disinstallando Formica si
+  cancellano. Per un backup altrove esporta il file con **Salva in…** (in una cartella o
+  in un'app di archiviazione, come Nextcloud e molte altre); per recuperarlo, aprilo con
+  Formica e scegli **Sostituisci tutto**.
 
 Per tenere allineati i telefoni basta scambiarsi il file ogni tanto, nei due sensi.
 

@@ -442,6 +442,7 @@
     <string name="undo_import_text">I dati tornano com\'erano il %1$s, prima di importare da %2$s. Le modifiche fatte dopo andranno perse.</string>
     <string name="backup_before_import">Prima di importare da %1$s</string>
     <string name="no_saved_copies">Nessuna copia salvata.</string>
+    <string name="backups_note">Le copie restano su questo telefono e si cancellano disinstallando Formica. Per tenere un backup altrove, esporta con «Salva in…»; per recuperarlo, importa il file con «Sostituisci tutto».</string>
     <string name="restore_title">Ripristinare questa copia?</string>
     <string name="restore_text">Tutti i dati attuali di questo telefono saranno sostituiti da quelli del %1$s.</string>
     <string name="action_restore">Ripristina</string>

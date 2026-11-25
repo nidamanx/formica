@@ -193,6 +193,10 @@ by email, with a cable…); on the other phone, open the file with Formica.
   phones are kept one after the other.
 - Before every import Formica saves a **copy of the data** (the last 5), and the last
   import can be **undone**.
+- The copies stay in the app's storage on this phone: uninstalling Formica deletes them.
+  For a backup elsewhere, export the file with **Save to…** (to a folder or a storage
+  app, such as Nextcloud and many others); to get it back, open it with Formica and
+  choose **Replace everything**.
 
 To keep the phones in step, exchange the file now and then, in both directions.
 
