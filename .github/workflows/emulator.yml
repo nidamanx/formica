@@ -6,8 +6,11 @@
 # To ask: "[store-screenshots]" in the message of the last commit of the push, or the
 # input store_screenshots of a manual run.
 # Two ways to start it:
-#  - automatically, on a push to develop that changes the app or the build: every level
-#    but the experimental ones (public repository: free minutes, jobs in parallel);
+#  - automatically, on a push to develop that changes the app or the build, or whose last
+#    commit asks for the store screenshots (an empty commit is enough): every level but
+#    the experimental ones (public repository: free minutes, jobs in parallel). The
+#    "changes" job decides: a "paths" filter would skip the whole workflow before the
+#    commit message can be read;
 #  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one. GitHub
 #    shows this button only once the workflow is on the default branch (main).
 # Experimental levels run only when asked for by name.
@@ -16,16 +19,6 @@ name: Emulator smoke test
 on:
   push:
     branches: [develop]
-    paths:
-      - "app/**"
-      - "gradle/**"
-      - "*.gradle.kts"
-      - "gradle.properties"
-      - ".github/workflows/emulator.yml"
-      - "scripts/emulator-smoke.sh"
-      - "scripts/emulator-common.sh"
-      - "scripts/store-screenshots.sh"
-      - "scripts/run-gradle.sh"
   workflow_dispatch:
     inputs:
       only:
@@ -46,7 +39,43 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Does this push need the emulator?
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          # Only a true/false comes from the commit message
+          ASKED: ${{ contains(github.event.head_commit.message, '[store-screenshots]') }}
+        run: |
+          # The files whose change needs a new test on the emulators
+          watched='^(app/|gradle/|[^/]*\.gradle\.kts$|gradle\.properties$|\.github/workflows/emulator\.yml$|scripts/(emulator-smoke|emulator-common|store-screenshots|run-gradle)\.sh$)'
+          if [[ $EVENT != push || $ASKED == true ]]; then
+            run=true
+          elif [[ ! $BEFORE =~ ^[0-9a-f]{40}$ || $BEFORE =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            # A new branch or an unknown previous commit: test everything
+            run=true
+          elif git diff --name-only "$BEFORE" HEAD | grep -Eq "$watched"; then
+            run=true
+          else
+            run=false
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "Emulator test needed: $run"
+
   emulator:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-24.04
     # A stuck emulator would otherwise run for GitHub's 6-hour limit (usual: 5-15 minutes)
     timeout-minutes: 40
