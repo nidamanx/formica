@@ -219,14 +219,41 @@ jobs:
         with:
           name: release-files
 
+      # A draft first: nobody sees it and the tag does not exist yet. It becomes public only
+      # when every file is there, uploaded and with its size (on 2026-11-25 an upload was
+      # lost without any error during a GitHub outage)
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.tag }}
           NAME: ${{ needs.build.outputs.name }}
         run: |
-          gh release create "$TAG" dist/* \
+          gh release create "$TAG" dist/* --draft \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "Formica $NAME" \
             --notes-file release-notes.md
+
+          missing() {  # the files of dist/ not on the draft yet, or with another size
+            local have f
+            have=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
+              --jq '.assets[] | select(.state == "uploaded") | "\(.name) \(.size)"')
+            for f in dist/*; do
+              grep -qxF "$(basename "$f") $(stat -c %s "$f")" <<<"$have" || echo "$f"
+            done
+          }
+          for attempt in 1 2 3; do
+            todo=$(missing)
+            [[ -z $todo ]] && break
+            echo "::warning::Attempt $attempt: not on the draft yet: $(echo "$todo" | xargs -n1 basename | paste -sd' ')"
+            for f in $todo; do
+              gh release upload "$TAG" "$f" --clobber --repo "$GITHUB_REPOSITORY" || true
+            done
+            sleep 20
+          done
+          todo=$(missing)
+          if [[ -n $todo ]]; then
+            echo "::error::The release stays a draft: files missing: $(echo "$todo" | xargs -n1 basename | paste -sd' ')"
+            exit 1
+          fi
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest

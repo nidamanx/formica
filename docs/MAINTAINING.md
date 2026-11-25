@@ -67,8 +67,9 @@ without showing its value.
    builds the unsigned APK (lint, tests, permissions) from a clean state; the `sign` job
    decrypts the key, signs with `scripts/sign-apk.sh`, removes
    the key, checks the certificate against `keystore/certificate-sha256.txt`, writes
-   `SHA256SUMS` and attests the build provenance; the `publish` job creates the tag
-   `v<versionName>` with the release.
+   `SHA256SUMS` and attests the build provenance; the `publish` job creates the release as
+   a draft, checks that every file is attached (uploading again what is missing), and
+   only then publishes it, which creates the tag `v<versionName>`.
 6. Locally: `git fetch origin --tags`, then check the release page and the files, and
    bring `develop` up to `main` (`git merge --ff-only main`, push).
 
