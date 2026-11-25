@@ -1,8 +1,8 @@
 # DRAFT of the F-Droid recipe. It is NOT used from this repository:
 # when ready, it is submitted as a merge request to
 # https://gitlab.com/fdroid/fdroiddata (file metadata/io.github.nidamanx.formica.yml).
-# Before submitting: set the commit of the release tag, and check the categories against
-# the current list of fdroiddata.
+# Each build entry names the commit of its release tag (v1.0.0: fd171f0). Before
+# submitting: check the categories against the current list of fdroiddata.
 
 Categories:
   - Inventory
@@ -24,7 +24,7 @@ Binaries: https://github.com/nidamanx/formica/releases/download/v%v/formica-%v.a
 Builds:
   - versionName: 1.0.0
     versionCode: 1
-    commit: TO_BE_SET_AT_RELEASE
+    commit: fd171f03e8d7265bed8e9e56beb9b2fd20d279fc
     subdir: app
     gradle:
       - yes
