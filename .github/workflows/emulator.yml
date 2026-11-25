@@ -1,7 +1,10 @@
 # Installs and starts the debug app on emulators (the oldest supported Android, a middle
 # version and recent ones), checks it does not crash and takes a screenshot of every
-# section, in the light and the dark theme and with large text; on Android 16 it also
-# takes the store screenshots in every language (scripts/store-screenshots.sh).
+# section, in the light and the dark theme and with large text. On Android 16 it can also
+# take the store screenshots in every language (scripts/store-screenshots.sh), only when
+# asked: they double the run time and are needed only when the screens change.
+# To ask: "[store-screenshots]" in the message of the last commit of the push, or the
+# input store_screenshots of a manual run.
 # Two ways to start it:
 #  - automatically, on a push to develop that changes the app or the build: every level
 #    but the experimental ones (public repository: free minutes, jobs in parallel);
@@ -29,6 +32,10 @@ on:
         description: "Only this API level (e.g. 26); empty = all but experimental"
         required: false
         default: ""
+      store_screenshots:
+        description: "Also take the store screenshots (on Android 16)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -41,12 +48,16 @@ concurrency:
 jobs:
   emulator:
     runs-on: ubuntu-24.04
+    # A stuck emulator would otherwise run for GitHub's 6-hour limit (usual: 5-15 minutes)
+    timeout-minutes: 40
     # Experimental images may fail for reasons outside the app: reported, not blocking
     continue-on-error: ${{ matrix.experimental == true }}
     env:
       # Jobs not selected start but skip every step (about a minute each).
       # The level asked for by hand, otherwise (also on push) all but the experimental ones
       SELECTED: ${{ inputs.only && inputs.only == format('{0}', matrix.api-level) || !inputs.only && matrix.experimental != true }}
+      # Only a true/false reaches the script: the commit message is never expanded in a command
+      STORE_SCREENSHOTS: ${{ matrix.api-level == 36 && (inputs.store_screenshots || contains(github.event.head_commit.message, '[store-screenshots]')) }}
     strategy:
       fail-fast: false
       matrix:
@@ -102,10 +113,10 @@ jobs:
           # Recent system images may take longer than the default 600 s to boot
           emulator-boot-timeout: 1200
           disk-size: 4000M
-          # Store screenshots (5 languages) on Android 16 only: one set is enough
+          # Store screenshots (5 languages) on Android 16 only, when asked: one set is enough
           script: |
             scripts/emulator-smoke.sh api${{ matrix.api-level }}-phone
-            if [ "${{ matrix.api-level }}" = "36" ]; then scripts/store-screenshots.sh; fi
+            if [ "$STORE_SCREENSHOTS" = "true" ]; then scripts/store-screenshots.sh; fi
 
       - name: Upload screenshots
         if: always() && env.SELECTED == 'true'

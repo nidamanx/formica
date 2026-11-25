@@ -104,13 +104,17 @@ do.
   artifact. On a Gradle failure the errors are also written as an annotation.
 - Emulator smoke test: installs and starts the debug app on Android 8, 11 and 16, passes
   the welcome screen, loads the sample data, opens every section in the light and the dark
-  theme and with large text, and keeps screenshots. On Android 16 it also takes the store
-  screenshots in every language (`scripts/store-screenshots.sh`), kept in the artifact
-  `screenshots-api36` under `store/`: copy them to
+  theme and with large text, and keeps screenshots. It runs on every push to `develop`
+  that changes the app or the build; by hand (*Actions → Emulator smoke test → Run
+  workflow*, once the workflow is on `main`) also on one level only (input `only`) or on
+  Android 17 (experimental).
+- Store screenshots, only when asked (they double the emulator run time): on Android 16
+  the same workflow takes them in every language (`scripts/store-screenshots.sh`) if the
+  last commit of the push has `[store-screenshots]` in its message (an empty commit is
+  enough: `git commit --allow-empty -m "chore: update the store screenshots
+  [store-screenshots]"`), or with the input `store_screenshots` of a manual run. They are
+  in the artifact `screenshots-api36` under `store/`: copy them to
   `fastlane/metadata/android/<locale>/images/phoneScreenshots/` when the screens change.
-  It runs on every push to `develop` that changes the app or the build; by hand (*Actions →
-  Emulator smoke test → Run workflow*, once the workflow is on `main`) also on one level
-  only (input `only`) or on Android 17 (experimental).
 - CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,
   on every push to `main` or `develop`, on pull requests to `main` and every Monday.
   Alerts are in *Security → Code scanning*; those of `develop` are shown with the branch
