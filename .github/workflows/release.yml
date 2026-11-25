@@ -4,9 +4,8 @@
 # Three jobs, so that each one holds only what it needs:
 #  - "build" runs Gradle (third-party plugins and dependencies) with no secret and a
 #    read-only token, and produces the unsigned APK;
-#  - "sign" never runs Gradle: in the "release" environment (deployment from main only,
-#    docs/MAINTAINING.md) it decrypts the key, signs with apksigner, removes the key,
-#    checks the certificate and attests the build provenance;
+#  - "sign" never runs Gradle: it decrypts the key (on main only), signs with apksigner,
+#    removes the key, checks the certificate and attests the build provenance;
 #  - "publish" only creates the tag and the release.
 name: Release
 
@@ -99,8 +98,6 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    # The release key lives in this environment's secrets, deployable from main only
-    environment: release
     permissions:
       contents: read
       id-token: write           # sign the build provenance attestation
@@ -130,7 +127,7 @@ jobs:
             exit 1
           fi
           if [[ -z $FORMICA_KEY_BASE64 || -z $FORMICA_KEY_PASSWORD ]]; then
-            echo "::error::The KEYSTORE_BASE64 or KEYSTORE_PASSWORD secret of the release environment is missing (docs/MAINTAINING.md)."
+            echo "::error::The KEYSTORE_BASE64 or KEYSTORE_PASSWORD secret is missing (docs/MAINTAINING.md)."
             exit 1
           fi
           # Checks every step and reports a wrong secret precisely, never its value
