@@ -128,6 +128,11 @@ do.
   [store-screenshots]"`), or with the input `store_screenshots` of a manual run. They are
   in the artifact `screenshots-api36` under `store/`: copy them to
   `fastlane/metadata/android/<locale>/images/phoneScreenshots/` when the screens change.
+- Reproducibility, only when asked: two independent builds of the same commit (different
+  runner, folder, time zone and file mode mask, no cache) must give the same unsigned APK
+  byte for byte, as F-Droid requires. It runs if the last commit of a push to `develop`
+  has `[reproducibility]` in its message, or by hand once the workflow is on `main`; when
+  the APKs differ, an annotation lists the entries that differ.
 - CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,
   on every push to `main` or `develop`, on pull requests to `main` and every Monday.
   Alerts are in *Security → Code scanning*; those of `develop` are shown with the branch
