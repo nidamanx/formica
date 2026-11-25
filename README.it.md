@@ -172,8 +172,8 @@ Per segnalare un problema di sicurezza, vedi [SECURITY.md](SECURITY.md).
    scadenza. I campi in più (durata, scorta minima, dove conviene…) sono facoltativi.
 3. Sulla scheda di un prodotto: **−** per consumarne un po', **+** per un nuovo acquisto
    o una nuova preparazione, il carrello per metterlo in lista. Tocca la scheda per i
-   dettagli: confezioni, spostamenti, apertura, storico (lì si annulla un acquisto o una
-   preparazione inseriti per errore).
+   dettagli: confezioni (se ne possono cambiare date e negozio), spostamenti, apertura,
+   storico (lì si annulla un acquisto o una preparazione inseriti per errore).
 4. Nella **Lista della spesa** spunta quello che compri: Formica chiede se aggiungerlo
    alla dispensa.
 5. In **Scadenze** trovi cosa è scaduto, cosa scade a breve e cosa sta per essere pronto.

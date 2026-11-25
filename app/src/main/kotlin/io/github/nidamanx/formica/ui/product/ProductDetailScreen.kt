@@ -276,6 +276,21 @@ fun ProductDetailScreen(
             onDismiss = viewModel::close,
         )
         DetailDialog.Delete -> DeleteDialog(product.name, onConfirm = viewModel::delete, onDismiss = viewModel::close)
+        is DetailDialog.EditPack -> {
+            val group = state.groups.firstOrNull { it.key == current.key }
+            if (group == null) {
+                LaunchedEffect(current) { viewModel.close() }
+            } else {
+                EditPackSheet(
+                    group = group,
+                    productName = product.name,
+                    stores = state.stores,
+                    format = format,
+                    onConfirm = { viewModel.editPack(current.key, it) },
+                    onDismiss = viewModel::close,
+                )
+            }
+        }
         is DetailDialog.Undo -> {
             val entry = current.entry
             val preparation = entry.type == MovementType.PREPARATION
@@ -305,6 +320,7 @@ private fun groupActions(group: BatchGroup, viewModel: ProductDetailViewModel): 
     R.string.menu_open to { viewModel.onOpenGroup(group) },
     R.string.menu_discard to { viewModel.open(DetailDialog.Discard(group.key)) },
     R.string.menu_correct to { viewModel.open(DetailDialog.Correct(group.key)) },
+    R.string.menu_edit_pack to { viewModel.open(DetailDialog.EditPack(group.key)) },
     R.string.menu_notes to { viewModel.open(DetailDialog.Notes(group.key)) },
 )
 

@@ -177,6 +177,10 @@
     <string name="menu_move">Mover…</string>
     <string name="menu_open">Marcar como abierto…</string>
     <string name="menu_discard">Desechar…</string>
+    <string name="menu_edit_pack">Editar datos…</string>
+    <string name="edit_pack_title">Datos de las existencias</string>
+    <string name="field_opened_on">Abierto el</string>
+    <string name="value_mixed">Varios valores</string>
     <string name="menu_notes">Notas…</string>
     <string name="discard_title">Desechar</string>
     <string name="move_title">Mover</string>

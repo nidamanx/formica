@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 package io.github.nidamanx.formica.domain
 
+import io.github.nidamanx.formica.domain.model.Batch
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.MeasureUnit
+import io.github.nidamanx.formica.domain.model.Origin
 import io.github.nidamanx.formica.domain.model.Product
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class EditsTest {
@@ -96,5 +99,53 @@ class EditsTest {
         assertEquals(NOW + 11, deleted.deletedAt)
         assertEquals(NOW + 11, deleted.modifiedAt)
         assertEquals(DEVICE, deleted.modifiedBy)
+    }
+
+    // Edit pack
+
+    private fun groupOf(vararg batches: Batch) =
+        BatchGroup(batches.first().groupKey, batches.toList(), 0L)
+
+    @Test
+    fun `editing a pack changes every batch and only what was edited`() {
+        val a = batch("a", expiresOn = TODAY + 5, purchasedOn = TODAY - 3).copy(storeId = "s1")
+        val b = batch("b", expiresOn = TODAY + 5, purchasedOn = TODAY - 1).copy(storeId = "s2")
+        val edit = GroupEdit(expiresOn = Edited(TODAY + 9), openedOn = Edited(TODAY))
+        val changed = editGroup(groupOf(a, b), edit, context()).associateBy { it.id }
+
+        assertEquals(setOf("a", "b"), changed.keys)
+        assertEquals(TODAY + 9, changed.getValue("a").expiresOn)
+        assertEquals(TODAY, changed.getValue("b").openedOn)
+        assertEquals(TODAY - 3, changed.getValue("a").purchasedOn)
+        assertEquals("s2", changed.getValue("b").storeId)
+        assertEquals(DEVICE, changed.getValue("a").modifiedBy)
+        assertTrue(changed.getValue("a").modifiedAt > a.modifiedAt)
+    }
+
+    @Test
+    fun `an edited purchase date and store apply to all batches, and can be cleared`() {
+        val a = batch("a", purchasedOn = TODAY - 3).copy(storeId = "s1")
+        val b = batch("b", purchasedOn = TODAY - 1).copy(storeId = "s2")
+        val changed = editGroup(groupOf(a, b), GroupEdit(purchasedOn = Edited(TODAY), storeId = Edited(null)), context())
+
+        assertEquals(listOf(TODAY, TODAY), changed.map { it.purchasedOn })
+        assertEquals(listOf(null, null), changed.map { it.storeId })
+    }
+
+    @Test
+    fun `a homemade pack gets the preparation date, not the purchase fields`() {
+        val a = batch("a", origin = Origin.HOMEMADE, preparedOn = TODAY - 10)
+        val edit = GroupEdit(preparedOn = Edited(TODAY - 12), purchasedOn = Edited(TODAY), storeId = Edited("s1"))
+        val changed = editGroup(groupOf(a), edit, context()).single()
+
+        assertEquals(TODAY - 12, changed.preparedOn)
+        assertEquals(null, changed.purchasedOn)
+        assertEquals(null, changed.storeId)
+    }
+
+    @Test
+    fun `an edit that changes nothing returns no batch`() {
+        val a = batch("a", expiresOn = TODAY + 5)
+        assertTrue(editGroup(groupOf(a), GroupEdit(expiresOn = Edited(TODAY + 5)), context()).isEmpty())
     }
 }

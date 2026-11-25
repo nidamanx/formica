@@ -4,6 +4,7 @@ package io.github.nidamanx.formica.domain
 import io.github.nidamanx.formica.domain.model.Batch
 import io.github.nidamanx.formica.domain.model.Category
 import io.github.nidamanx.formica.domain.model.Location
+import io.github.nidamanx.formica.domain.model.Origin
 import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.model.Store
 
@@ -39,6 +40,44 @@ fun editBatchNotes(stored: Batch, notes: String?, ctx: OperationContext): Batch 
     modifiedAt = nextModifiedAt(ctx.now, stored.modifiedAt),
     modifiedBy = ctx.deviceId,
 )
+
+/** A value the user changed in "Edit pack"; a null [Edited] keeps each batch's own value. */
+data class Edited<T>(val value: T)
+
+private fun <T> Edited<T>?.or(current: T): T = if (this == null) current else value
+
+/** Changes asked for a group in "Edit pack". Quantity and location change only through movements. */
+data class GroupEdit(
+    val purchasedOn: Edited<Long?>? = null,
+    val storeId: Edited<String?>? = null,
+    val preparedOn: Edited<Long>? = null,
+    val expiresOn: Edited<Long?>? = null,
+    val readyFrom: Edited<Long?>? = null,
+    val openedOn: Edited<Long?>? = null,
+)
+
+/**
+ * Applies [edit] to every batch of the group; returns only the batches that changed.
+ * Purchase date and store concern purchased batches, the preparation date homemade ones.
+ * A group whose key becomes equal to another one is shown together with it.
+ */
+fun editGroup(group: BatchGroup, edit: GroupEdit, ctx: OperationContext): List<Batch> =
+    group.batches.filter { it.deletedAt == null }.mapNotNull { stored ->
+        val purchased = stored.origin == Origin.PURCHASED
+        val edited = stored.copy(
+            purchasedOn = if (purchased) edit.purchasedOn.or(stored.purchasedOn) else stored.purchasedOn,
+            storeId = if (purchased) edit.storeId.or(stored.storeId) else stored.storeId,
+            preparedOn = if (purchased) stored.preparedOn else edit.preparedOn?.value ?: stored.preparedOn,
+            expiresOn = edit.expiresOn.or(stored.expiresOn),
+            readyFrom = edit.readyFrom.or(stored.readyFrom),
+            openedOn = edit.openedOn.or(stored.openedOn),
+        )
+        if (edited == stored) {
+            null
+        } else {
+            edited.copy(modifiedAt = nextModifiedAt(ctx.now, stored.modifiedAt), modifiedBy = ctx.deviceId)
+        }
+    }
 
 fun editLocation(stored: Location, edited: Location, ctx: OperationContext): Location = edited.copy(
     id = stored.id,

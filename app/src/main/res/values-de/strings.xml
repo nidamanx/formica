@@ -166,6 +166,10 @@
     <string name="menu_move">Verschieben…</string>
     <string name="menu_open">Als geöffnet markieren…</string>
     <string name="menu_discard">Wegwerfen…</string>
+    <string name="menu_edit_pack">Angaben bearbeiten…</string>
+    <string name="edit_pack_title">Angaben zum Bestand</string>
+    <string name="field_opened_on">Geöffnet am</string>
+    <string name="value_mixed">Mehrere Werte</string>
     <string name="menu_notes">Notizen…</string>
     <string name="discard_title">Wegwerfen</string>
     <string name="move_title">Verschieben</string>

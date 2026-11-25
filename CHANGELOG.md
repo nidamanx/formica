@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pantry: products with quantities (decimals too), units, categories, locations and
   notes; several packs with their own expiry dates, "opened on" and the days a product
-  keeps after opening; search, filters and sorting.
+  keeps after opening, all editable later; search, filters and sorting.
 - Homemade products and products from producers: preparation date, the day a
   preparation is ready, purchases in large quantities.
 - Estimated duration of the stock, from the use of the last weeks.

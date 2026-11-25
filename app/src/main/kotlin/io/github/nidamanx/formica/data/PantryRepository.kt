@@ -3,6 +3,7 @@ package io.github.nidamanx.formica.data
 
 import androidx.room.withTransaction
 import io.github.nidamanx.formica.domain.BatchGroup
+import io.github.nidamanx.formica.domain.GroupEdit
 import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.MinStockBehavior
 import io.github.nidamanx.formica.domain.OperationContext
@@ -10,6 +11,7 @@ import io.github.nidamanx.formica.domain.RecordType
 import io.github.nidamanx.formica.domain.StockPlan
 import io.github.nidamanx.formica.domain.droppedBelowMinStock
 import io.github.nidamanx.formica.domain.editBatchNotes
+import io.github.nidamanx.formica.domain.editGroup
 import io.github.nidamanx.formica.domain.editProduct
 import io.github.nidamanx.formica.domain.groupBatches
 import io.github.nidamanx.formica.domain.model.Batch
@@ -140,6 +142,20 @@ class PantryRepository(
                 ?: error("batch $batchId not found")
             batchDao.upsert(listOf(editBatchNotes(stored, notes, ctx).toEntity()))
             if (stored.notes != notes) db.notesReviewDao().delete(RecordType.BATCH, stored.id)
+        }
+    }
+
+    /** "Edit pack": dates, store and opening of a group's batches (SPEC §4). */
+    suspend fun editPack(productId: String, key: GroupKey, edit: GroupEdit) {
+        val ctx = context()
+        db.withTransaction {
+            val product = requireProduct(productId)
+            val batches = batchDao.forProduct(productId).map { it.toDomain() }
+            val quantities = quantitiesByBatch(movementDao.forProduct(productId).map { it.toDomain() })
+            val group = groupBatches(batches, quantities, product.daysAfterOpening).firstOrNull { it.key == key }
+                ?: return@withTransaction
+            val changed = editGroup(group, edit, ctx)
+            if (changed.isNotEmpty()) batchDao.upsert(changed.map { it.toEntity() })
         }
     }
 

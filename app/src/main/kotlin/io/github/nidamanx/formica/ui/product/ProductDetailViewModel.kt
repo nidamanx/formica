@@ -10,6 +10,7 @@ import io.github.nidamanx.formica.data.PantryRepository
 import io.github.nidamanx.formica.data.ShoppingRepository
 import io.github.nidamanx.formica.domain.BatchGroup
 import io.github.nidamanx.formica.domain.DurationEstimate
+import io.github.nidamanx.formica.domain.GroupEdit
 import io.github.nidamanx.formica.domain.GroupKey
 import io.github.nidamanx.formica.domain.HistoryEntry
 import io.github.nidamanx.formica.domain.ListThresholds
@@ -74,6 +75,7 @@ sealed interface DetailDialog {
     data class Open(val key: GroupKey) : DetailDialog
     data class Correct(val key: GroupKey?) : DetailDialog
     data class Notes(val key: GroupKey) : DetailDialog
+    data class EditPack(val key: GroupKey) : DetailDialog
     data object Delete : DetailDialog
     data class Undo(val entry: HistoryEntry) : DetailDialog
 }
@@ -210,6 +212,11 @@ class ProductDetailViewModel(
 
     fun addToList(id: String) {
         viewModelScope.launch { shopping.toBuy(id, automatic = true) }
+    }
+
+    fun editPack(key: GroupKey, edit: GroupEdit) {
+        _dialog.value = null
+        viewModelScope.launch { pantry.editPack(productId, key, edit) }
     }
 
     /** The notes of a group are written on each of its batches. */
