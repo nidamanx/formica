@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Sample data of debug builds (Formica-D), in every language of the app -->
+<resources>
+    <string name="demo_store_supermarket">Supermercato</string>
+    <string name="demo_store_market">Mercato del sabato</string>
+    <string name="demo_store_bakery">Panetteria</string>
+    <string name="demo_store_farm">Azienda agricola</string>
+    <string name="demo_store_oil_mill">Frantoio</string>
+    <string name="demo_milk">Latte fresco</string>
+    <string name="demo_yogurt">Yogurt</string>
+    <string name="demo_eggs">Uova</string>
+    <string name="demo_ricotta">Ricotta</string>
+    <string name="demo_spinach">Spinaci freschi</string>
+    <string name="demo_ragu">Ragù</string>
+    <string name="demo_peas">Piselli surgelati</string>
+    <string name="demo_passata">Passata di pomodoro</string>
+    <string name="demo_apricot_jam">Marmellata di albicocche</string>
+    <string name="demo_honey">Miele</string>
+    <string name="demo_olive_oil">Olio extravergine d\'oliva</string>
+    <string name="demo_wholemeal_flour">Farina integrale</string>
+    <string name="demo_brown_rice">Riso integrale</string>
+    <string name="demo_lentils">Lenticchie</string>
+    <string name="demo_sauerkraut">Crauti</string>
+    <string name="demo_potatoes">Patate</string>
+    <string name="demo_apples">Mele</string>
+    <string name="demo_wholemeal_bread">Pane integrale</string>
+    <string name="demo_lemons">Limoni</string>
+    <string name="demo_tomatoes">Pomodori</string>
+    <string name="demo_price_each">l\'uno</string>
+    <string name="demo_price_per_litre">al litro</string>
+    <string name="demo_note_ragu">Ricetta della nonna</string>
+    <string name="demo_note_oil">Il frantoio vende da novembre a gennaio</string>
+</resources>

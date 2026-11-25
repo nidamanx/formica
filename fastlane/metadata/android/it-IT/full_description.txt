@@ -1,0 +1,30 @@
+Formica tiene in ordine la dispensa di casa e la lista della spesa, e le condivide con la famiglia scambiando un file tra i telefoni. Funziona senza internet, senza account e senza server. Per telefoni e tablet.
+
+<b>Dispensa</b>
+• Prodotti con quantità anche decimali, unità, categoria, posizione e note
+• Più confezioni dello stesso prodotto, con scadenze diverse
+• "Aperto il", con i giorni di validità dopo l'apertura
+• Stima di quanto dureranno le scorte
+
+<b>Fatto in casa e dai produttori</b>
+• Conserve, yogurt, fermentati e molto altro, con la data di preparazione
+• Il giorno da cui una preparazione è pronta
+• Acquisti in grandi quantità dai produttori
+
+<b>Lista della spesa</b>
+• Voci collegate alla dispensa o libere
+• Scorta minima: sotto la quantità scelta, il prodotto entra in lista da solo
+• Prodotti comprati spesso, raggruppati per categoria o per negozio
+• Dove conviene: il negozio e il prezzo migliore di ogni prodotto
+
+<b>Scadenze</b>
+• Una notifica al giorno con ciò che scade e ciò che è pronto
+
+<b>In famiglia</b>
+• Esporta un file e aprilo su un altro telefono: le modifiche si uniscono
+• Anteprima e backup prima di ogni importazione, con annullamento
+
+<b>Privacy</b>
+• Nessun accesso a internet, nessun account, nessuna pubblicità o tracker
+• Backup automatico di Android disattivato: i dati escono dal telefono solo con l'esportazione
+• Software libero (AGPL-3.0)

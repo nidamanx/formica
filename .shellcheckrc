@@ -1,0 +1,3 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Follow the files that scripts source (# shellcheck source=...), as shellcheck -x does
+external-sources=true

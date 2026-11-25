@@ -1,0 +1,30 @@
+Formica hält den Vorrat zu Hause und die Einkaufsliste in Ordnung und teilt sie mit der Familie, indem die Handys eine Datei austauschen. Funktioniert ohne Internet, ohne Konto und ohne Server. Für Smartphones und Tablets.
+
+<b>Vorrat</b>
+• Produkte mit Mengen (auch mit Kommastellen), Einheiten, Kategorie, Lagerort und Notizen
+• Mehrere Packungen desselben Produkts mit unterschiedlicher Haltbarkeit
+• „Geöffnet am“, mit der Haltbarkeit nach dem Öffnen
+• Eine Schätzung, wie lange dein Vorrat reicht
+
+<b>Selbstgemacht und vom Erzeuger</b>
+• Eingemachtes, Joghurt, Fermentiertes und vieles mehr, mit dem Zubereitungsdatum
+• Der Tag, ab dem eine Zubereitung fertig ist
+• Einkäufe in großen Mengen direkt beim Erzeuger
+
+<b>Einkaufsliste</b>
+• Einträge aus dem Vorrat oder freier Text
+• Mindestvorrat: unter der gewählten Menge kommt das Produkt von selbst auf die Liste
+• Häufig gekaufte Produkte, nach Kategorie oder Geschäft gruppiert
+• Am günstigsten bei: das Geschäft und der beste Preis für jedes Produkt
+
+<b>Haltbarkeit</b>
+• Eine Benachrichtigung am Tag mit dem, was abläuft und was fertig ist
+
+<b>In der Familie</b>
+• Exportiere eine Datei und öffne sie auf einem anderen Handy: die Änderungen werden zusammengeführt
+• Vorschau und Sicherung vor jedem Import, der sich rückgängig machen lässt
+
+<b>Datenschutz</b>
+• Kein Internetzugriff, kein Konto, keine Werbung und keine Tracker
+• Automatische Android-Sicherung ausgeschaltet: Daten verlassen das Handy nur, wenn du sie exportierst
+• Freie Software (AGPL-3.0)

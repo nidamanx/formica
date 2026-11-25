@@ -1,0 +1,30 @@
+Formica keeps the household pantry and the shopping list in order, and shares them with the family by exchanging a file between phones. It works without internet, without an account and without a server. For phones and tablets.
+
+<b>Pantry</b>
+• Products with quantities (decimals too), units, category, location and notes
+• Several packs of the same product, with different expiry dates
+• "Opened on", with the days it keeps after opening
+• An estimate of how long your stock will last
+
+<b>Homemade and from producers</b>
+• Preserves, yogurt, fermented food and many others, with the preparation date
+• The day a preparation is ready
+• Purchases in large quantities from producers
+
+<b>Shopping list</b>
+• Items linked to the pantry or free text
+• Minimum stock: below the amount you choose, the product goes on the list by itself
+• Products bought often, grouped by category or by shop
+• Best price: the shop and the best price for each product
+
+<b>Expiry dates</b>
+• One notification a day with what expires and what is ready
+
+<b>In the family</b>
+• Export a file and open it on another phone: changes are merged
+• Preview and backup before every import, which can be undone
+
+<b>Privacy</b>
+• No internet access, no account, no ads or trackers
+• Android's automatic backup turned off: data leaves the phone only when you export it
+• Free software (AGPL-3.0)

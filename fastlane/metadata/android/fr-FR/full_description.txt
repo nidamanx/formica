@@ -1,0 +1,30 @@
+Formica tient en ordre le garde-manger de la maison et la liste de courses, et les partage avec la famille en échangeant un fichier entre les téléphones. Fonctionne sans internet, sans compte et sans serveur. Pour téléphones et tablettes.
+
+<b>Garde-manger</b>
+• Produits avec quantités (décimales aussi), unités, catégorie, emplacement et notes
+• Plusieurs paquets du même produit, avec des dates limites différentes
+• « Ouvert le », avec les jours de conservation après ouverture
+• Une estimation de la durée de vos provisions
+
+<b>Fait maison et chez les producteurs</b>
+• Conserves, yaourts, fermentations et bien d'autres, avec la date de préparation
+• Le jour où une préparation est prête
+• Achats en grande quantité chez les producteurs
+
+<b>Liste de courses</b>
+• Articles liés au garde-manger ou texte libre
+• Stock minimum : en dessous de la quantité choisie, le produit s'ajoute tout seul à la liste
+• Produits achetés souvent, regroupés par catégorie ou par magasin
+• Moins cher chez : le magasin et le meilleur prix de chaque produit
+
+<b>Dates limites</b>
+• Une notification par jour avec ce qui expire et ce qui est prêt
+
+<b>En famille</b>
+• Exportez un fichier et ouvrez-le sur un autre téléphone : les modifications sont fusionnées
+• Aperçu et sauvegarde avant chaque importation, qui peut être annulée
+
+<b>Confidentialité</b>
+• Aucun accès à internet, aucun compte, ni publicité ni traceur
+• Sauvegarde automatique d'Android désactivée : les données ne quittent le téléphone que lorsque vous les exportez
+• Logiciel libre (AGPL-3.0)

@@ -7,6 +7,9 @@ captures/
 .externalNativeBuild/
 .cxx/
 
+# Emulator screenshots (scripts/emulator-smoke.sh): published as CI artifacts
+/screenshots/
+
 # Built packages: releases are built and published only by GitHub Actions
 *.apk
 *.aab

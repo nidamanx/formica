@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- German translation of values/strings.xml: every string, in sync with the English ones -->
+<resources>
+    <string name="nav_pantry">Vorrat</string>
+    <string name="nav_shopping_list">Einkaufsliste</string>
+    <string name="nav_expiries">Haltbarkeit</string>
+    <string name="placeholder_pantry">Dein Vorrat ist leer.</string>
+    <string name="placeholder_shopping_list">Die Liste ist leer. Füge mit + einen Eintrag hinzu oder markiere ein Produkt aus dem Vorrat als „Einkaufen“.</string>
+    <string name="placeholder_expiries">Nichts läuft bald ab.</string>
+    <!-- Common actions -->
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_move_up">Nach oben</string>
+    <string name="action_move_down">Nach unten</string>
+    <string name="cd_back">Zurück</string>
+    <string name="cd_more_options">Weitere Optionen</string>
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_locations">Lagerorte</string>
+    <string name="settings_categories">Kategorien</string>
+    <string name="settings_stores">Geschäfte</string>
+    <string name="settings_device_name">Gerätename</string>
+    <string name="settings_device_name_hint">Andere Handys sehen ihn, wenn ihr Daten austauscht.</string>
+    <string name="location_new">Neuer Lagerort</string>
+    <string name="location_edit">Lagerort bearbeiten</string>
+    <string name="category_new">Neue Kategorie</string>
+    <string name="category_edit">Kategorie bearbeiten</string>
+    <string name="store_new">Neues Geschäft</string>
+    <string name="store_edit">Geschäft bearbeiten</string>
+    <string name="field_name">Name</string>
+    <string name="field_type">Art</string>
+    <string name="field_notes">Notizen</string>
+    <string name="store_type_supermarket">Supermarkt</string>
+    <string name="store_type_shop">Laden</string>
+    <string name="store_type_market">Markt</string>
+    <string name="store_type_producer">Erzeuger</string>
+    <string name="delete_confirm">„%1$s“ löschen?</string>
+    <string name="delete_category_message">Die Produkte dieser Kategorie haben dann keine Kategorie mehr.</string>
+    <string name="delete_store_message">Die verknüpften Produkte haben dann kein Geschäft mehr.</string>
+    <string name="location_in_use">In „%1$s“ sind noch Produkte: verschiebe sie zuerst.</string>
+    <string name="error_name_required">Gib einen Namen ein.</string>
+    <string name="error_name_exists">„%1$s“ gibt es schon.</string>
+    <string name="stores_empty">Noch keine Geschäfte. Füge die Supermärkte, Läden, Märkte und Erzeuger hinzu, bei denen du einkaufst.</string>
+    <!-- Pantry list -->
+    <string name="pantry_search">In Namen und Notizen suchen</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_expiry">Haltbarkeit</string>
+    <string name="sort_preparation">Zubereitungsdatum</string>
+    <string name="filter_location">Lagerort</string>
+    <string name="filter_category">Kategorie</string>
+    <string name="filter_all">Alle</string>
+    <string name="pantry_no_match">Kein Produkt passt zu den Filtern.</string>
+    <string name="badge_expiring">Läuft bald ab</string>
+    <string name="badge_expired">Abgelaufen</string>
+    <string name="badge_not_ready">In Zubereitung</string>
+    <string name="badge_running_low">Fast aufgebraucht</string>
+    <string name="badge_check">Menge prüfen</string>
+    <string name="line_expires">haltbar bis %1$s</string>
+    <string name="line_expired">abgelaufen am %1$s</string>
+    <string name="line_ready_from">fertig ab %1$s</string>
+    <string name="made_today">heute zubereitet</string>
+    <plurals name="made_days_ago">
+        <item quantity="one">vor %1$d Tag zubereitet</item>
+        <item quantity="other">vor %1$d Tagen zubereitet</item>
+    </plurals>
+    <plurals name="made_months_ago">
+        <item quantity="one">vor %1$d Monat zubereitet</item>
+        <item quantity="other">vor %1$d Monaten zubereitet</item>
+    </plurals>
+    <plurals name="made_years_ago">
+        <item quantity="one">vor %1$d Jahr zubereitet</item>
+        <item quantity="other">vor %1$d Jahren zubereitet</item>
+    </plurals>
+    <plurals name="disc_days">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
+    <plurals name="disc_months">
+        <item quantity="one">Monat</item>
+        <item quantity="other">Monate</item>
+    </plurals>
+    <string name="disc_today">heute</string>
+    <string name="disc_expired">abgelaufen</string>
+    <string name="cd_use">Verbrauchen</string>
+    <string name="cd_add_purchase">Einkauf hinzufügen</string>
+    <string name="cd_new_product">Neues Produkt</string>
+    <string name="msg_nothing_to_use">Es ist nichts mehr zu verbrauchen.</string>
+    <string name="msg_used_only">Nicht genug da: nur %1$s verbraucht.</string>
+    <!-- Units: short form on the cards, full name in the form -->
+    <string name="unit_piece_short">Stk.</string>
+    <string name="unit_gram_short">g</string>
+    <string name="unit_kilogram_short">kg</string>
+    <string name="unit_milliliter_short">ml</string>
+    <string name="unit_liter_short">l</string>
+    <plurals name="unit_package">
+        <item quantity="one">Packung</item>
+        <item quantity="other">Packungen</item>
+    </plurals>
+    <plurals name="unit_jar">
+        <item quantity="one">Glas</item>
+        <item quantity="other">Gläser</item>
+    </plurals>
+    <plurals name="unit_bottle">
+        <item quantity="one">Flasche</item>
+        <item quantity="other">Flaschen</item>
+    </plurals>
+    <string name="unit_piece_name">Stück</string>
+    <string name="unit_gram_name">Gramm</string>
+    <string name="unit_kilogram_name">Kilogramm</string>
+    <string name="unit_milliliter_name">Milliliter</string>
+    <string name="unit_liter_name">Liter</string>
+    <string name="unit_package_name">Packungen</string>
+    <string name="unit_jar_name">Gläser</string>
+    <string name="unit_bottle_name">Flaschen</string>
+    <!-- Add purchase and use panels -->
+    <string name="purchase_title">Einkauf hinzufügen</string>
+    <string name="use_title">Verbrauchen</string>
+    <string name="field_quantity">Menge</string>
+    <string name="field_expiry">Haltbar bis</string>
+    <string name="field_expiry_this_pack">Haltbarkeitsdatum dieses Bestands</string>
+    <string name="field_location">Lagerort</string>
+    <string name="field_store">Geschäft</string>
+    <string name="value_none_f">Keine Angabe</string>
+    <string name="value_none_m">Keine Angabe</string>
+    <string name="cd_clear_date">Datum löschen</string>
+    <string name="action_ok">OK</string>
+    <string name="error_quantity">Gib eine gültige Menge ein.</string>
+    <!-- Product form -->
+    <string name="product_new">Neues Produkt</string>
+    <string name="product_edit">Produkt bearbeiten</string>
+    <string name="field_unit">Einheit</string>
+    <string name="field_category">Kategorie</string>
+    <string name="form_more">Mehr</string>
+    <string name="field_shelf_life">Haltbar (Tage)</string>
+    <string name="field_shelf_life_help">Wie lange es sich meist hält, ab Einkauf oder Zubereitung. Damit wird das Haltbarkeitsdatum künftiger Einkäufe und Zubereitungen vorgeschlagen.</string>
+    <string name="field_days_after_opening">Nach dem Öffnen haltbar (Tage)</string>
+    <string name="field_warning_days">Vor Ablauf erinnern (Tage)</string>
+    <string name="field_min_stock">Mindestvorrat</string>
+    <string name="error_days">Gib eine Anzahl Tage ein.</string>
+    <!-- Product detail -->
+    <string name="estimate_label">Geschätzte Dauer: %1$s</string>
+    <plurals name="estimate_days">
+        <item quantity="one">etwa %1$d Tag</item>
+        <item quantity="other">etwa %1$d Tage</item>
+    </plurals>
+    <plurals name="estimate_weeks">
+        <item quantity="one">etwa %1$d Woche</item>
+        <item quantity="other">etwa %1$d Wochen</item>
+    </plurals>
+    <plurals name="estimate_months">
+        <item quantity="one">etwa %1$d Monat</item>
+        <item quantity="other">etwa %1$d Monate</item>
+    </plurals>
+    <string name="estimate_more_than_year">mehr als ein Jahr</string>
+    <string name="estimate_insufficient">zu wenige Daten</string>
+    <string name="menu_correct">Menge korrigieren…</string>
+    <string name="delete_product_message">Das Produkt und sein Bestand werden nicht mehr angezeigt.</string>
+    <string name="section_stock">Bestand</string>
+    <string name="line_opened">geöffnet am %1$s</string>
+    <string name="line_made_on">zubereitet am %1$s</string>
+    <string name="badge_opened">Geöffnet</string>
+    <string name="menu_use">Verbrauchen…</string>
+    <string name="menu_move">Verschieben…</string>
+    <string name="menu_open">Als geöffnet markieren…</string>
+    <string name="menu_discard">Wegwerfen…</string>
+    <string name="menu_edit_pack">Angaben bearbeiten…</string>
+    <string name="edit_pack_title">Angaben zum Bestand</string>
+    <string name="field_opened_on">Geöffnet am</string>
+    <string name="value_mixed">Mehrere Werte</string>
+    <string name="menu_notes">Notizen…</string>
+    <string name="discard_title">Wegwerfen</string>
+    <string name="move_title">Verschieben</string>
+    <string name="open_title">Als geöffnet markieren</string>
+    <string name="notes_title">Notizen</string>
+    <string name="correct_title">Menge korrigieren</string>
+    <string name="open_how_many">Wie viele öffnest du?</string>
+    <string name="correct_help">Gib ein, wie viel wirklich da ist.</string>
+    <string name="field_new_location">Neuer Lagerort</string>
+    <string name="msg_only_were">Es waren nur %1$s da.</string>
+    <string name="section_history">Verlauf</string>
+    <string name="history_purchase">Einkauf</string>
+    <string name="history_preparation">Zubereitung</string>
+    <string name="history_consumption">Verbrauch</string>
+    <string name="history_correction">Korrektur</string>
+    <string name="history_discard">Weggeworfen</string>
+    <string name="history_opening">Geöffnet</string>
+    <string name="history_transfer">Verschoben: %1$s → %2$s</string>
+    <string name="history_show_all">Alle anzeigen (%1$d)</string>
+    <string name="history_purchase_undone">Einkauf rückgängig gemacht</string>
+    <string name="history_preparation_undone">Zubereitung rückgängig gemacht</string>
+    <string name="history_purchase_was_undone">Einkauf · rückgängig gemacht</string>
+    <string name="history_preparation_was_undone">Zubereitung · rückgängig gemacht</string>
+    <string name="undo_purchase_title">Diesen Einkauf rückgängig machen?</string>
+    <string name="undo_preparation_title">Diese Zubereitung rückgängig machen?</string>
+    <string name="undo_text">Was am %2$s hinzugefügt wurde, wird aus dem Vorrat entfernt: %1$s.</string>
+    <string name="undo_purchase_confirm">Einkauf rückgängig machen</string>
+    <string name="undo_preparation_confirm">Zubereitung rückgängig machen</string>
+    <string name="msg_nothing_to_undo">Nichts zu entfernen: Es wurde schon alles verbraucht.</string>
+    <string name="msg_undid_only">Schon teilweise verbraucht: nur %1$s entfernt.</string>
+    <!-- Initial data, created once at the first start in the phone's language; afterwards
+         they are the user's data -->
+    <string-array name="initial_locations">
+        <item>Kühlschrank</item>
+        <item>Gefrierschrank</item>
+        <item>Speisekammer</item>
+        <item>Keller</item>
+    </string-array>
+    <string-array name="initial_categories">
+        <item>Obst und Gemüse</item>
+        <item>Milchprodukte und Eier</item>
+        <item>Fleisch und Fisch</item>
+        <item>Brot und Nudeln</item>
+        <item>Reis und Getreide</item>
+        <item>Mehl</item>
+        <item>Konserven</item>
+        <item>Tiefkühlkost</item>
+        <item>Getränke</item>
+        <item>Gewürze und Saucen</item>
+        <item>Frühstück und Süßes</item>
+        <item>Haushalt und Reinigung</item>
+        <item>Körperpflege</item>
+        <item>Sonstiges</item>
+    </string-array>
+    <string name="label_homemade">Selbstgemacht</string>
+    <string name="field_prepared_on">Zubereitungsdatum</string>
+    <string name="field_ready_from">Fertig ab</string>
+    <string name="field_days_until_ready">Tage bis fertig</string>
+    <string name="field_days_until_ready_help">Damit wird vorgeschlagen, ab wann neue Zubereitungen fertig sind.</string>
+    <string name="field_purchased_on">Kaufdatum</string>
+    <string name="preparation_title">Neue Zubereitung</string>
+    <string name="badge_to_make">Zubereiten</string>
+    <string name="line_bought_on">gekauft am %1$s</string>
+    <string name="line_bought_on_at">gekauft am %1$s bei %2$s</string>
+    <string name="line_bought_at">von %1$s</string>
+    <string name="shopping_group_category">Nach Kategorie</string>
+    <string name="shopping_group_store">Nach Geschäft</string>
+    <string name="filter_store">Geschäft</string>
+    <string name="shopping_running_low">Fast aufgebraucht</string>
+    <string name="shopping_frequent">Häufig</string>
+    <string name="cd_add_to_list">%1$s zur Liste hinzufügen</string>
+    <string name="shopping_no_category">Ohne Kategorie</string>
+    <string name="shopping_no_store">Ohne Geschäft</string>
+    <string name="shopping_bought">Gekauft</string>
+    <string name="shopping_clear_bought">Gekaufte entfernen</string>
+    <string name="badge_min_stock">Mindestvorrat</string>
+    <string name="line_cheapest_at">Am günstigsten bei %1$s</string>
+    <string name="shopping_new_item">Neuer Eintrag</string>
+    <string name="shopping_edit_item">Eintrag bearbeiten</string>
+    <string name="tick_title">Zum Vorrat hinzufügen?</string>
+    <string name="action_no">Nein</string>
+    <string name="action_to_buy">Einkaufen</string>
+    <string name="action_remove_from_list">Von der Liste entfernen</string>
+    <string name="msg_below_min_stock">%1$s ist unter dem Mindestvorrat</string>
+    <string name="action_add_to_list">Zur Liste hinzufügen</string>
+    <string name="best_title">Am günstigsten bei</string>
+    <string name="best_noted_on">notiert am %1$s</string>
+    <string name="field_best_store">Günstigstes Geschäft</string>
+    <string name="field_best_price">Preis (€)</string>
+    <string name="field_best_reference">Preis pro</string>
+    <string name="field_best_reference_help">Zum Beispiel: pro kg, 6er-Packung</string>
+    <string name="error_price">Gib einen Preis ein, zum Beispiel %1$s</string>
+    <string name="settings_shopping">Einkaufsliste</string>
+    <string name="settings_on_tick">Wenn du ein Produkt abhakst</string>
+    <string name="on_tick_ask">Fragen, ob es zum Vorrat kommt</string>
+    <string name="on_tick_always">Immer zum Vorrat hinzufügen</string>
+    <string name="on_tick_never">Nicht hinzufügen</string>
+    <string name="settings_min_stock">Unter dem Mindestvorrat</string>
+    <string name="min_stock_automatic">Automatisch auf die Liste setzen</string>
+    <string name="min_stock_ask">Vorher fragen</string>
+    <string name="settings_running_low">Fast aufgebraucht</string>
+    <string name="field_days">Tage</string>
+    <string name="settings_running_low_help">Ein Produkt ist fast aufgebraucht, wenn die geschätzte Dauer kürzer ist.</string>
+    <plurals name="running_low_summary">
+        <item quantity="one">Weniger als %1$d Tag</item>
+        <item quantity="other">Weniger als %1$d Tage</item>
+    </plurals>
+    <string name="expiries_expired">Abgelaufen</string>
+    <string name="expiries_expiring">Läuft bald ab</string>
+    <string name="expiries_preparing">In Zubereitung / bald fertig</string>
+    <plurals name="expiries_later">
+        <item quantity="one">Später · %1$d Eintrag</item>
+        <item quantity="other">Später · %1$d Einträge</item>
+    </plurals>
+    <string name="action_show">Anzeigen</string>
+    <string name="action_hide">Ausblenden</string>
+    <string name="settings_notifications">Benachrichtigungen</string>
+    <string name="settings_daily_notification">Tägliche Benachrichtigung</string>
+    <string name="settings_notification_time">Uhrzeit</string>
+    <string name="notification_time_title">Uhrzeit der Benachrichtigung</string>
+    <string name="settings_warning_days">Vorwarnung</string>
+    <plurals name="warning_days_summary">
+        <item quantity="one">%1$d Tag vor Ablauf</item>
+        <item quantity="other">%1$d Tage vor Ablauf</item>
+    </plurals>
+    <string name="settings_warning_days_help">Hat ein Produkt eine eigene Vorwarnung, gilt diese.</string>
+    <string name="notification_channel_name">Erinnerungen an die Haltbarkeit</string>
+    <string name="notification_channel_description">Eine Benachrichtigung am Tag mit dem, was abläuft, und den fertigen Zubereitungen.</string>
+    <string name="notification_title">Haltbarkeit</string>
+    <plurals name="notif_expiring">
+        <item quantity="one">%1$d Produkt läuft %2$s ab</item>
+        <item quantity="other">%1$d Produkte laufen %2$s ab</item>
+    </plurals>
+    <string name="notif_when_today">heute</string>
+    <string name="notif_when_tomorrow">bis morgen</string>
+    <plurals name="notif_when_days">
+        <item quantity="one">innerhalb von %1$d Tag</item>
+        <item quantity="other">innerhalb von %1$d Tagen</item>
+    </plurals>
+    <plurals name="notif_expired">
+        <item quantity="one">%1$d Produkt ist abgelaufen</item>
+        <item quantity="other">%1$d Produkte sind abgelaufen</item>
+    </plurals>
+    <plurals name="notif_ready">
+        <item quantity="one">%1$d Produkt ist fertig</item>
+        <item quantity="other">%1$d Produkte sind fertig</item>
+    </plurals>
+    <string name="notif_status_expired">abgelaufen</string>
+    <string name="notif_status_today">läuft heute ab</string>
+    <string name="notif_status_tomorrow">läuft morgen ab</string>
+    <plurals name="notif_status_days">
+        <item quantity="one">läuft in %1$d Tag ab</item>
+        <item quantity="other">läuft in %1$d Tagen ab</item>
+    </plurals>
+    <string name="notif_status_ready">heute fertig</string>
+    <plurals name="notif_more">
+        <item quantity="one">+%1$d weiteres</item>
+        <item quantity="other">+%1$d weitere</item>
+    </plurals>
+    <string name="notif_banner_title">Erinnerungen an die Haltbarkeit</string>
+    <string name="notif_banner_text">Jeden Morgen eine einzige Benachrichtigung mit dem, was abläuft und was fertig ist. Nichts, wenn es nichts zu melden gibt.</string>
+    <string name="action_enable">Einschalten</string>
+    <string name="action_no_thanks">Nein, danke</string>
+    <string name="notif_permission_denied">Benachrichtigungen sind blockiert. Du kannst sie in den Android-Einstellungen erlauben.</string>
+    <string name="action_open_settings">Einstellungen öffnen</string>
+    <string name="settings_exchange">Datenaustausch</string>
+    <string name="settings_exchange_hint">Exportieren, importieren, Sicherungen</string>
+    <string name="exchange_last">Letzter Austausch</string>
+    <string name="exchange_last_with">Mit %1$s, %2$s</string>
+    <string name="exchange_today">heute</string>
+    <string name="exchange_yesterday">gestern</string>
+    <plurals name="exchange_days_ago">
+        <item quantity="one">vor %1$d Tag</item>
+        <item quantity="other">vor %1$d Tagen</item>
+    </plurals>
+    <string name="exchange_never">Noch kein Austausch</string>
+    <string name="action_export">Exportieren</string>
+    <string name="export_text">Alle Daten dieses Handys in einer Datei, die du mit Formica auf dem anderen Handy öffnest.</string>
+    <string name="action_share">Teilen</string>
+    <string name="action_save_to">Speichern unter…</string>
+    <string name="msg_file_saved">Datei gespeichert</string>
+    <string name="msg_save_failed">Die Datei konnte nicht gespeichert werden.</string>
+    <string name="action_import_file">Aus Datei importieren</string>
+    <string name="import_title">Importieren</string>
+    <string name="import_file_from">Datei von</string>
+    <string name="import_exported_on">Exportiert am %1$s</string>
+    <string name="import_same_device">Diese Datei wurde auf diesem Handy exportiert. Du kannst sie trotzdem importieren.</string>
+    <string name="import_mode">Modus</string>
+    <string name="mode_merge">Zusammenführen</string>
+    <string name="mode_merge_hint">Behält die Änderungen beider Handys</string>
+    <string name="mode_new_products">Nur neue Produkte</string>
+    <string name="mode_new_products_hint">Fügt die Produkte hinzu, die hier fehlen; sonst ändert sich nichts</string>
+    <string name="mode_replace_all">Alles ersetzen</string>
+    <string name="mode_replace_all_hint">Die Daten dieses Handys werden durch die der Datei ersetzt</string>
+    <string name="import_changes">Was sich ändert</string>
+    <string name="import_products">Produkte</string>
+    <plurals name="import_new_masculine">
+        <item quantity="one">%1$d neu</item>
+        <item quantity="other">%1$d neu</item>
+    </plurals>
+    <plurals name="import_updated_masculine">
+        <item quantity="one">%1$d geändert</item>
+        <item quantity="other">%1$d geändert</item>
+    </plurals>
+    <plurals name="import_deleted_masculine">
+        <item quantity="one">%1$d gelöscht</item>
+        <item quantity="other">%1$d gelöscht</item>
+    </plurals>
+    <plurals name="import_new_feminine">
+        <item quantity="one">%1$d neu</item>
+        <item quantity="other">%1$d neu</item>
+    </plurals>
+    <plurals name="import_updated_feminine">
+        <item quantity="one">%1$d geändert</item>
+        <item quantity="other">%1$d geändert</item>
+    </plurals>
+    <plurals name="import_deleted_feminine">
+        <item quantity="one">%1$d gelöscht</item>
+        <item quantity="other">%1$d gelöscht</item>
+    </plurals>
+    <string name="import_no_changes">Keine Änderungen</string>
+    <string name="import_duplicates">Mögliche Doppelte</string>
+    <string name="import_auto_merged">Lagerorte, Kategorien und Geschäfte mit gleichem Namen werden zusammengeführt: %1$d</string>
+    <string name="import_duplicate_names">Hier: „%1$s“ · In der Datei: „%2$s“</string>
+    <string name="duplicate_merge">Zusammenführen</string>
+    <string name="duplicate_keep_separate">Getrennt lassen</string>
+    <string name="import_both_notes">Auf beiden Handys geschriebene Notizen</string>
+    <string name="import_notes_appended">werden untereinander behalten</string>
+    <string name="import_not_formica">Das ist keine Formica-Datei.</string>
+    <string name="import_newer_version">Diese Datei stammt aus einer neueren Version von Formica. Aktualisiere die App, um sie zu importieren.</string>
+    <string name="import_unreadable">Die Datei konnte nicht gelesen werden.</string>
+    <string name="import_done">Import abgeschlossen</string>
+    <string name="import_failed">Import fehlgeschlagen: keine Daten wurden geändert.</string>
+    <string name="section_backups">Sicherungen</string>
+    <string name="undo_last_import">Letzten Import rückgängig machen</string>
+    <string name="undo_last_import_hint">Zurück zum Stand vor %1$s</string>
+    <string name="saved_copies">Gespeicherte Kopien</string>
+    <plurals name="saved_copies_count">
+        <item quantity="one">%1$d Kopie</item>
+        <item quantity="other">%1$d Kopien</item>
+    </plurals>
+    <string name="undo_import_title">Letzten Import rückgängig machen?</string>
+    <string name="undo_import_text">Die Daten kehren zum Stand vom %1$s zurück, vor dem Import von %2$s. Spätere Änderungen gehen verloren.</string>
+    <string name="backup_before_import">Vor dem Import von %1$s</string>
+    <string name="no_saved_copies">Keine gespeicherten Kopien.</string>
+    <string name="backups_note">Die Kopien bleiben auf diesem Telefon und werden beim Deinstallieren von Formica gelöscht. Für eine Sicherung an einem anderen Ort mit „Speichern unter…“ exportieren; zum Zurückholen die Datei mit „Alles ersetzen“ importieren.</string>
+    <string name="restore_title">Diese Kopie wiederherstellen?</string>
+    <string name="restore_text">Alle aktuellen Daten dieses Handys werden durch die vom %1$s ersetzt.</string>
+    <string name="action_restore">Wiederherstellen</string>
+    <string name="msg_copy_restored">Kopie wiederhergestellt</string>
+    <string name="msg_import_undone">Import rückgängig gemacht</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="section_exchange_log">Austauschprotokoll</string>
+    <string name="exchange_log_entry">Importiert am %1$s · %2$s</string>
+    <string name="section_maintenance">Wartung</string>
+    <string name="clean_up">Gelöschte Einträge aufräumen</string>
+    <string name="clean_up_hint">Älter als 6 Monate</string>
+    <string name="clean_up_text">Einträge, die vor mehr als 6 Monaten gelöscht wurden, werden endgültig entfernt. Ein Handy, das seit mehr als 6 Monaten keine Daten ausgetauscht hat, könnte sie zurückbringen.</string>
+    <string name="action_clean_up">Aufräumen</string>
+    <plurals name="clean_up_done">
+        <item quantity="one">%1$d Eintrag entfernt</item>
+        <item quantity="other">%1$d Einträge entfernt</item>
+    </plurals>
+    <string name="clean_up_nothing">Nichts aufzuräumen.</string>
+    <string name="badge_notes_review">Notizen prüfen</string>
+    <!-- First start -->
+    <string name="welcome_title">Willkommen bei Formica</string>
+    <string name="welcome_text">Vorrat und Einkaufsliste für zu Hause. Funktioniert ohne Internet und ohne Konto: deine Daten bleiben auf dem Handy.</string>
+    <string name="welcome_notification">Tägliche Erinnerung an die Haltbarkeit</string>
+    <string name="welcome_notification_hint">Um %1$s, nur wenn etwas abläuft oder fertig ist. Du kannst das in den Einstellungen ändern.</string>
+    <string name="welcome_initial_data">Lagerorte und Kategorien sind schon angelegt: du kannst sie in den Einstellungen ändern.</string>
+    <string name="action_start">Los geht’s</string>
+    <!-- About -->
+    <string name="about_title">Über die App</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_how_title">So funktioniert’s</string>
+    <string name="about_how_text">Formica verwaltet Vorrat und Einkaufsliste für zu Hause: was du hast, wo es ist, wann es abläuft und was du nachkaufen musst. Auch Selbstgemachtes und Produkte direkt vom Erzeuger sind dabei.</string>
+    <string name="about_family_title">In der Familie</string>
+    <string name="about_family_text">Für mehrere Handys exportierst du eine Datei und öffnest sie auf dem anderen Handy: Formica führt die Daten beider Handys zusammen. Vor jedem Import speichert es eine Kopie, die du wiederherstellen kannst.</string>
+    <string name="about_name_title">Der Name</string>
+    <string name="about_name_text">Formica heißt Ameise, auf Lateinisch wie auf Italienisch: Ameisen gehören zu den Lebewesen mit den besten Vorräten.</string>
+    <string name="about_privacy_title">Datenschutz</string>
+    <string name="about_privacy_text">Kein Internetzugriff, kein Konto, keine Datensammlung, keine Werbung und keine Tracker. Deine Daten bleiben auf dem Handy und sind von den Android-Sicherungen ausgeschlossen: sie verlassen es nur mit einem Export, den du startest.</string>
+    <string name="about_permissions_title">Berechtigungen</string>
+    <string name="about_perm_notifications">Benachrichtigungen: für die tägliche Erinnerung an die Haltbarkeit.</string>
+    <string name="about_perm_boot">Beim Start ausführen: um die Erinnerung nach einem Neustart des Handys neu zu planen.</string>
+    <string name="about_perm_wake_lock">Ruhezustand verhindern: um die tägliche Prüfung abzuschließen.</string>
+    <string name="about_perm_receiver">Interne Berechtigung von Formica: verhindert, dass andere Apps Nachrichten an interne Teile von Formica senden, und gibt keinen Zugriff auf Daten. Sie wird bis Android 12 gebraucht; neuere Versionen bieten denselben Schutz selbst, und die Berechtigung bleibt ungenutzt.</string>
+    <string name="about_author">Autor: %1$s</string>
+    <string name="about_license">Freie Software, lizenziert unter der GNU AGPL v3 oder neuer</string>
+    <string name="about_source">Quellcode und Fehlermeldungen: %1$s</string>
+</resources>

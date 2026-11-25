@@ -1,0 +1,177 @@
+# Installs and starts the debug app on emulators (the oldest supported Android, a middle
+# version and recent ones), checks it does not crash and takes a screenshot of every
+# section, in the light and the dark theme and with large text. On Android 16 it can also
+# take the store screenshots in every language (scripts/store-screenshots.sh), only when
+# asked: they double the run time and are needed only when the screens change.
+# To ask: "[store-screenshots]" in the message of the last commit of the push, or the
+# input store_screenshots of a manual run.
+# Two ways to start it:
+#  - automatically, on a push to develop that changes the app or the build, or whose last
+#    commit asks for the store screenshots (an empty commit is enough): every level but
+#    the experimental ones (public repository: free minutes, jobs in parallel). The
+#    "changes" job decides: a "paths" filter would skip the whole workflow before the
+#    commit message can be read;
+#  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one. GitHub
+#    shows this button only once the workflow is on the default branch (main).
+# Experimental levels run only when asked for by name.
+name: Emulator smoke test
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Only this API level (e.g. 26); empty = all but experimental"
+        required: false
+        default: ""
+      store_screenshots:
+        description: "Also take the store screenshots (on Android 16)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# A newer push makes the running automatic test pointless; manual runs are never cancelled
+concurrency:
+  group: emulator-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Does this push need the emulator?
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          # Only a true/false comes from the commit message
+          ASKED: ${{ contains(github.event.head_commit.message, '[store-screenshots]') }}
+        run: |
+          # The files whose change needs a new test on the emulators
+          watched='^(app/|gradle/|[^/]*\.gradle\.kts$|gradle\.properties$|\.github/workflows/emulator\.yml$|scripts/(emulator-smoke|emulator-common|store-screenshots|run-gradle)\.sh$)'
+          if [[ $EVENT != push || $ASKED == true ]]; then
+            run=true
+          elif [[ ! $BEFORE =~ ^[0-9a-f]{40}$ || $BEFORE =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            # A new branch or an unknown previous commit: test everything
+            run=true
+          elif git diff --name-only "$BEFORE" HEAD | grep -Eq "$watched"; then
+            run=true
+          else
+            run=false
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "Emulator test needed: $run"
+
+  emulator:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    runs-on: ubuntu-24.04
+    # A stuck emulator would otherwise run for GitHub's 6-hour limit (usual: 5-15 minutes)
+    timeout-minutes: 40
+    # Experimental images may fail for reasons outside the app: reported, not blocking
+    continue-on-error: ${{ matrix.experimental == true }}
+    env:
+      # Jobs not selected start but skip every step (about a minute each).
+      # The level asked for by hand, otherwise (also on push) all but the experimental ones
+      SELECTED: ${{ inputs.only && inputs.only == format('{0}', matrix.api-level) || !inputs.only && matrix.experimental != true }}
+      # Only a true/false reaches the script: the commit message is never expanded in a command
+      STORE_SCREENSHOTS: ${{ matrix.api-level == 36 && (inputs.store_screenshots || contains(github.event.head_commit.message, '[store-screenshots]')) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [26, 30, 36]
+        include:
+          # From Android 16 the SDK packages have a minor version: android-37.0
+          - api-level: "37.0"
+            experimental: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.SELECTED == 'true'
+        with:
+          persist-credentials: false
+
+      - name: Enable KVM
+        if: env.SELECTED == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        if: env.SELECTED == 'true'
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        if: env.SELECTED == 'true'
+        with:
+          # MIT-licensed cache: the default "enhanced" one is proprietary since v6
+          cache-provider: basic
+          # The parallel jobs would all try to save the same entry: only build.yml writes it
+          cache-read-only: true
+
+      - name: Build debug APK
+        if: env.SELECTED == 'true'
+        # A failed download on the runner is retried once; other errors become an annotation
+        run: scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log" assembleDebug
+
+      # The emulator sometimes never exits after "adb emu kill" (seen on Android 8): the step
+      # then hits its time limit after the checks passed. The marker file written by the last
+      # line tells the two cases apart in the next step
+      - name: Install, start and check
+        id: checks
+        if: env.SELECTED == 'true'
+        timeout-minutes: 30
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+          profile: pixel_6
+          disable-animations: true
+          # GitHub runners have 4 cores; recent images are very slow with the default 2
+          cores: 4
+          ram-size: 4096M
+          # Recent system images may take longer than the default 600 s to boot
+          emulator-boot-timeout: 1200
+          disk-size: 4000M
+          # Store screenshots (5 languages) on Android 16 only, when asked: one set is enough
+          # Each line runs only if the previous one succeeded
+          script: |
+            scripts/emulator-smoke.sh api${{ matrix.api-level }}-phone
+            if [ "$STORE_SCREENSHOTS" = "true" ]; then scripts/store-screenshots.sh; fi
+            touch "$RUNNER_TEMP/emulator-checks-passed"
+
+      - name: Result of the checks
+        if: env.SELECTED == 'true'
+        env:
+          OUTCOME: ${{ steps.checks.outcome }}
+        run: |
+          if [[ ! -f $RUNNER_TEMP/emulator-checks-passed ]]; then
+            echo "::error::The checks on the emulator failed or did not finish (see the previous step)"
+            exit 1
+          fi
+          if [[ $OUTCOME != success ]]; then
+            echo "::warning::The checks passed, but the emulator did not shut down in time"
+          fi
+
+      - name: Upload screenshots
+        if: always() && env.SELECTED == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshots-api${{ matrix.api-level }}
+          path: screenshots/
+          if-no-files-found: ignore

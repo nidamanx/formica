@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- German translation of values/demo_strings.xml: every string, in sync with the English ones -->
+<resources>
+    <string name="demo_store_supermarket">Supermarkt</string>
+    <string name="demo_store_market">Samstagsmarkt</string>
+    <string name="demo_store_bakery">Bäckerei</string>
+    <string name="demo_store_farm">Bauernhof</string>
+    <string name="demo_store_oil_mill">Ölmühle</string>
+    <string name="demo_milk">Frische Milch</string>
+    <string name="demo_yogurt">Joghurt</string>
+    <string name="demo_eggs">Eier</string>
+    <string name="demo_ricotta">Ricotta</string>
+    <string name="demo_spinach">Frischer Spinat</string>
+    <string name="demo_ragu">Ragù</string>
+    <string name="demo_peas">Tiefkühlerbsen</string>
+    <string name="demo_passata">Passierte Tomaten</string>
+    <string name="demo_apricot_jam">Aprikosenmarmelade</string>
+    <string name="demo_honey">Honig</string>
+    <string name="demo_olive_oil">Natives Olivenöl extra</string>
+    <string name="demo_wholemeal_flour">Vollkornmehl</string>
+    <string name="demo_brown_rice">Naturreis</string>
+    <string name="demo_lentils">Linsen</string>
+    <string name="demo_sauerkraut">Sauerkraut</string>
+    <string name="demo_potatoes">Kartoffeln</string>
+    <string name="demo_apples">Äpfel</string>
+    <string name="demo_wholemeal_bread">Vollkornbrot</string>
+    <string name="demo_lemons">Zitronen</string>
+    <string name="demo_tomatoes">Tomaten</string>
+    <string name="demo_price_each">pro Stück</string>
+    <string name="demo_price_per_litre">pro Liter</string>
+    <string name="demo_note_ragu">Omas Rezept</string>
+    <string name="demo_note_oil">Die Ölmühle verkauft von November bis Januar</string>
+</resources>

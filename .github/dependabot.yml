@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
-    # Work happens on dev; main only receives verified changes from dev
-    target-branch: dev
+    # Work happens on develop; main only receives verified changes from develop
+    target-branch: develop
     schedule:
       interval: monthly

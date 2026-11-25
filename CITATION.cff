@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software, or parts of its code, please cite it as below."
+type: software
+title: "Formica"
+abstract: >-
+  An Android app to manage the household pantry and the shopping list, shared with the
+  family by exchanging a file between phones. It also handles homemade products and
+  products bought from producers. No internet access, no account, no server.
+authors:
+  - given-names: "Nicola Davide"
+    family-names: "Mannarelli"
+    alias: "nidamanx"
+repository-code: "https://github.com/nidamanx/formica"
+url: "https://github.com/nidamanx/formica"
+license: AGPL-3.0-or-later
+version: "1.0.0"
+date-released: "2026-11-25"
+keywords:
+  - android
+  - pantry
+  - pantry-manager
+  - shopping-list
+  - grocery-list
+  - expiry-tracker
+  - food-inventory
+  - home-inventory
+  - household
+  - homemade
+  - family
+  - offline
+  - privacy
+  - no-tracking
+  - foss
+  - f-droid
