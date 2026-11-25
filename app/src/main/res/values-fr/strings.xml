@@ -131,6 +131,7 @@
     <string name="use_title">Consommer</string>
     <string name="field_quantity">Quantité</string>
     <string name="field_expiry">Date limite</string>
+    <string name="field_expiry_this_pack">Date limite de ce stock</string>
     <string name="field_location">Emplacement</string>
     <string name="field_store">Magasin</string>
     <string name="value_none_f">Aucune</string>
@@ -145,7 +146,7 @@
     <string name="field_category">Catégorie</string>
     <string name="form_more">Plus</string>
     <string name="field_shelf_life">Se conserve (jours)</string>
-    <string name="field_shelf_life_help">Sert à proposer la date limite des nouveaux achats et des nouvelles préparations.</string>
+    <string name="field_shelf_life_help">Combien de temps il se conserve d\'habitude, depuis l\'achat ou la préparation. Sert à proposer la date limite des prochains achats et préparations.</string>
     <string name="field_days_after_opening">Se garde après ouverture (jours)</string>
     <string name="field_warning_days">Me prévenir avant la date limite (jours)</string>
     <string name="field_min_stock">Stock minimum</string>

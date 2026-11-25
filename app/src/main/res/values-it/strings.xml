@@ -128,6 +128,7 @@
     <string name="use_title">Consuma</string>
     <string name="field_quantity">Quantità</string>
     <string name="field_expiry">Scadenza</string>
+    <string name="field_expiry_this_pack">Scadenza di questa confezione</string>
     <string name="field_location">Posizione</string>
     <string name="field_store">Luogo d\'acquisto</string>
     <string name="value_none_f">Nessuna</string>
@@ -142,7 +143,7 @@
     <string name="field_category">Categoria</string>
     <string name="form_more">Altro</string>
     <string name="field_shelf_life">Si conserva per (giorni)</string>
-    <string name="field_shelf_life_help">Serve a proporre la scadenza dei nuovi acquisti e delle nuove preparazioni.</string>
+    <string name="field_shelf_life_help">Quanto dura di solito, dall\'acquisto o dalla preparazione. Serve a proporre la scadenza delle prossime confezioni.</string>
     <string name="field_days_after_opening">Dopo l\'apertura dura (giorni)</string>
     <string name="field_warning_days">Avvisami prima della scadenza (giorni)</string>
     <string name="field_min_stock">Scorta minima</string>

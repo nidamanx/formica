@@ -121,6 +121,7 @@
     <string name="use_title">Verbrauchen</string>
     <string name="field_quantity">Menge</string>
     <string name="field_expiry">Haltbar bis</string>
+    <string name="field_expiry_this_pack">Haltbarkeitsdatum dieses Bestands</string>
     <string name="field_location">Lagerort</string>
     <string name="field_store">Geschäft</string>
     <string name="value_none_f">Keine Angabe</string>
@@ -135,7 +136,7 @@
     <string name="field_category">Kategorie</string>
     <string name="form_more">Mehr</string>
     <string name="field_shelf_life">Haltbar (Tage)</string>
-    <string name="field_shelf_life_help">Damit wird das Haltbarkeitsdatum neuer Einkäufe und Zubereitungen vorgeschlagen.</string>
+    <string name="field_shelf_life_help">Wie lange es sich meist hält, ab Einkauf oder Zubereitung. Damit wird das Haltbarkeitsdatum künftiger Einkäufe und Zubereitungen vorgeschlagen.</string>
     <string name="field_days_after_opening">Nach dem Öffnen haltbar (Tage)</string>
     <string name="field_warning_days">Vor Ablauf erinnern (Tage)</string>
     <string name="field_min_stock">Mindestvorrat</string>

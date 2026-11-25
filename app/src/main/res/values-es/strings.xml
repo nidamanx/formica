@@ -129,6 +129,7 @@
     <string name="use_title">Consumir</string>
     <string name="field_quantity">Cantidad</string>
     <string name="field_expiry">Caducidad</string>
+    <string name="field_expiry_this_pack">Caducidad de estas existencias</string>
     <string name="field_location">Ubicación</string>
     <string name="field_store">Tienda</string>
     <string name="value_none_f">Ninguna</string>
@@ -143,7 +144,7 @@
     <string name="field_category">Categoría</string>
     <string name="form_more">Más</string>
     <string name="field_shelf_life">Se conserva (días)</string>
-    <string name="field_shelf_life_help">Sirve para proponer la caducidad de las nuevas compras y preparaciones.</string>
+    <string name="field_shelf_life_help">Cuánto dura normalmente, desde la compra o la preparación. Sirve para proponer la caducidad de las próximas compras y preparaciones.</string>
     <string name="field_days_after_opening">Dura después de abrir (días)</string>
     <string name="field_warning_days">Avisarme antes de que caduque (días)</string>
     <string name="field_min_stock">Stock mínimo</string>

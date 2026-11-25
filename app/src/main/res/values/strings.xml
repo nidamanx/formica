@@ -127,6 +127,7 @@
     <string name="use_title">Use</string>
     <string name="field_quantity">Quantity</string>
     <string name="field_expiry">Expiry date</string>
+    <string name="field_expiry_this_pack">Expiry date of this stock</string>
     <string name="field_location">Location</string>
     <string name="field_store">Store</string>
     <string name="value_none_f">None</string>
@@ -142,7 +143,7 @@
     <string name="field_category">Category</string>
     <string name="form_more">More</string>
     <string name="field_shelf_life">Keeps for (days)</string>
-    <string name="field_shelf_life_help">Used to suggest the expiry date of new purchases and preparations.</string>
+    <string name="field_shelf_life_help">How long it usually keeps, from purchase or preparation. Used to suggest the expiry date of the next stock.</string>
     <string name="field_days_after_opening">Lasts after opening (days)</string>
     <string name="field_warning_days">Warn me before expiry (days)</string>
     <string name="field_min_stock">Minimum stock</string>

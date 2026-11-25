@@ -238,7 +238,7 @@ private fun ProductForm(
         }
         if (isNew) {
             DateField(
-                label = stringResource(R.string.field_expiry),
+                label = stringResource(R.string.field_expiry_this_pack),
                 value = expiresOn,
                 emptyText = none,
                 format = format,
