@@ -88,7 +88,7 @@ jobs:
         # A failed download on the runner is retried once; any other error stops the build
         run: >-
           scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log"
-          lintDebug testDebugUnitTest assembleDebug assembleRelease
+          lintDebug lintRelease testDebugUnitTest assembleDebug assembleRelease
 
       - name: Remove the debug key
         if: always()
