@@ -7,12 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-// Release signing is configured only when the keystore comes from environment variables
-// (the Release workflow, from its secrets). Builds without them produce an unsigned
-// release APK, which is what F-Droid needs for its reproducibility check.
-val keystoreFile: String? = System.getenv("FORMICA_KEYSTORE_FILE")
-val keystorePassword: String? = System.getenv("FORMICA_KEYSTORE_PASSWORD")
-val hasReleaseSigning = !keystoreFile.isNullOrBlank() && !keystorePassword.isNullOrBlank()
+// The release APK is always built unsigned (what F-Droid needs for its reproducibility
+// check): the Release workflow signs it afterwards with scripts/sign-apk.sh, so the release
+// key never reaches Gradle and its plugins.
 
 // Debug signing: the fixed debug key only where its environment variables are set (the
 // Build workflow on pushes, from the repository secrets), so test builds install over
@@ -52,18 +49,6 @@ android {
                 keyPassword = debugKeystorePassword
             }
         }
-        if (hasReleaseSigning) {
-            create("release") {
-                storeFile = file(keystoreFile!!)
-                storeType = "pkcs12"
-                storePassword = keystorePassword
-                keyAlias = "formica"
-                keyPassword = keystorePassword
-                enableV1Signing = false
-                enableV2Signing = true
-                enableV3Signing = true
-            }
-        }
     }
 
     buildTypes {
@@ -81,9 +66,6 @@ android {
             )
             // No git metadata in the APK: identical output however the source was checked out
             vcsInfo.include = false
-            if (hasReleaseSigning) {
-                signingConfig = signingConfigs.getByName("release")
-            }
         }
     }
 

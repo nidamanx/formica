@@ -8,7 +8,8 @@
   with any other key.
 
 The keys themselves are never stored in the repository, not even encrypted: they live
-only in the repository secrets and in an offline backup (`docs/MAINTAINING.md`). They
+only in GitHub secrets (the release key in the environment `release`, usable from `main`
+only) and in an offline backup (`docs/MAINTAINING.md`). They
 were created with `scripts/generate-signing-key.sh` on the maintainer's computer. The
 Build workflow fails if a key file appears (`scripts/check-secrets.sh`). Never replace
 the release key: with a new key, users cannot update and must uninstall the app.

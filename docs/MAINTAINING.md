@@ -16,13 +16,22 @@ are needed.
 The keys are never stored in the repository, not even encrypted. Each one exists in two
 places only:
 
-- the repository secrets (*Settings → Secrets and variables → Actions → Secrets*);
+- GitHub secrets: the release key in the secrets of the environment `release`, the debug
+  key in the repository secrets (*Settings → Secrets and variables → Actions*);
 - an offline backup in the maintainer's password manager.
 
-| Key | Secrets | Public fingerprint |
-|---|---|---|
-| Release | `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD` | `keystore/certificate-sha256.txt`, both READMEs |
-| Debug (test builds, "Formica-D") | `DEBUG_KEYSTORE_BASE64`, `DEBUG_KEYSTORE_PASSWORD` | `keystore/debug-certificate-sha256.txt` |
+| Key | Secrets | Where | Public fingerprint |
+|---|---|---|---|
+| Release | `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD` | environment `release` | `keystore/certificate-sha256.txt`, both READMEs |
+| Debug (test builds, "Formica-D") | `DEBUG_KEYSTORE_BASE64`, `DEBUG_KEYSTORE_PASSWORD` | repository | `keystore/debug-certificate-sha256.txt` |
+
+The environment `release` (*Settings → Environments*) has the deployment rule "Selected
+branches and tags" with `main` only: no workflow run on another branch can read the
+release key, even one changed on `develop`. Only the `sign` job of the Release workflow
+uses it, and that job never runs Gradle: the APK is built unsigned and signed afterwards
+with `scripts/sign-apk.sh` (apksigner), so the key never reaches the build tools and
+their plugins. The Build workflow runs the same script on every run with a throwaway key
+made in the job (no secret), so the signing steps are tested before each release.
 
 `*_BASE64` holds the content of the `formica-<kind>-keystore.b64` file (one long line
 of base64); `*_PASSWORD` the password given to the script. The fingerprints are public
@@ -41,7 +50,8 @@ On the maintainer's own computer (never a shared machine or a CI runner), with O
 3. Copy the content of `formica-<kind>-keystore.b64` into a secure note of the password
    manager (not a password field: it may cut long text). Paste it back from there into
    a file and compare it with `cmp` before going on.
-4. Create the two secrets, then delete the file with `shred -u`.
+4. Create the two secrets (for the release key, in the environment `release`), then
+   delete the file with `shred -u`.
 5. Put the fingerprint in `keystore/` (and, for the release key, in both READMEs).
 
 The workflows decrypt the keys with `scripts/decrypt-signing-key.sh`, which reports a
@@ -58,10 +68,12 @@ without showing its value.
    `date-released` in `CITATION.cff`. `scripts/check-version.sh --release` checks it all.
 4. With Build and emulator test green on `develop`, make `main` identical to `develop`
    in one commit.
-5. *Actions → Release → Run workflow* on `main`. The workflow checks the version, the
-   key and the permissions, builds and signs the APK, checks its certificate against
-   `keystore/certificate-sha256.txt`, writes `SHA256SUMS`, attests the build provenance
-   and creates the tag `v<versionName>` with the release.
+5. *Actions → Release → Run workflow* on `main`. The `build` job checks the version and
+   builds the unsigned APK (lint, tests, permissions) from a clean state; the `sign` job
+   (environment `release`) decrypts the key, signs with `scripts/sign-apk.sh`, removes
+   the key, checks the certificate against `keystore/certificate-sha256.txt`, writes
+   `SHA256SUMS` and attests the build provenance; the `publish` job creates the tag
+   `v<versionName>` with the release.
 6. Locally: `git fetch origin --tags`, then check the release page and the files.
 
 A published tag is never moved or deleted (repository ruleset): a wrong release is

@@ -11,9 +11,15 @@ on:
 permissions:
   contents: read
 
+# A newer push makes the running build pointless; manual runs are never cancelled
+concurrency:
+  group: build-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
 jobs:
   version:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -24,6 +30,7 @@ jobs:
 
   secrets:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       # Actions are pinned to a commit SHA (version in the comment); Dependabot updates both
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,6 +42,7 @@ jobs:
 
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -84,7 +92,23 @@ jobs:
 
       - name: Remove the debug key
         if: always()
-        run: rm -f "$RUNNER_TEMP/debug.p12"
+        run: rm -f "$RUNNER_TEMP/debug.p12" "$RUNNER_TEMP/debug.p12.enc"
+
+      - name: Sign the release APK as the Release workflow does
+        # Same script as the release, with a throwaway key made here (no secret): the
+        # signing steps are tested on every run, the key is deleted right after
+        run: |
+          FORMICA_KEYSTORE_PASSWORD=$(openssl rand -hex 24)
+          export FORMICA_KEYSTORE_PASSWORD
+          keytool -genkeypair -keystore "$RUNNER_TEMP/throwaway.p12" -storetype PKCS12 \
+            -alias throwaway -keyalg RSA -keysize 2048 -validity 1 -dname "CN=throwaway" \
+            -storepass:env FORMICA_KEYSTORE_PASSWORD -keypass:env FORMICA_KEYSTORE_PASSWORD
+          status=0
+          scripts/sign-apk.sh "$RUNNER_TEMP/throwaway.p12" throwaway \
+            app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/release-test-signed.apk" \
+            || status=$?
+          rm -f "$RUNNER_TEMP/throwaway.p12" "$RUNNER_TEMP/release-test-signed.apk"
+          exit "$status"
 
       - name: Check the debug signing certificate
         if: steps.debug_key.outputs.file

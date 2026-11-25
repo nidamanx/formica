@@ -12,7 +12,7 @@ Usage: scripts/check-version.sh [-h] [--release]
   --release  also require a released section "## [versionName] - YYYY-MM-DD" in
              CHANGELOG.md and the same date in CITATION.cff (Release workflow)
 
-Run from the repository root. Checks the version badges of README.md and README.it.md,
+Run from the repository root. Checks that versionName is X.Y.Z, the version badges of README.md and README.it.md,
 the English store changelog for versionCode, the latest released section of
 CHANGELOG.md, version and date-released in CITATION.cff.
 USAGE
@@ -32,6 +32,8 @@ expect() {  # file, what, found, wanted
   fi
 }
 [[ -n $ver && -n $code ]] || { echo "::error file=app/build.gradle.kts::versionName or versionCode not found"; exit 1; }
+# Semantic Versioning X.Y.Z only: the name becomes the tag, the file name and the title
+[[ $ver =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error file=app/build.gradle.kts::versionName '$ver' is not X.Y.Z"; exit 1; }
 for f in README.md README.it.md CITATION.cff CHANGELOG.md; do
   [[ -f $f ]] || { echo "::error file=$f::$f is missing"; fail=1; }
 done

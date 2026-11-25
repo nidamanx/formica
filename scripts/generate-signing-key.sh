@@ -64,7 +64,9 @@ cleanup() {
     rm -rf "$work"
   fi
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+# Ctrl-C or kill: stop here (EXIT then cleans up), never go on with the next command
+trap 'exit 130' INT TERM
 
 # The password reaches openssl through a file descriptor: never on the command line
 # (visible in the process list) nor in the environment
