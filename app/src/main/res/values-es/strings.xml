@@ -195,6 +195,18 @@
     <string name="history_discard">Desechado</string>
     <string name="history_opening">Apertura</string>
     <string name="history_transfer">Traslado: %1$s → %2$s</string>
+    <string name="history_show_all">Mostrar todo (%1$d)</string>
+    <string name="history_purchase_undone">Compra deshecha</string>
+    <string name="history_preparation_undone">Preparación deshecha</string>
+    <string name="history_purchase_was_undone">Compra · deshecha</string>
+    <string name="history_preparation_was_undone">Preparación · deshecha</string>
+    <string name="undo_purchase_title">¿Deshacer esta compra?</string>
+    <string name="undo_preparation_title">¿Deshacer esta preparación?</string>
+    <string name="undo_text">Lo añadido el %2$s se quita de la despensa: %1$s.</string>
+    <string name="undo_purchase_confirm">Deshacer compra</string>
+    <string name="undo_preparation_confirm">Deshacer preparación</string>
+    <string name="msg_nothing_to_undo">Nada que quitar: ya se ha consumido todo.</string>
+    <string name="msg_undid_only">Ya se había consumido en parte: solo se ha quitado %1$s.</string>
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">

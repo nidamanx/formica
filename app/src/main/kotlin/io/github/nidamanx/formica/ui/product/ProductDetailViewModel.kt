@@ -75,12 +75,15 @@ sealed interface DetailDialog {
     data class Correct(val key: GroupKey?) : DetailDialog
     data class Notes(val key: GroupKey) : DetailDialog
     data object Delete : DetailDialog
+    data class Undo(val entry: HistoryEntry) : DetailDialog
 }
 
 sealed interface DetailMessage {
     data object NothingToUse : DetailMessage
     data class UsedOnly(val amount: Long, val unit: MeasureUnit) : DetailMessage
     data class OnlyWere(val amount: Long, val unit: MeasureUnit) : DetailMessage
+    data object NothingToUndo : DetailMessage
+    data class UndidOnly(val amount: Long, val unit: MeasureUnit) : DetailMessage
 }
 
 class ProductDetailViewModel(
@@ -162,7 +165,7 @@ class ProductDetailViewModel(
         }
     }
 
-    fun use(key: GroupKey?, amount: Long) = perform(amount, DetailMessage::UsedOnly, nothingMessage = true) {
+    fun use(key: GroupKey?, amount: Long) = perform(amount, DetailMessage::UsedOnly, DetailMessage.NothingToUse) {
         if (key == null) {
             pantry.consume(productId, amount)
         } else {
@@ -196,6 +199,10 @@ class ProductDetailViewModel(
             pantry.prepare(productId, quantity, locationId, preparedOn, expiresOn, readyFrom)
         }
 
+    fun undo(entry: HistoryEntry) = perform(entry.delta, DetailMessage::UndidOnly, DetailMessage.NothingToUndo) {
+        pantry.undoAddition(productId, entry.id)
+    }
+
     fun toggleToBuy() {
         val listed = state.value.inList
         viewModelScope.launch { if (listed) shopping.removeFromList(productId) else shopping.toBuy(productId) }
@@ -224,7 +231,7 @@ class ProductDetailViewModel(
     private fun perform(
         requested: Long,
         partial: (Long, MeasureUnit) -> DetailMessage,
-        nothingMessage: Boolean = false,
+        nothing: DetailMessage? = null,
         operation: suspend () -> StockPlan,
     ) {
         _dialog.value = null
@@ -233,7 +240,7 @@ class ProductDetailViewModel(
             val plan = operation()
             when {
                 plan.unallocated == 0L -> Unit
-                nothingMessage && plan.unallocated == requested -> messageChannel.send(DetailMessage.NothingToUse)
+                nothing != null && plan.unallocated == requested -> messageChannel.send(nothing)
                 else -> messageChannel.send(partial(requested - plan.unallocated, currentUnit))
             }
         }

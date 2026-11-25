@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Homemade products and products from producers: preparation date, the day a
   preparation is ready, purchases in large quantities.
 - Estimated duration of the stock, from the use of the last weeks.
+- Product history with the latest moves; a purchase or a preparation entered by mistake
+  can be undone.
 - Shopping list: items linked to the pantry or free text, minimum stock, products
   running low and bought often, grouped by category or shop; cheapest shop and price
   for each product.

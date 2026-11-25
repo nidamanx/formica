@@ -192,6 +192,18 @@
     <string name="history_discard">Discarded</string>
     <string name="history_opening">Opened</string>
     <string name="history_transfer">Move: %1$s → %2$s</string>
+    <string name="history_show_all">Show all (%1$d)</string>
+    <string name="history_purchase_undone">Purchase undone</string>
+    <string name="history_preparation_undone">Preparation undone</string>
+    <string name="history_purchase_was_undone">Purchase · undone</string>
+    <string name="history_preparation_was_undone">Preparation · undone</string>
+    <string name="undo_purchase_title">Undo this purchase?</string>
+    <string name="undo_preparation_title">Undo this preparation?</string>
+    <string name="undo_text">What was added on %2$s is removed from the pantry: %1$s.</string>
+    <string name="undo_purchase_confirm">Undo purchase</string>
+    <string name="undo_preparation_confirm">Undo preparation</string>
+    <string name="msg_nothing_to_undo">Nothing to remove: it has all been used.</string>
+    <string name="msg_undid_only">Partly used already: only %1$s removed.</string>
 
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->

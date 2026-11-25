@@ -108,8 +108,8 @@ fun droppedBelowMinStock(product: Product, before: Long, after: Long): Boolean =
         !isBelowMinStock(before, product.minStock) && isBelowMinStock(after, product.minStock)
 
 /**
- * "Frequent": the products with the most purchases in the last 180 days, not already in
- * the list; at most 10, ties by name.
+ * "Frequent": the products with the most purchases in the last 180 days (undone ones
+ * excluded), not already in the list; at most 10, ties by name.
  */
 fun frequentProducts(
     products: List<Product>,
@@ -120,8 +120,9 @@ fun frequentProducts(
     compareNames: Comparator<String>,
 ): List<Product> {
     val since = now - FREQUENT_WINDOW_DAYS * DAY_MILLIS
+    val undone = undoneMovementIds(movements)
     val purchases = movements
-        .filter { it.type == MovementType.PURCHASE && it.timestamp in since..now }
+        .filter { it.type == MovementType.PURCHASE && it.timestamp in since..now && it.id !in undone }
         .groupingBy { batchProduct[it.batchId] }
         .eachCount()
     val inList = items.filter { it.isOpen }.mapNotNull { it.productId }.toSet()

@@ -184,6 +184,18 @@
     <string name="history_discard">Weggeworfen</string>
     <string name="history_opening">Geöffnet</string>
     <string name="history_transfer">Verschoben: %1$s → %2$s</string>
+    <string name="history_show_all">Alle anzeigen (%1$d)</string>
+    <string name="history_purchase_undone">Einkauf rückgängig gemacht</string>
+    <string name="history_preparation_undone">Zubereitung rückgängig gemacht</string>
+    <string name="history_purchase_was_undone">Einkauf · rückgängig gemacht</string>
+    <string name="history_preparation_was_undone">Zubereitung · rückgängig gemacht</string>
+    <string name="undo_purchase_title">Diesen Einkauf rückgängig machen?</string>
+    <string name="undo_preparation_title">Diese Zubereitung rückgängig machen?</string>
+    <string name="undo_text">Was am %2$s hinzugefügt wurde, wird aus dem Vorrat entfernt: %1$s.</string>
+    <string name="undo_purchase_confirm">Einkauf rückgängig machen</string>
+    <string name="undo_preparation_confirm">Zubereitung rückgängig machen</string>
+    <string name="msg_nothing_to_undo">Nichts zu entfernen: Es wurde schon alles verbraucht.</string>
+    <string name="msg_undid_only">Schon teilweise verbraucht: nur %1$s entfernt.</string>
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">

@@ -197,6 +197,18 @@
     <string name="history_discard">Jeté</string>
     <string name="history_opening">Ouverture</string>
     <string name="history_transfer">Déplacement : %1$s → %2$s</string>
+    <string name="history_show_all">Tout afficher (%1$d)</string>
+    <string name="history_purchase_undone">Achat annulé</string>
+    <string name="history_preparation_undone">Préparation annulée</string>
+    <string name="history_purchase_was_undone">Achat · annulé</string>
+    <string name="history_preparation_was_undone">Préparation · annulée</string>
+    <string name="undo_purchase_title">Annuler cet achat ?</string>
+    <string name="undo_preparation_title">Annuler cette préparation ?</string>
+    <string name="undo_text">Ce qui a été ajouté le %2$s est retiré du garde-manger : %1$s.</string>
+    <string name="undo_purchase_confirm">Annuler l\'achat</string>
+    <string name="undo_preparation_confirm">Annuler la préparation</string>
+    <string name="msg_nothing_to_undo">Rien à retirer : tout a déjà été consommé.</string>
+    <string name="msg_undid_only">Déjà consommé en partie : seulement %1$s retiré.</string>
     <!-- Initial data, created once at the first start in the phone's language; afterwards
          they are the user's data -->
     <string-array name="initial_locations">

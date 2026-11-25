@@ -26,6 +26,7 @@ import io.github.nidamanx.formica.domain.planPreparation
 import io.github.nidamanx.formica.domain.planPurchase
 import io.github.nidamanx.formica.domain.planToBuy
 import io.github.nidamanx.formica.domain.planTransfer
+import io.github.nidamanx.formica.domain.planUndoAddition
 import io.github.nidamanx.formica.domain.productQuantity
 import io.github.nidamanx.formica.domain.quantitiesByBatch
 import io.github.nidamanx.formica.domain.softDeleted
@@ -195,6 +196,13 @@ class PantryRepository(
             planCorrection(target, quantities, realQuantity, ctx)
         }
 
+    /** Undo of a purchase or preparation from the history (SPEC §4). */
+    suspend fun undoAddition(productId: String, movementId: String): StockPlan =
+        withStockAndMovements(productId) { _, _, movements, quantities, ctx ->
+            val original = movements.firstOrNull { it.id == movementId } ?: error("movement $movementId not found")
+            planUndoAddition(original, movements, quantities, ctx)
+        }
+
     private fun initialPlan(product: Product, initial: InitialStock, ctx: OperationContext): StockPlan =
         when (initial) {
             is InitialStock.Purchase -> planPurchase(
@@ -214,6 +222,13 @@ class PantryRepository(
     private suspend fun withStock(
         productId: String,
         plan: (Product, List<Batch>, Map<String, Long>, OperationContext) -> StockPlan,
+    ): StockPlan = withStockAndMovements(productId) { product, batches, _, quantities, ctx ->
+        plan(product, batches, quantities, ctx)
+    }
+
+    private suspend fun withStockAndMovements(
+        productId: String,
+        plan: (Product, List<Batch>, List<Movement>, Map<String, Long>, OperationContext) -> StockPlan,
     ): StockPlan {
         val ctx = context()
         val behavior = minStockBehavior()
@@ -221,8 +236,9 @@ class PantryRepository(
         val result = db.withTransaction {
             val product = requireProduct(productId)
             val batches = batchDao.forProduct(productId).map { it.toDomain() }
-            val quantities = quantitiesByBatch(movementDao.forProduct(productId).map { it.toDomain() })
-            val stockPlan = plan(product, batches, quantities, ctx)
+            val movements = movementDao.forProduct(productId).map { it.toDomain() }
+            val quantities = quantitiesByBatch(movements)
+            val stockPlan = plan(product, batches, movements, quantities, ctx)
             applyPlan(stockPlan)
             val before = productQuantity(batches, quantities)
             val after = before + stockPlan.movements.sumOf { it.delta }

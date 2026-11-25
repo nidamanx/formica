@@ -147,3 +147,24 @@ fun DeleteDialog(name: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
         },
     )
 }
+
+@Composable
+fun UndoDialog(
+    title: String,
+    text: String,
+    confirmLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text(confirmLabel) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_no)) }
+        },
+    )
+}

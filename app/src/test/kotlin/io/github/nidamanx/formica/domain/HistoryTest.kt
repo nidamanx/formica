@@ -40,4 +40,22 @@ class HistoryTest {
         )
         assertTrue(buildHistory(movements, mapOf("a" to closed, "b" to opened)).single().isOpening)
     }
+
+    @Test
+    fun `an undone purchase is marked and its correction names it`() {
+        val movements = listOf(
+            movement("a", units(2), MovementType.PURCHASE, NOW - 2 * DAY, id = "buy"),
+            movement("a", units(1), MovementType.PREPARATION, NOW - DAY, id = "prep"),
+            movement("a", -units(2), MovementType.CORRECTION, NOW, id = "undo").copy(groupId = "buy"),
+            movement("a", -units(1), MovementType.CORRECTION, NOW, id = "fix"),
+        )
+        val history = buildHistory(movements, mapOf("a" to batch("a"))).associateBy { it.id }
+
+        assertTrue(history.getValue("buy").undone)
+        assertFalse(history.getValue("buy").undoable)
+        assertTrue(history.getValue("prep").undoable)
+        assertEquals(MovementType.PURCHASE, history.getValue("undo").undoOf)
+        assertEquals(null, history.getValue("fix").undoOf)
+        assertFalse(history.getValue("fix").undoable)
+    }
 }

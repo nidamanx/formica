@@ -194,6 +194,18 @@
     <string name="history_discard">Scarto</string>
     <string name="history_opening">Apertura</string>
     <string name="history_transfer">Spostamento: %1$s → %2$s</string>
+    <string name="history_show_all">Mostra tutto (%1$d)</string>
+    <string name="history_purchase_undone">Acquisto annullato</string>
+    <string name="history_preparation_undone">Preparazione annullata</string>
+    <string name="history_purchase_was_undone">Acquisto · annullato</string>
+    <string name="history_preparation_was_undone">Preparazione · annullata</string>
+    <string name="undo_purchase_title">Annullare questo acquisto?</string>
+    <string name="undo_preparation_title">Annullare questa preparazione?</string>
+    <string name="undo_text">Viene tolto dalla dispensa quanto aggiunto il %2$s: %1$s.</string>
+    <string name="undo_purchase_confirm">Annulla acquisto</string>
+    <string name="undo_preparation_confirm">Annulla preparazione</string>
+    <string name="msg_nothing_to_undo">Niente da togliere: è già stato usato tutto.</string>
+    <string name="msg_undid_only">Era già stato usato in parte: tolto solo %1$s.</string>
 
     <string-array name="initial_locations">
         <item>Frigo</item>

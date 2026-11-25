@@ -147,6 +147,41 @@ fun planCorrection(
     }
 }
 
+/** Movement types that the user can undo from the history. */
+val UNDOABLE_TYPES = setOf(MovementType.PURCHASE, MovementType.PREPARATION)
+
+/** Ids of the purchases and preparations undone by a CORRECTION (its groupId is the undone movement's id). */
+fun undoneMovementIds(productMovements: List<Movement>): Set<String> = productMovements
+    .filter { it.type == MovementType.CORRECTION && it.groupId != null }
+    .mapNotNullTo(HashSet()) { it.groupId }
+
+/**
+ * Undo of a purchase or preparation: a CORRECTION on the same batch, with groupId = the
+ * undone movement's id, taking what is left of it (never below zero). Not a consumption
+ * nor a discard; no movement is deleted.
+ */
+fun planUndoAddition(
+    original: Movement,
+    productMovements: List<Movement>,
+    quantities: Map<String, Long>,
+    ctx: OperationContext,
+): StockPlan {
+    require(original.type in UNDOABLE_TYPES && original.delta > 0) { "not an undoable movement" }
+    if (original.id in undoneMovementIds(productMovements)) return StockPlan()
+    val amount = minOf(original.delta, maxOf(quantities[original.batchId] ?: 0L, 0L))
+    if (amount == 0L) return StockPlan(unallocated = original.delta)
+    val correction = Movement(
+        id = ctx.newId(),
+        batchId = original.batchId,
+        delta = -amount,
+        type = MovementType.CORRECTION,
+        groupId = original.id,
+        timestamp = ctx.now,
+        deviceId = ctx.deviceId,
+    )
+    return StockPlan(movements = listOf(correction), unallocated = original.delta - amount)
+}
+
 private fun addToKey(
     productBatches: List<Batch>,
     key: GroupKey,

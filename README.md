@@ -173,7 +173,7 @@ To report a security problem, see [SECURITY.md](SECURITY.md).
    extra fields (shelf life, minimum stock, cheapest at…) are optional.
 3. On a product's card: **−** to use some, **+** for a new purchase or a new preparation,
    the cart to put it on the list. Tap the card for the details: packs, moves, opening,
-   history.
+   history (a purchase or a preparation entered by mistake can be undone there).
 4. In the **Shopping list**, tick what you buy: Formica asks whether to add it to the
    pantry.
 5. **Expiry dates** shows what has expired, what expires soon and what is getting ready.

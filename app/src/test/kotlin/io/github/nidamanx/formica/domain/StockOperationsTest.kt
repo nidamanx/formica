@@ -282,4 +282,52 @@ class StockOperationsTest {
         val plan = planCorrection(listOf(batch("a")), mapOf("a" to units(2)), units(2), context())
         assertEquals(StockPlan(), plan)
     }
+
+    // Undo of a purchase or preparation
+
+    @Test
+    fun `undoing a purchase takes its quantity back with a linked correction`() {
+        val purchase = movement("a", units(3), MovementType.PURCHASE, id = "buy")
+        val all = listOf(movement("a", units(2), MovementType.PURCHASE, NOW - 20 * DAY), purchase)
+        val plan = planUndoAddition(purchase, all, quantitiesByBatch(all), context())
+
+        val m = plan.movements.single()
+        assertEquals("a", m.batchId)
+        assertEquals(-units(3), m.delta)
+        assertEquals(MovementType.CORRECTION, m.type)
+        assertEquals("buy", m.groupId)
+        assertEquals(0L, plan.unallocated)
+        assertEquals(setOf("buy"), undoneMovementIds(all + plan.movements))
+    }
+
+    @Test
+    fun `undoing a partly used preparation takes only what is left`() {
+        val preparation = movement("a", units(4), MovementType.PREPARATION, id = "prep")
+        val all = listOf(preparation, movement("a", -units(3), MovementType.CONSUMPTION, NOW - DAY))
+        val plan = planUndoAddition(preparation, all, quantitiesByBatch(all), context())
+
+        assertEquals(-units(1), plan.movements.single().delta)
+        assertEquals(units(3), plan.unallocated)
+    }
+
+    @Test
+    fun `undoing a fully used purchase records nothing`() {
+        val purchase = movement("a", units(2), MovementType.PURCHASE, id = "buy")
+        val all = listOf(purchase, movement("a", -units(2), MovementType.CONSUMPTION, NOW - DAY))
+        val plan = planUndoAddition(purchase, all, quantitiesByBatch(all), context())
+
+        assertTrue(plan.movements.isEmpty())
+        assertEquals(units(2), plan.unallocated)
+    }
+
+    @Test
+    fun `a purchase already undone is not undone again`() {
+        val purchase = movement("a", units(2), MovementType.PURCHASE, id = "buy")
+        val undo = movement("a", -units(2), MovementType.CORRECTION, NOW - DAY).copy(groupId = "buy")
+        val all = listOf(movement("a", units(5), MovementType.PURCHASE, NOW - 20 * DAY), purchase, undo)
+        val plan = planUndoAddition(purchase, all, quantitiesByBatch(all), context())
+
+        assertTrue(plan.movements.isEmpty())
+        assertEquals(0L, plan.unallocated)
+    }
 }

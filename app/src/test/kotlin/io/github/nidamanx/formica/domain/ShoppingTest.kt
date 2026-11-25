@@ -104,6 +104,19 @@ class ShoppingTest {
     }
 
     @Test
+    fun `undone purchases do not count as frequent`() {
+        val products = listOf(product("milk"), product("eggs"))
+        val movements = listOf(
+            movement("b-milk", units(1), MovementType.PURCHASE, NOW - DAY, id = "buy"),
+            movement("b-milk", -units(1), MovementType.CORRECTION, NOW).copy(groupId = "buy"),
+            movement("b-eggs", units(6), MovementType.PURCHASE, NOW - DAY),
+        )
+        val batchProduct = mapOf("b-milk" to "milk", "b-eggs" to "eggs")
+        val frequent = frequentProducts(products, movements, batchProduct, emptyList(), NOW, naturalOrder())
+        assertEquals(listOf("eggs"), frequent.map { it.id })
+    }
+
+    @Test
     fun `frequent products are at most ten`() {
         val products = (1..12).map { product("p$it", name = "P%02d".format(it)) }
         val movements = products.map { movement("b-${it.id}", units(1), MovementType.PURCHASE, NOW - DAY) }

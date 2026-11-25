@@ -32,12 +32,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,6 +106,11 @@ fun ProductDetailScreen(
                         R.string.msg_only_were,
                         resources.quantityText(message.amount, message.unit, format),
                     )
+                    DetailMessage.NothingToUndo -> resources.getString(R.string.msg_nothing_to_undo)
+                    is DetailMessage.UndidOnly -> resources.getString(
+                        R.string.msg_undid_only,
+                        resources.quantityText(message.amount, message.unit, format),
+                    )
                 },
             )
         }
@@ -114,6 +121,7 @@ fun ProductDetailScreen(
     val locationNames = state.locations.associate { it.id to it.name }
     val storeNames = state.stores.associate { it.id to it.name }
     val plainGroup = state.groups.singleOrNull()?.takeIf { !state.showGroups }
+    var showAllHistory by rememberSaveable(productId) { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -175,8 +183,19 @@ fun ProductDetailScreen(
             }
             if (state.history.isNotEmpty()) {
                 item { SectionTitle(stringResource(R.string.section_history)) }
-                items(state.history, key = { it.id }) { entry ->
-                    HistoryRow(entry, product.unit, locationNames, format, resources)
+                val shown = if (showAllHistory) state.history else state.history.take(HISTORY_PREVIEW)
+                items(shown, key = { it.id }) { entry ->
+                    HistoryRow(entry, product.unit, locationNames, format, resources) {
+                        OverflowMenu(listOf(R.string.action_undo to { viewModel.open(DetailDialog.Undo(entry)) }))
+                    }
+                }
+                if (shown.size < state.history.size) {
+                    item {
+                        TextButton(
+                            onClick = { showAllHistory = true },
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        ) { Text(stringResource(R.string.history_show_all, state.history.size)) }
+                    }
                 }
             }
         }
@@ -257,6 +276,23 @@ fun ProductDetailScreen(
             onDismiss = viewModel::close,
         )
         DetailDialog.Delete -> DeleteDialog(product.name, onConfirm = viewModel::delete, onDismiss = viewModel::close)
+        is DetailDialog.Undo -> {
+            val entry = current.entry
+            val preparation = entry.type == MovementType.PREPARATION
+            UndoDialog(
+                title = stringResource(if (preparation) R.string.undo_preparation_title else R.string.undo_purchase_title),
+                text = stringResource(
+                    R.string.undo_text,
+                    resources.quantityText(entry.delta, product.unit, format),
+                    format.date(entry.day),
+                ),
+                confirmLabel = stringResource(
+                    if (preparation) R.string.undo_preparation_confirm else R.string.undo_purchase_confirm,
+                ),
+                onConfirm = { viewModel.undo(entry) },
+                onDismiss = viewModel::close,
+            )
+        }
     }
 }
 
@@ -467,6 +503,7 @@ private fun BestPriceBox(best: BestPrice, stale: Boolean, format: DisplayFormat)
 }
 
 private const val STALE_ALPHA = 0.55f
+private const val HISTORY_PREVIEW = 20
 
 /** Purchase date and store, shown only when every batch of the group agrees on them. */
 @Composable
@@ -504,8 +541,8 @@ private fun HistoryRow(
     locationNames: Map<String, String>,
     format: DisplayFormat,
     resources: Resources,
+    undoMenu: @Composable () -> Unit,
 ) {
-    val day = Instant.ofEpochMilli(entry.timestamp).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
     val label = when {
         entry.isOpening -> stringResource(R.string.history_opening)
         entry.type == MovementType.TRANSFER -> stringResource(
@@ -513,6 +550,10 @@ private fun HistoryRow(
             entry.fromLocationId?.let { locationNames[it] }.orEmpty(),
             entry.toLocationId?.let { locationNames[it] }.orEmpty(),
         )
+        entry.undoOf == MovementType.PURCHASE -> stringResource(R.string.history_purchase_undone)
+        entry.undoOf == MovementType.PREPARATION -> stringResource(R.string.history_preparation_undone)
+        entry.undone && entry.type == MovementType.PURCHASE -> stringResource(R.string.history_purchase_was_undone)
+        entry.undone -> stringResource(R.string.history_preparation_was_undone)
         else -> stringResource(entry.type.historyLabel())
     }
     val amount = resources.quantityText(Math.abs(entry.delta), unit, format)
@@ -524,21 +565,27 @@ private fun HistoryRow(
     Column(Modifier.padding(horizontal = 16.dp)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
         ) {
             Text(
-                "${format.date(day)} · $label",
+                "${format.date(entry.day)} · $label",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
             Text(signed, style = MaterialTheme.typography.bodyMedium)
+            if (entry.undoable) undoMenu()
         }
         HorizontalDivider()
     }
 }
+
+/** Local calendar day of the entry (epoch day). */
+private val HistoryEntry.day: Long
+    get() = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
 
 private fun MovementType.historyLabel(): Int = when (this) {
     MovementType.PURCHASE -> R.string.history_purchase

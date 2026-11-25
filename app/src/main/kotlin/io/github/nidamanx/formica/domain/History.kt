@@ -18,6 +18,12 @@ data class HistoryEntry(
     val delta: Long,
     val fromLocationId: String? = null,
     val toLocationId: String? = null,
+    /** A purchase or preparation that can still be undone. */
+    val undoable: Boolean = false,
+    /** A purchase or preparation undone later. */
+    val undone: Boolean = false,
+    /** For the CORRECTION of an undo: the type of the undone movement. */
+    val undoOf: MovementType? = null,
 ) {
     val isOpening: Boolean
         get() = type == MovementType.TRANSFER && fromLocationId == toLocationId
@@ -26,7 +32,25 @@ data class HistoryEntry(
 /** Newest first. */
 fun buildHistory(productMovements: List<Movement>, batchesById: Map<String, Batch>): List<HistoryEntry> {
     val (transfers, others) = productMovements.partition { it.type == MovementType.TRANSFER }
-    val single = others.map { HistoryEntry(it.id, it.timestamp, it.type, it.delta) }
+    val undone = undoneMovementIds(productMovements)
+    val byId = others.associateBy { it.id }
+    val single = others.map {
+        val undoOf = if (it.type == MovementType.CORRECTION) {
+            it.groupId?.let { id -> byId[id]?.type }?.takeIf { type -> type in UNDOABLE_TYPES }
+        } else {
+            null
+        }
+        val isAddition = it.type in UNDOABLE_TYPES && it.delta > 0
+        HistoryEntry(
+            id = it.id,
+            timestamp = it.timestamp,
+            type = it.type,
+            delta = it.delta,
+            undoable = isAddition && it.id !in undone,
+            undone = isAddition && it.id in undone,
+            undoOf = undoOf,
+        )
+    }
     val moves = transfers.groupBy { it.groupId ?: it.id }.map { (groupId, parts) ->
         val from = parts.firstOrNull { it.delta < 0 }
         val to = parts.firstOrNull { it.delta > 0 }
