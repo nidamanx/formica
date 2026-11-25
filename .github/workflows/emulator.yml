@@ -98,8 +98,14 @@ jobs:
         # A failed download on the runner is retried once; other errors become an annotation
         run: scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log" assembleDebug
 
+      # The emulator sometimes never exits after "adb emu kill" (seen on Android 8): the step
+      # then hits its time limit after the checks passed. The marker file written by the last
+      # line tells the two cases apart in the next step
       - name: Install, start and check
+        id: checks
         if: env.SELECTED == 'true'
+        timeout-minutes: 30
+        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: ${{ matrix.api-level }}
@@ -114,9 +120,24 @@ jobs:
           emulator-boot-timeout: 1200
           disk-size: 4000M
           # Store screenshots (5 languages) on Android 16 only, when asked: one set is enough
+          # Each line runs only if the previous one succeeded
           script: |
             scripts/emulator-smoke.sh api${{ matrix.api-level }}-phone
             if [ "$STORE_SCREENSHOTS" = "true" ]; then scripts/store-screenshots.sh; fi
+            touch "$RUNNER_TEMP/emulator-checks-passed"
+
+      - name: Result of the checks
+        if: env.SELECTED == 'true'
+        env:
+          OUTCOME: ${{ steps.checks.outcome }}
+        run: |
+          if [[ ! -f $RUNNER_TEMP/emulator-checks-passed ]]; then
+            echo "::error::The checks on the emulator failed or did not finish (see the previous step)"
+            exit 1
+          fi
+          if [[ $OUTCOME != success ]]; then
+            echo "::warning::The checks passed, but the emulator did not shut down in time"
+          fi
 
       - name: Upload screenshots
         if: always() && env.SELECTED == 'true'
