@@ -52,9 +52,10 @@ data class MergeResult(
  * The result of importing a file (SPEC §11.4, §11.5), computed without touching any data:
  * the preview shows it, the import writes [MergeResult.snapshot].
  *
- * @param noteHeader the line between appended notes, for a device name ("— Anna, 23/11/2026 —")
+ * @param noteHeader the line between appended notes, for the device and the time (epoch ms) of
+ *   the part that follows ("— Anna, 23/11/2026 —")
  */
-fun mergeImport(request: ImportRequest, ctx: OperationContext, noteHeader: (String) -> String): MergeResult {
+fun mergeImport(request: ImportRequest, ctx: OperationContext, noteHeader: (String, Long) -> String): MergeResult {
     val local = request.local
     return when (request.mode) {
         ImportMode.REPLACE_ALL -> result(local, request.remote, emptyList(), 0, emptySet())
@@ -129,7 +130,7 @@ private fun <T> Kind<T>.oldestFirst(): Comparator<T> = compareBy<T>({ createdAt(
 private class Merger(
     private val request: ImportRequest,
     private val ctx: OperationContext,
-    private val noteHeader: (String) -> String,
+    private val noteHeader: (String, Long) -> String,
 ) {
     private val review = mutableSetOf<RecordRef>()
     private val locations = request.local.locations.associateByTo(LinkedHashMap()) { it.id }
@@ -243,18 +244,29 @@ private class Merger(
             rn == null || ln.contains(rn) -> keepLocal
             else -> {
                 review += RecordRef(kind.type, kind.id(result))
-                val at = nextModifiedAt(ctx.now, maxOf(access.modifiedAt(l) ?: 0L, access.modifiedAt(r) ?: 0L))
-                access.with(result, appendNotes(ln, rn, request.remoteDeviceName), at)
+                val lAt = access.modifiedAt(l) ?: 0L
+                val rAt = access.modifiedAt(r) ?: 0L
+                val at = nextModifiedAt(ctx.now, maxOf(lAt, rAt))
+                // The same text on both phones, whichever imports first: older part first, each
+                // header naming the device and time of its part (crossed imports then converge)
+                val localFirst = lAt < rAt || lAt == rAt && ln <= rn
+                val notes = if (localFirst) {
+                    appendNotes(ln, rn, request.remoteDeviceName, rAt)
+                } else {
+                    appendNotes(rn, ln, request.localDeviceName, lAt)
+                }
+                access.with(result, notes, at)
             }
         }
     }
 
-    private fun appendNotes(first: String, second: String, secondDevice: String) =
-        first + "\n\n" + noteHeader(secondDevice) + "\n" + second
+    private fun appendNotes(first: String, second: String, secondDevice: String, secondAt: Long) =
+        first + "\n\n" + noteHeader(secondDevice, secondAt) + "\n" + second
 
-    /** Rule 4: the best price fields travel together, the latest noted wins. */
+    /** Rule 4: the best price fields travel together, the latest noted wins (ties as rule 2). */
     private fun bestPrice(l: Product, r: Product, result: Product): Product {
-        val latest = if ((r.bestPriceNotedAt ?: Long.MIN_VALUE) > (l.bestPriceNotedAt ?: Long.MIN_VALUE)) r else l
+        val byNotedAt = compareBy<Product>({ it.bestPriceNotedAt ?: Long.MIN_VALUE }, { it.modifiedBy })
+        val latest = if (byNotedAt.compare(r, l) > 0) r else l
         return result.copy(
             bestPriceStoreId = latest.bestPriceStoreId,
             bestPriceCents = latest.bestPriceCents,
@@ -318,7 +330,7 @@ private class Merger(
         val ln = loser.notes?.takeIf { it.isNotBlank() }
         if (ln != null && kn?.contains(ln) != true) {
             if (kn != null) review += RecordRef(RecordType.PRODUCT, keeper.id)
-            val notes = if (kn == null) ln else appendNotes(kn, ln, loserDevice)
+            val notes = if (kn == null) ln else appendNotes(kn, ln, loserDevice, loser.notesModifiedAt ?: ctx.now)
             val keeperAt = nextModifiedAt(ctx.now, keeper.modifiedAt)
             products[keeper.id] = keeper.copy(
                 notes = notes,

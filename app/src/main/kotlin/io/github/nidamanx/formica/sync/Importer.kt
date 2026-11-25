@@ -18,7 +18,8 @@ import io.github.nidamanx.formica.ui.format.DisplayFormat
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -58,20 +59,25 @@ class Importer(
     }
 
     /**
-     * Saves a copy of all the data, then applies the import in one transaction and logs it.
+     * Saves a copy of all the data, then applies the import and logs it. Reading, copy, merge
+     * and writing are one transaction (SPEC §11.3): a change made meanwhile cannot be lost.
      *
      * @return the time of the import, which names the copy taken just before it
      */
     suspend fun import(file: ExportFile, mode: ImportMode, keepSeparate: Set<String>): Long {
         val ctx = operationContext()
-        val local = exchange.snapshot()
-        backups.save(local, deviceSettings.device(), takenAt = ctx.now)
-        val result = merge(file, mode, keepSeparate, local, ctx)
-        val record = ImportRecord(file.device.id, file.device.name, file.exportedAt, ctx.now, mode)
-        exchange.apply(result.snapshot, replace = mode == ImportMode.REPLACE_ALL, record, result.notesToReview)
+        val device = deviceSettings.device()
+        val (before, result) = exchange.inTransaction {
+            val local = exchange.snapshot()
+            backups.save(local, device, takenAt = ctx.now)
+            val result = merge(file, mode, keepSeparate, local, ctx)
+            val record = ImportRecord(file.device.id, file.device.name, file.exportedAt, ctx.now, mode)
+            exchange.apply(result.snapshot, replace = mode == ImportMode.REPLACE_ALL, record, result.notesToReview)
+            local to result
+        }
         // The import is written: a failure here must not report it as failed
         try {
-            pantry.restock(productsDroppedBelowMinStock(local, result.snapshot))
+            pantry.restock(productsDroppedBelowMinStock(before, result.snapshot))
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
@@ -84,18 +90,24 @@ class Importer(
      * Puts back the copy taken at [takenAt] with the logic of "Replace everything"
      * (SPEC §11.6); the imports made from that moment on leave the log.
      *
-     * @return false if the copy cannot be read (nothing changes)
+     * @return false if the copy cannot be read or written (nothing changes: one transaction)
      */
     suspend fun restore(takenAt: Long): Boolean {
         val copy = backups.read(takenAt) as? ReadResult.Valid ?: return false
-        exchange.apply(
-            snapshot = copy.file.toSnapshot(),
-            replace = true,
-            record = null,
-            review = emptySet(),
-            undoImportsFrom = takenAt,
-        )
-        return true
+        return try {
+            exchange.apply(
+                snapshot = copy.file.toSnapshot(),
+                replace = true,
+                record = null,
+                review = emptySet(),
+                undoImportsFrom = takenAt,
+            )
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            false
+        }
     }
 
     /** "Undo last import": the copy taken just before it. */
@@ -120,9 +132,12 @@ class Importer(
             lastExportedAt = exchange.lastExportedAtFrom(file.device.id),
             keepSeparate = keepSeparate,
         )
-        // "— Anna, 23/11/2026 —": the date in the format of the phone's language
-        val today = DisplayFormat(Locale.getDefault()).date(LocalDate.now().toEpochDay())
-        return mergeImport(request, ctx) { device -> "— $device, $today —" }
+        // "— Anna, 23/11/2026 —": the day the part was written, in the format of the phone's language
+        val format = DisplayFormat(Locale.getDefault())
+        return mergeImport(request, ctx) { device, at ->
+            val day = Instant.ofEpochMilli(at).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
+            "— $device, ${format.date(day)} —"
+        }
     }
 }
 

@@ -17,7 +17,7 @@ import org.junit.Test
 /** The scenarios of SPEC §14 (the newer formatVersion one is in FormatTest) and the rules of §11.5. */
 class MergeTest {
 
-    private val header = { device: String -> "— $device, 23/11/2026 —" }
+    private val header = { device: String, _: Long -> "— $device, 23/11/2026 —" }
 
     private fun product(
         id: String,
@@ -149,6 +149,22 @@ class MergeTest {
     }
 
     @Test
+    fun `crossed imports give the same notes on both phones, then stay`() {
+        val onA = Snapshot(products = listOf(product("p", modifiedAt = 1600, notes = "Mine", notesAt = 1600)))
+        val onB = Snapshot(products = listOf(product("p", modifiedAt = 1500, notes = "Theirs", notesAt = 1500)))
+        fun import(local: Snapshot, remote: Snapshot, localName: String, remoteName: String, since: Long = 0) =
+            mergeImport(ImportRequest(local, remote, ImportMode.MERGE, localName, remoteName, since), context(), header)
+                .snapshot
+        // Both phones export, then each imports the other's file
+        val a = import(onA, onB, "Pixel", "Anna")
+        val b = import(onB, onA, "Anna", "Pixel")
+        assertEquals("Theirs\n\n— Pixel, 23/11/2026 —\nMine", a.product("p").notes)
+        assertEquals(a.product("p").notes, b.product("p").notes)
+        // The next exchange changes nothing
+        assertEquals(a.product("p").notes, import(a, b, "Pixel", "Anna", since = 1600).product("p").notes)
+    }
+
+    @Test
     fun `notes changed on one phone only follow that phone`() {
         val local = Snapshot(products = listOf(product("p", modifiedAt = 1500, notes = "Old", notesAt = 500)))
         val remote = Snapshot(products = listOf(product("p", modifiedAt = 1400, notes = "New", notesAt = 1400)))
@@ -195,6 +211,18 @@ class MergeTest {
         assertEquals(120L, merged.bestPriceCents)
         assertEquals(40L, merged.bestPriceNotedAt)
         assertTrue(merged.modifiedAt > 60)
+    }
+
+    @Test
+    fun `a tie on the best price date gives the same price on both phones`() {
+        val onA = product("p", modifiedAt = 50, modifiedBy = "device-a")
+            .copy(bestPriceStoreId = "s1", bestPriceCents = 120, bestPriceNotedAt = 40)
+        val onB = product("p", modifiedAt = 50, modifiedBy = "device-b")
+            .copy(bestPriceStoreId = "s2", bestPriceCents = 99, bestPriceNotedAt = 40)
+        val a = merge(Snapshot(products = listOf(onA)), Snapshot(products = listOf(onB))).snapshot.product("p")
+        val b = merge(Snapshot(products = listOf(onB)), Snapshot(products = listOf(onA))).snapshot.product("p")
+        assertEquals("s2", a.bestPriceStoreId)
+        assertEquals("s2", b.bestPriceStoreId)
     }
 
     // Scenario 6

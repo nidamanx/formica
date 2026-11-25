@@ -16,6 +16,7 @@ import io.github.nidamanx.formica.sync.ReadResult
 import io.github.nidamanx.formica.ui.appContainer
 import java.text.Collator
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,22 +67,26 @@ class ImportViewModel(private val importer: Importer, pending: MutableStateFlow<
 
     private suspend fun load(uri: Uri) {
         _state.value = ImportUiState.Loading
-        _state.value = when (val read = importer.read(uri)) {
-            is ReadResult.Valid -> ready(read.file, ImportMode.MERGE, emptySet())
-            else -> ImportUiState.Refused(read)
+        _state.value = orFailed {
+            when (val read = importer.read(uri)) {
+                is ReadResult.Valid -> ready(read.file, ImportMode.MERGE, emptySet())
+                else -> ImportUiState.Refused(read)
+            }
         }
     }
 
-    fun setMode(mode: ImportMode) = update { ready(it.file, mode, it.keepSeparate) }
+    fun setMode(mode: ImportMode) = update { it.copy(mode = mode) }
 
     /** A duplicate product of the file: merged (default) or kept separate. */
     fun setMerge(remoteId: String, merge: Boolean) = update {
-        ready(it.file, it.mode, if (merge) it.keepSeparate - remoteId else it.keepSeparate + remoteId)
+        it.copy(keepSeparate = if (merge) it.keepSeparate - remoteId else it.keepSeparate + remoteId)
     }
 
     fun import() {
         val current = _state.value as? ImportUiState.Ready ?: return
         if (current.importing) return
+        // The import merges again from the chosen options: a preview still running is not needed
+        updating?.cancel()
         _state.value = current.copy(importing = true)
         viewModelScope.launch {
             try {
@@ -95,10 +100,30 @@ class ImportViewModel(private val importer: Importer, pending: MutableStateFlow<
         }
     }
 
-    private fun update(change: suspend (ImportUiState.Ready) -> ImportUiState) {
+    private var updating: Job? = null
+
+    /**
+     * The choice is shown at once; its preview follows. Quick taps: each change starts from the
+     * previous choices and only the latest computes its preview.
+     */
+    private fun update(change: (ImportUiState.Ready) -> ImportUiState.Ready) {
         val current = _state.value as? ImportUiState.Ready ?: return
         if (current.importing) return
-        viewModelScope.launch { _state.value = change(current) }
+        val chosen = change(current)
+        _state.value = chosen
+        updating?.cancel()
+        updating = viewModelScope.launch {
+            _state.value = orFailed { ready(chosen.file, chosen.mode, chosen.keepSeparate) }
+        }
+    }
+
+    /** An unexpected error while preparing the preview: shown as a failure, nothing changed. */
+    private suspend fun orFailed(block: suspend () -> ImportUiState): ImportUiState = try {
+        block()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        ImportUiState.Failed
     }
 
     private suspend fun ready(file: ExportFile, mode: ImportMode, keepSeparate: Set<String>): ImportUiState.Ready {

@@ -132,6 +132,10 @@ interface BatchDao {
     @Query("DELETE FROM batches WHERE deletedAt IS NOT NULL AND deletedAt < :before")
     suspend fun purgeDeleted(before: Long): Int
 
+    /** Batches of products removed for good by the clean-up: nothing can reach them any more. */
+    @Query("DELETE FROM batches WHERE productId NOT IN (SELECT id FROM products)")
+    suspend fun purgeOrphans(): Int
+
     /** Batches with stock left in a location, among the products that are not deleted. */
     @Query(
         "SELECT COUNT(*) FROM batches b JOIN products p ON p.id = b.productId " +
@@ -173,13 +177,6 @@ interface MovementDao {
 
     @Query("SELECT batchId AS id, SUM(delta) AS quantity FROM movements GROUP BY batchId")
     fun observeBatchQuantities(): Flow<List<IdQuantity>>
-
-    /** Totals of the products, from their batches that are not deleted. */
-    @Query(
-        "SELECT b.productId AS id, SUM(m.delta) AS quantity FROM movements m " +
-            "JOIN batches b ON m.batchId = b.id WHERE b.deletedAt IS NULL GROUP BY b.productId",
-    )
-    fun observeProductQuantities(): Flow<List<IdQuantity>>
 }
 
 @Dao
@@ -216,7 +213,14 @@ interface ImportRecordDao {
     fun observeAll(): Flow<List<ImportRecordEntity>>
 
     /** Last import from a device: its exportedAt is the reference time of the notes merge. */
-    @Query("SELECT * FROM import_records WHERE deviceId = :deviceId ORDER BY exportedAt DESC LIMIT 1")
+    /**
+     * The last import from that device that merged its notes: "New products only" leaves the
+     * notes of existing records alone, so it must not move the threshold T (SPEC §11.5.3).
+     */
+    @Query(
+        "SELECT * FROM import_records WHERE deviceId = :deviceId AND mode != 'NEW_PRODUCTS_ONLY' " +
+            "ORDER BY exportedAt DESC LIMIT 1",
+    )
     suspend fun lastFrom(deviceId: String): ImportRecordEntity?
 
     /** The imports undone by restoring the copy taken at [time]. */
@@ -234,4 +238,7 @@ interface NotesReviewDao {
 
     @Query("DELETE FROM notes_review WHERE type = :type AND id = :id")
     suspend fun delete(type: RecordType, id: String)
+
+    @Query("DELETE FROM notes_review")
+    suspend fun deleteAll()
 }

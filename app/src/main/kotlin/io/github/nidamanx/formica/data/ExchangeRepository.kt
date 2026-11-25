@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.map
 /** Whole-database reads and writes of the data exchange (SPEC §11). */
 class ExchangeRepository(private val db: FormicaDatabase) {
 
+    /** Runs [block] in one database transaction: the reads and writes of an import. */
+    suspend fun <R> inTransaction(block: suspend () -> R): R = db.withTransaction(block)
+
     /** Every synced record, deleted ones included, read in one transaction. */
     suspend fun snapshot(): Snapshot = db.withTransaction { readSnapshot() }
 
@@ -53,6 +56,8 @@ class ExchangeRepository(private val db: FormicaDatabase) {
                 db.batchDao().deleteAll()
                 db.movementDao().deleteAll()
                 db.shoppingItemDao().deleteAll()
+                // The marks were about the replaced records
+                db.notesReviewDao().deleteAll()
             }
             val current = if (replace) Snapshot() else readSnapshot()
             db.locationDao().upsert(changed(current.locations, snapshot.locations) { it.id }.map { it.toEntity() })
@@ -80,8 +85,9 @@ class ExchangeRepository(private val db: FormicaDatabase) {
     }
 
     /**
-     * Removes for good the records deleted before [before] (SPEC §11.7). Movements stay:
-     * they are never deleted, and those of a removed batch are simply no longer reached.
+     * Removes for good the records deleted before [before] (SPEC §11.7), with the batches of
+     * the products removed. Movements stay: they are never deleted, and those of a removed
+     * batch are simply no longer reached.
      *
      * @return the number of records removed
      */
@@ -91,6 +97,7 @@ class ExchangeRepository(private val db: FormicaDatabase) {
             db.storeDao().purgeDeleted(before) +
             db.productDao().purgeDeleted(before) +
             db.batchDao().purgeDeleted(before) +
+            db.batchDao().purgeOrphans() +
             db.shoppingItemDao().purgeDeleted(before)
     }
 

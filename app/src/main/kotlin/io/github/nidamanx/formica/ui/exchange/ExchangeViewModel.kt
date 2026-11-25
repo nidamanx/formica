@@ -88,8 +88,16 @@ class ExchangeViewModel(
     private val eventChannel = Channel<ExchangeEvent>(Channel.BUFFERED)
     val events: Flow<ExchangeEvent> = eventChannel.receiveAsFlow()
 
+    /** The export file is written in the app's cache first: a full storage fails like "Save to…". */
     fun share() {
-        viewModelScope.launch { eventChannel.send(ExchangeEvent.Share(exporter.shareIntent())) }
+        viewModelScope.launch {
+            val event = try {
+                ExchangeEvent.Share(exporter.shareIntent())
+            } catch (_: IOException) {
+                ExchangeEvent.SaveFailed
+            }
+            eventChannel.send(event)
+        }
     }
 
     /** "Save to…": the system file picker opens with the proposed name. */
