@@ -59,23 +59,23 @@
     <string name="badge_running_low">Sta per finire</string>
     <string name="badge_check">Da verificare</string>
     <string name="line_expires">scade il %1$s</string>
-    <string name="line_expired">scaduto il %1$s</string>
-    <string name="line_ready_from">pronto dal %1$s</string>
-    <string name="made_today">preparata oggi</string>
+    <string name="line_expired">scadeva il %1$s</string>
+    <string name="line_ready_from">utilizzabile dal %1$s</string>
+    <string name="made_today">preparazione: oggi</string>
     <plurals name="made_days_ago">
-        <item quantity="one">preparata %1$d giorno fa</item>
-        <item quantity="many">preparata %1$d giorni fa</item>
-        <item quantity="other">preparata %1$d giorni fa</item>
+        <item quantity="one">preparazione: %1$d giorno fa</item>
+        <item quantity="many">preparazione: %1$d giorni fa</item>
+        <item quantity="other">preparazione: %1$d giorni fa</item>
     </plurals>
     <plurals name="made_months_ago">
-        <item quantity="one">preparata %1$d mese fa</item>
-        <item quantity="many">preparata %1$d mesi fa</item>
-        <item quantity="other">preparata %1$d mesi fa</item>
+        <item quantity="one">preparazione: %1$d mese fa</item>
+        <item quantity="many">preparazione: %1$d mesi fa</item>
+        <item quantity="other">preparazione: %1$d mesi fa</item>
     </plurals>
     <plurals name="made_years_ago">
-        <item quantity="one">preparata %1$d anno fa</item>
-        <item quantity="many">preparata %1$d anni fa</item>
-        <item quantity="other">preparata %1$d anni fa</item>
+        <item quantity="one">preparazione: %1$d anno fa</item>
+        <item quantity="many">preparazione: %1$d anni fa</item>
+        <item quantity="other">preparazione: %1$d anni fa</item>
     </plurals>
     <plurals name="disc_days">
         <item quantity="one">giorno</item>
@@ -170,8 +170,8 @@
     <string name="menu_correct">Correggi quantità…</string>
     <string name="delete_product_message">Il prodotto e le sue confezioni non compariranno più.</string>
     <string name="section_stock">Confezioni</string>
-    <string name="line_opened">aperto il %1$s</string>
-    <string name="line_made_on">preparata il %1$s</string>
+    <string name="line_opened">apertura: %1$s</string>
+    <string name="line_made_on">preparazione: %1$s</string>
     <string name="badge_opened">Aperto</string>
     <string name="menu_use">Consuma…</string>
     <string name="menu_move">Sposta…</string>
@@ -242,8 +242,8 @@
     <string name="field_purchased_on">Data di acquisto</string>
     <string name="preparation_title">Nuova preparazione</string>
     <string name="badge_to_make">Da preparare</string>
-    <string name="line_bought_on">comprata il %1$s</string>
-    <string name="line_bought_on_at">comprata il %1$s da %2$s</string>
+    <string name="line_bought_on">acquisto: %1$s</string>
+    <string name="line_bought_on_at">acquisto: %1$s, da %2$s</string>
     <string name="line_bought_at">da %1$s</string>
     <string name="shopping_group_category">Per categoria</string>
     <string name="shopping_group_store">Per luogo</string>
@@ -334,7 +334,7 @@
         <item quantity="many">%1$d prodotti sono pronti</item>
         <item quantity="other">%1$d prodotti sono pronti</item>
     </plurals>
-    <string name="notif_status_expired">scaduto</string>
+    <string name="notif_status_expired">oltre la scadenza</string>
     <string name="notif_status_today">scade oggi</string>
     <string name="notif_status_tomorrow">scade domani</string>
     <plurals name="notif_status_days">
@@ -342,7 +342,7 @@
         <item quantity="many">scade fra %1$d giorni</item>
         <item quantity="other">scade fra %1$d giorni</item>
     </plurals>
-    <string name="notif_status_ready">pronto oggi</string>
+    <string name="notif_status_ready">utilizzabile da oggi</string>
     <plurals name="notif_more">
         <item quantity="one">+%1$d altro</item>
         <item quantity="many">+%1$d altri</item>
@@ -480,7 +480,7 @@
     <string name="about_family_title">In famiglia</string>
     <string name="about_family_text">Per usarla su più telefoni, esporta un file e aprilo sull\'altro telefono: Formica unisce i dati dei due telefoni. Prima di ogni importazione salva una copia, che puoi ripristinare.</string>
     <string name="about_name_title">Il nome</string>
-    <string name="about_name_text">Formica in latino, come in italiano: le formiche sono tra gli esseri viventi che fanno le migliori dispense.</string>
+    <string name="about_name_text">Formica, in latino come in italiano, è uno degli esseri viventi che fanno le migliori dispense.</string>
     <string name="about_privacy_title">Privacy</string>
     <string name="about_privacy_text">Nessun accesso a internet, nessun account, nessuna raccolta di dati, niente pubblicità né tracker. I dati restano sul telefono e sono esclusi dai backup di Android: escono solo con l\'esportazione che avvii tu.</string>
     <string name="about_permissions_title">Autorizzazioni</string>

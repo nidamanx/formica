@@ -35,7 +35,7 @@
     <string name="field_type">Tipo</string>
     <string name="field_notes">Notas</string>
     <string name="store_type_supermarket">Supermercado</string>
-    <string name="store_type_shop">Tienda</string>
+    <string name="store_type_shop">Comercio</string>
     <string name="store_type_market">Mercado</string>
     <string name="store_type_producer">Productor</string>
     <string name="delete_confirm">¿Eliminar «%1$s»?</string>
