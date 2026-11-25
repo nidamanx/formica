@@ -3,7 +3,7 @@
 **English** · [Italiano](README.it.md)
 
 [![License: AGPL v3+](https://img.shields.io/badge/License-AGPL_v3%2B-blue.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-0.1.0-informational)
+![Version](https://img.shields.io/badge/version-1.0.0-informational)
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84)
 [![Internet](https://img.shields.io/badge/internet-no_access-brightgreen.svg)](#permissions)
 
@@ -21,8 +21,6 @@ beings that keep the best pantries.
 It is free software, with no internet access, no ads and no trackers, and it uses only
 open-source libraries (AndroidX, Kotlin). Releases are built, signed and verified by
 GitHub Actions, and the builds are designed to be reproducible.
-
-> **In development.** There is no release yet: the first one, 1.0.0, is being prepared.
 
 <p align="center">
   <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/nidamanx/formica"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" height="80" alt="Get it on Obtainium"></a>

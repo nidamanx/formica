@@ -3,7 +3,7 @@
 [English](README.md) · **Italiano**
 
 [![Licenza: AGPL v3+](https://img.shields.io/badge/License-AGPL_v3%2B-blue.svg)](LICENSE)
-![Versione](https://img.shields.io/badge/version-0.1.0-informational)
+![Versione](https://img.shields.io/badge/version-1.0.0-informational)
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84)
 [![Internet](https://img.shields.io/badge/internet-no_access-brightgreen.svg)](#autorizzazioni)
 
@@ -20,8 +20,6 @@ viventi che fanno le migliori dispense.
 È software libero, senza accesso a internet, senza pubblicità e senza tracker, e usa
 solo librerie open source (AndroidX, Kotlin). Le release sono compilate, firmate e
 verificate da GitHub Actions, e le build sono pensate per essere riproducibili.
-
-> **In sviluppo.** Non esiste ancora una release: la prima, 1.0.0, è in preparazione.
 
 <p align="center">
   <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/nidamanx/formica"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" height="80" alt="Get it on Obtainium"></a>

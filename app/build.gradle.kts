@@ -35,7 +35,7 @@ android {
         targetSdk = 37
         // versionCode must increase with every release (Android and F-Droid rely on it)
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         manifestPlaceholders["appLabel"] = "Formica"
     }
 
