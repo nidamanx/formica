@@ -17,7 +17,6 @@ import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.normalizedName
 import io.github.nidamanx.formica.ui.appContainer
 import io.github.nidamanx.formica.ui.settings.NameError
-import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,8 +33,9 @@ data class ProductFields(
     val locationId: String?,
     val categoryId: String?,
     val homemade: Boolean,
-    /** First stock only (new product): preparation date, ready date and expiry. */
+    /** First stock only (new product): preparation or purchase date, ready date and expiry. */
     val preparedOn: Long,
+    val purchasedOn: Long,
     val readyFrom: Long?,
     val expiresOn: Long?,
     val shelfLifeDays: String,
@@ -139,7 +139,7 @@ class ProductFormViewModel(
                         quantity, location, fields.preparedOn, fields.expiresOn, fields.readyFrom,
                     )
                     else -> InitialStock.Purchase(
-                        quantity, location, fields.expiresOn, LocalDate.now().toEpochDay(), null,
+                        quantity, location, fields.expiresOn, fields.purchasedOn, null,
                     )
                 }
                 pantry.createProduct(fields.applyTo(emptyProduct(), minStock, bestPrice), initial)

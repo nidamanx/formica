@@ -97,6 +97,7 @@ private fun ProductForm(
     var homemade by rememberSaveable { mutableStateOf(p?.homemade ?: false) }
     val today = remember { LocalDate.now().toEpochDay() }
     var preparedOn by rememberSaveable { mutableLongStateOf(today) }
+    var purchasedOn by rememberSaveable { mutableLongStateOf(today) }
     var ready by rememberSaveable { mutableStateOf<Long?>(null) }
     var readyEdited by rememberSaveable { mutableStateOf(false) }
     var expiry by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -115,7 +116,7 @@ private fun ProductForm(
         mutableStateOf(bestStoreId != null || more.any { it.isNotEmpty() })
     }
     // The first stock's dates follow the durations until the user sets them
-    val stockDate = if (homemade) preparedOn else today
+    val stockDate = if (homemade) preparedOn else purchasedOn
     val expiresOn = if (expiryEdited) expiry else proposedExpiry(stockDate, shelfLife.daysOrNull())
     val readyFrom = if (readyEdited) ready else proposedReadyFrom(preparedOn, untilReady.daysOrNull())
     var errors by remember { mutableStateOf(ProductFormErrors()) }
@@ -221,6 +222,17 @@ private fun ProductForm(
                     ready = it
                     readyEdited = true
                 },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (isNew && !homemade) {
+            DateField(
+                label = stringResource(R.string.field_purchased_on),
+                value = purchasedOn,
+                emptyText = "",
+                format = format,
+                onChange = { date -> date?.let { purchasedOn = it } },
+                clearable = false,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -371,6 +383,7 @@ private fun ProductForm(
                         categoryId = categoryId,
                         homemade = homemade,
                         preparedOn = preparedOn,
+                        purchasedOn = purchasedOn,
                         readyFrom = readyFrom,
                         expiresOn = expiresOn,
                         shelfLifeDays = shelfLife,
