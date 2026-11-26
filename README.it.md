@@ -100,7 +100,8 @@ per esempio in una chat. Le modifiche fatte su più telefoni si uniscono senza u
   nessuna se non c'è niente da segnalare.
 - **In famiglia**: esporta un file e aprilo su un altro telefono, con anteprima, copia di
   sicurezza e annullamento (vedi [In famiglia](#in-famiglia)).
-- Tema chiaro e scuro secondo il sistema; funziona con TalkBack e con i caratteri grandi.
+- **Accessibile**: funziona con TalkBack e con i caratteri grandi; tema chiaro e scuro
+  secondo il sistema.
 - English, Italiano, Français, Deutsch, Español.
 
 ## Requisiti

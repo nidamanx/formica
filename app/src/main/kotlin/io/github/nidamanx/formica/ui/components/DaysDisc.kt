@@ -29,7 +29,7 @@ enum class DiscTone { EXPIRED, EXPIRING, PREPARING, NEUTRAL }
 
 /**
  * Days left to a date ("3 days", "today", "2 months"), or "expired" with [DiscTone.EXPIRED];
- * "–" without a date. TalkBack reads [statusText] instead of the visible text.
+ * "–" without a date. TalkBack reads [statusText] followed by the visible text.
  */
 @Composable
 fun DaysDisc(days: Long?, tone: DiscTone, statusText: String) {
@@ -50,13 +50,18 @@ fun DaysDisc(days: Long?, tone: DiscTone, statusText: String) {
             months.toString() to resources.getQuantityString(R.plurals.disc_months, months.toInt())
         }
     }
+    // "Expiring, 3 days"; the status alone when the disc says the same ("expired")
+    val spoken = listOf(statusText, listOf(number, word).filter { it.isNotEmpty() && it != "–" }.joinToString(" "))
+        .filter { it.isNotEmpty() }
+        .distinctBy { it.lowercase() }
+        .joinToString(", ")
     Surface(
         shape = CircleShape,
         color = background,
         contentColor = foreground,
         modifier = Modifier
             .circleAround(MIN_DISC_SIZE)
-            .clearAndSetSemantics { if (statusText.isNotEmpty()) contentDescription = statusText },
+            .clearAndSetSemantics { if (spoken.isNotEmpty()) contentDescription = spoken },
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

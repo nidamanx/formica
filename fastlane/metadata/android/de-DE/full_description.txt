@@ -25,6 +25,10 @@ Formica hält den Vorrat zu Hause und die Einkaufsliste in Ordnung und teilt sie
 • Exportiere eine Datei und öffne sie auf einem anderen Handy: die Änderungen werden zusammengeführt
 • Vorschau und Sicherung vor jedem Import, der sich rückgängig machen lässt
 
+<b>Barrierefrei</b>
+• Funktioniert mit TalkBack und mit großer Schrift
+• Helles und dunkles Design nach den Systemeinstellungen
+
 <b>Datenschutz</b>
 • Kein Internetzugriff, kein Konto, keine Werbung und keine Tracker
 • Automatische Android-Sicherung ausgeschaltet: Daten verlassen das Handy nur, wenn du sie exportierst

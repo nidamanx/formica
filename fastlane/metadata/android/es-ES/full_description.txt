@@ -25,6 +25,10 @@ Formica mantiene en orden la despensa de casa y la lista de la compra, y las com
 • Exporta un archivo y ábrelo en otro teléfono: los cambios se combinan
 • Vista previa y copia de seguridad antes de cada importación, que se puede deshacer
 
+<b>Accesible</b>
+• Funciona con TalkBack y con letra grande
+• Tema claro y oscuro según el sistema
+
 <b>Privacidad</b>
 • Sin acceso a internet, sin cuenta, sin publicidad ni rastreadores
 • Copia de seguridad automática de Android desactivada: los datos solo salen del teléfono cuando los exportas

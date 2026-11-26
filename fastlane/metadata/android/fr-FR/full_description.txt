@@ -25,6 +25,10 @@ Formica tient en ordre le garde-manger de la maison et la liste de courses, et l
 • Exportez un fichier et ouvrez-le sur un autre téléphone : les modifications sont fusionnées
 • Aperçu et sauvegarde avant chaque importation, qui peut être annulée
 
+<b>Accessible</b>
+• Fonctionne avec TalkBack et avec les grandes polices
+• Thème clair et sombre selon le système
+
 <b>Confidentialité</b>
 • Aucun accès à internet, aucun compte, ni publicité ni traceur
 • Sauvegarde automatique d'Android désactivée : les données ne quittent le téléphone que lorsque vous les exportez

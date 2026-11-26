@@ -25,6 +25,10 @@ Formica keeps the household pantry and the shopping list in order, and shares th
 • Export a file and open it on another phone: changes are merged
 • Preview and backup before every import, which can be undone
 
+<b>Accessible</b>
+• Works with TalkBack and with large text
+• Light and dark theme following the system
+
 <b>Privacy</b>
 • No internet access, no account, no ads or trackers
 • Android's automatic backup turned off: data leaves the phone only when you export it

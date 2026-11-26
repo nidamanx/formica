@@ -25,6 +25,10 @@ Formica tiene in ordine la dispensa di casa e la lista della spesa, e le condivi
 • Esporta un file e aprilo su un altro telefono: le modifiche si uniscono
 • Anteprima e backup prima di ogni importazione, con annullamento
 
+<b>Accessibile</b>
+• Funziona con TalkBack e con i caratteri grandi
+• Tema chiaro e scuro secondo il sistema
+
 <b>Privacy</b>
 • Nessun accesso a internet, nessun account, nessuna pubblicità o tracker
 • Backup automatico di Android disattivato: i dati escono dal telefono solo con l'esportazione

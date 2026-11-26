@@ -318,7 +318,12 @@ private fun ItemRow(
             .clickable(onClick = onClick)
             .padding(start = 4.dp, end = 16.dp, top = 2.dp, bottom = 2.dp),
     ) {
-        Checkbox(checked = bought, onCheckedChange = { onToggle() })
+        Checkbox(
+            checked = bought,
+            onCheckedChange = { onToggle() },
+            // TalkBack names the item it ticks
+            modifier = Modifier.semantics { contentDescription = row.name },
+        )
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(row.name, style = MaterialTheme.typography.bodyLarge, color = color, textDecoration = decoration)
             if (!bought && (row.item.automatic || cheapestAt != null)) {

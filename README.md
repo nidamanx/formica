@@ -100,7 +100,8 @@ sent for example in a chat. Changes made on several phones are merged without a 
   ready; none when there is nothing to report.
 - **With the family**: export a file and open it on another phone, with a preview, a
   backup copy and undo (see [With the family](#with-the-family)).
-- Light and dark theme following the system; works with TalkBack and with large text.
+- **Accessible**: works with TalkBack and with large text; light and dark theme following
+  the system.
 - English, Italiano, Français, Deutsch, Español.
 
 ## Requirements

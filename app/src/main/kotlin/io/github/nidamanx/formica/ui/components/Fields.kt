@@ -28,6 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.ui.format.DisplayFormat
 
@@ -44,21 +48,26 @@ fun <T> SelectField(
     modifier: Modifier = Modifier,
 ) {
     var open by remember { mutableStateOf(false) }
+    val valueText = optionLabel(selected)
     Box(modifier) {
         OutlinedTextField(
-            value = optionLabel(selected),
+            value = valueText,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            // TalkBack reads the box laid over it instead, as one control
+            modifier = Modifier
+                .fillMaxWidth()
+                .clearAndSetSemantics {},
         )
         // Covers the text field, which would otherwise take the tap for editing
         Box(
             Modifier
                 .matchParentSize()
-                .clickable { open = true },
+                .semantics { contentDescription = "$label, $valueText" }
+                .clickable(role = Role.DropdownList) { open = true },
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             options.forEach { option ->
@@ -91,20 +100,25 @@ fun DateField(
 ) {
     var picking by remember { mutableStateOf(false) }
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        val valueText = value?.let { format.date(it) } ?: emptyText
         Box(Modifier.weight(1f)) {
             OutlinedTextField(
-                value = value?.let { format.date(it) } ?: emptyText,
+                value = valueText,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(label) },
                 trailingIcon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                // TalkBack reads the box laid over it instead, as one control
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clearAndSetSemantics {},
             )
             Box(
                 Modifier
                     .matchParentSize()
-                    .clickable { picking = true },
+                    .semantics { contentDescription = "$label, $valueText" }
+                    .clickable(role = Role.Button) { picking = true },
             )
         }
         if (clearable && value != null) {

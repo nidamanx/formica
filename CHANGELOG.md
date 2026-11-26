@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The permission that keeps the phone awake is explained better: it is used only during
   the daily check and does not turn on the screen.
 - The notification icon has the same closed smile as the app icon.
+- TalkBack reads the name and value of the selection and date fields, the item of each
+  shopping list checkbox, and the days left on the round day counters.
 
 ## [1.0.0] - 2026-11-25
 
