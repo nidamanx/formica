@@ -79,7 +79,7 @@ jobs:
           # by the other workflows
           cache-disabled: true
 
-      # The same tasks run in every Build on develop: a task missing here would show there.
+      # The same tasks run in every Build: a task missing here would show there.
       # Unit tests exist for the debug variant only; they test the same code
       - name: Lint, unit tests and unsigned release build
         # A failed download on the runner is retried once; any other error stops the build

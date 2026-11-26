@@ -1,10 +1,10 @@
 # Lint, unit tests, debug and release builds and the permission check on every push to
-# main or develop and on pull requests; the debug APK is kept as an artifact.
+# main and on pull requests; the debug APK is kept as an artifact.
 name: Build
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

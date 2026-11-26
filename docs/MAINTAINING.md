@@ -5,11 +5,9 @@ are needed.
 
 ## Branches
 
-- `develop`: work in progress. Every push runs the Build and CodeQL workflows and, when
-  the app or the build changes, the emulator smoke test.
-- `main`: the default branch. It only receives released versions: `develop` is merged
-  into it (`git merge --no-ff`) just before each release, then `develop` is
-  fast-forwarded to `main`. Releases are built from `main` only.
+All work happens on `main`, the only branch. Every push runs the Build and CodeQL
+workflows and, when the app or the build changes, the emulator smoke test. A release is
+the tag `v<versionName>` on a commit of `main`, created by the Release workflow.
 
 ## Signing keys
 
@@ -61,8 +59,8 @@ without showing its value.
 3. In `CHANGELOG.md` move the `[Unreleased]` entries to `## [X.Y.Z] - YYYY-MM-DD`. Set
    the same version in the badges of `README.md` and `README.it.md`, and `version` and
    `date-released` in `CITATION.cff`. `scripts/check-version.sh --release` checks it all.
-4. With Build and emulator test green on `develop`, merge `develop` into `main`
-   (`git merge --no-ff develop -m "Release X.Y.Z"`).
+4. Push these changes to `main` and wait for the Build and the emulator test to be green;
+   run *Actions → Reproducibility → Run workflow* too.
 5. *Actions → Release → Run workflow* on `main`. The `build` job checks the version and
    builds the unsigned APK (lint, tests, permissions) from a clean state; the `sign` job
    decrypts the key, signs with `scripts/sign-apk.sh`, removes
@@ -70,8 +68,7 @@ without showing its value.
    `SHA256SUMS` and attests the build provenance; the `publish` job creates the release as
    a draft, checks that every file is attached (uploading again what is missing), and
    only then publishes it, which creates the tag `v<versionName>`.
-6. Locally: `git fetch origin --tags`, then check the release page and the files, and
-   bring `develop` up to `main` (`git merge --ff-only main`, push).
+6. Locally: `git fetch origin --tags`, then check the release page and the files.
 
 A published tag is never moved or deleted (repository ruleset): a wrong release is
 fixed with a new version.
@@ -108,15 +105,14 @@ do.
 
 ## Testing builds
 
-- Every push to `main` or `develop` runs the Build workflow: lint, unit tests, debug and
+- Every push to `main` runs the Build workflow: lint, unit tests, debug and
   release builds, permission check (`config/allowed-permissions.txt`), debug APK as an
   artifact. On a Gradle failure the errors are also written as an annotation.
 - Emulator smoke test: installs and starts the debug app on Android 8, 11 and 16, passes
   the welcome screen, loads the sample data, opens every section in the light and the dark
-  theme and with large text, and keeps screenshots. It runs on every push to `develop`
+  theme and with large text, and keeps screenshots. It runs on every push to `main`
   that changes the app or the build; by hand (*Actions → Emulator smoke test → Run
-  workflow*, once the workflow is on `main`) also on one level only (input `only`) or on
-  Android 17 (experimental).
+  workflow*) also on one level only (input `only`) or on Android 17 (experimental).
 - Store screenshots, only when asked (they double the emulator run time): on Android 16
   the same workflow takes them in every language (`scripts/store-screenshots.sh`) if the
   last commit of the push has `[store-screenshots]` in its message (an empty commit is
@@ -132,6 +128,5 @@ do.
   before each release (*Actions → Reproducibility → Run workflow*); when the APKs differ,
   an annotation lists the entries that differ.
 - CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,
-  on every push to `main` or `develop`, on pull requests to `main` and every Monday.
-  Alerts are in *Security → Code scanning*; those of `develop` are shown with the branch
-  filter.
+  on every push to `main`, on pull requests to `main` and every Monday. Alerts are in
+  *Security → Code scanning*.

@@ -6,19 +6,18 @@
 # To ask: "[store-screenshots]" in the message of the last commit of the push, or the
 # input store_screenshots of a manual run.
 # Two ways to start it:
-#  - automatically, on a push to develop that changes the app or the build, or whose last
+#  - automatically, on a push to main that changes the app or the build, or whose last
 #    commit asks for the store screenshots (an empty commit is enough): every level but
 #    the experimental ones (public repository: free minutes, jobs in parallel). The
 #    "changes" job decides: a "paths" filter would skip the whole workflow before the
 #    commit message can be read;
-#  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one. GitHub
-#    shows this button only once the workflow is on the default branch (main).
+#  - by hand: Actions > Emulator smoke test > Run workflow, all levels or one.
 # Experimental levels run only when asked for by name.
 name: Emulator smoke test
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
   workflow_dispatch:
     inputs:
       only:

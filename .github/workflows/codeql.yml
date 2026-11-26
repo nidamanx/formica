@@ -2,12 +2,11 @@
 # The default setup cannot read Kotlin: it analyzes without building ("none" mode,
 # Java only). Here the debug app is built as in the Build workflow, so the Kotlin
 # extractor sees every file; no secret is used (the SDK debug key signs it).
-# develop is scanned too: main only changes at each release.
 name: CodeQL
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
   schedule:
