@@ -232,10 +232,10 @@
         android:fillColor="#FF4A4A55" />
     <path
         android:pathData="M62.5,71 A8.5,8.5 0 1,0 79.5,71 A8.5,8.5 0 1,0 62.5,71 Z"
-        android:fillColor="#FFFFD15C" />
+        android:fillColor="#FFFFFFFF" />
     <path
         android:pathData="M68.1,66.7 L70.4,66.7 Q74.7,66.7 74.7,71 Q74.7,75.3 70.4,75.3 L68.1,75.3 Z"
-        android:strokeColor="#FF2A2A31"
+        android:strokeColor="#FF000000"
         android:strokeWidth="2.1"
         android:strokeLineJoin="round" />
 </vector>

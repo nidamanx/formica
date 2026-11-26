@@ -18,7 +18,8 @@ RELEASE = dict(BASE, bg="#BFE3F4", body="#E0A042", hi="#F7CC85")
 DEBUG = dict(BASE, bg="#4A4A55", body="#B9B9C2", hi="#D8D8DF", line="#2A2A31", box="#E2E2E8",
              box2="#C4C4CC", tape="#F4F4F7", cheek="#9A9AA4", bread="#CFCFD6", bread2="#A9A9B2",
              leaf="#9EA3A0", apple="#8F8F98", pupil="#22222A")
-BADGE = dict(fill="#FFD15C", letter="#2A2A31")
+# Black and white, like the rest of the debug icon (owner, 2026-11-26)
+BADGE = dict(fill="#FFFFFF", letter="#000000")
 
 # Monochrome (themed icons): the launcher paints every opaque pixel in one colour, so the
 # drawing is reduced to ink, and the details that must stay visible become holes (paper)

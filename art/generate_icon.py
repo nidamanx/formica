@@ -11,7 +11,7 @@ Outputs:
   also in the monochrome layer, so themed icons tell the two apps apart;
 - art/icon.svg and fastlane/metadata/android/en-US/images/icon.png (512x512);
 - app/src/main/res/drawable/ic_notification.xml: the status bar icon, a simpler ant drawn
-  for 18-24 px (big smile, thick legs, full box with food coming out).
+  for 18-24 px (closed smile, thick legs, full box with food coming out).
 """
 import math
 import re
@@ -255,8 +255,22 @@ def mono_vector(inner):
 
 # ---------- Notification icon: a simpler ant on a 24x24 grid ----------
 
+# Stroke of the smile hole (owner's choice, 2026-11-26): thin like the launcher smile, still open at 18 px
+SMILE_WIDTH = 0.8
+
+
+def quad(p0, c, p1, steps=CURVE_STEPS):
+    """Points of a quadratic Bezier curve."""
+    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p1[0],
+             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p1[1])
+            for t in (i / steps for i in range(steps + 1))]
+
+
 def notification_shape():
-    """The ant of the status bar, facing left, as one shape: holes for eyes, smile and tape."""
+    """The ant of the status bar, facing left, as one shape: holes for eyes, smile and tape.
+
+    The smile is the closed D1 smile of the launcher icon, scaled to the smaller head.
+    """
     def ellipse(cx, cy, rx, ry):
         return affinity.scale(Point(cx, cy).buffer(1, 32), rx, ry)
 
@@ -273,7 +287,8 @@ def notification_shape():
         line([(11, 16.2), (9.2, 21)], 1.4), line([(13.2, 16.4), (13.8, 21)], 1.4),
         line([(17.6, 18), (19.6, 21)], 1.4),
     ])
-    smile = ellipse(7, 13.9, 2.4, 1.9).intersection(box(4, 13.9, 10, 17))
+    smile = line(quad((5.0, 14.1), (5.2, 14.6), (5.5, 14.7)) + quad((5.5, 14.7), (7.0, 16.5), (8.5, 14.7))[1:]
+                 + quad((8.5, 14.7), (8.8, 14.6), (9.0, 14.1))[1:], SMILE_WIDTH)
     face = unary_union([ellipse(5.6, 11.6, 0.9, 1.1), ellipse(8.4, 11.6, 0.9, 1.1), smile])
     x0, y0, x1, y1 = 11.2, 6.2, 20.6, 11.4
     outer = rounded_box(x0, y0, x1, y1, 0.6)
