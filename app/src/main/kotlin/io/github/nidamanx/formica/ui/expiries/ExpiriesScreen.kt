@@ -57,6 +57,7 @@ import io.github.nidamanx.formica.ui.format.rememberDisplayFormat
 @Composable
 fun ExpiriesScreen(
     onOpenSettings: () -> Unit,
+    onOpenAbout: () -> Unit,
     onOpenProduct: (String) -> Unit,
     viewModel: ExpiriesViewModel = viewModel(factory = ExpiriesViewModel.Factory),
 ) {
@@ -70,7 +71,7 @@ fun ExpiriesScreen(
     )
     val showBanner = notifications?.enabled == true && access.access != NotificationAccess.GRANTED
 
-    Scaffold(topBar = { SectionTopBar(stringResource(R.string.nav_expiries), onOpenSettings) }) { padding ->
+    Scaffold(topBar = { SectionTopBar(stringResource(R.string.nav_expiries), onOpenSettings, onOpenAbout) }) { padding ->
         Column(Modifier.padding(padding)) {
             if (showBanner) {
                 NotificationBanner(

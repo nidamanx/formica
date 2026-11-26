@@ -270,7 +270,7 @@ formica/
 
 Il progetto segue il [Semantic Versioning](https://semver.org/lang/it/). La versione
 (`versionName`, e `versionCode` per Android) è in `app/build.gradle.kts` e si vede in
-Impostazioni → Informazioni. Ogni release ha un tag Git `vX.Y.Z`, e le modifiche di ogni
+Informazioni, nel menu ⋮. Ogni release ha un tag Git `vX.Y.Z`, e le modifiche di ogni
 versione sono elencate in [CHANGELOG.md](CHANGELOG.md).
 
 ## Licenza ed esclusione di responsabilità

@@ -60,6 +60,7 @@ import io.github.nidamanx.formica.ui.pantry.PurchaseSheet
 @Composable
 fun ShoppingScreen(
     onOpenSettings: () -> Unit,
+    onOpenAbout: () -> Unit,
     viewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModel.Factory),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -73,6 +74,7 @@ fun ShoppingScreen(
             SectionTopBar(
                 title = stringResource(R.string.nav_shopping_list),
                 onOpenSettings = onOpenSettings,
+                onOpenAbout = onOpenAbout,
                 actions = if (state.view.bought.isEmpty()) {
                     emptyList()
                 } else {

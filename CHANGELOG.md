@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - About: the app icon, name and version at the top, and every section in its own box.
+- About opens from the ⋮ menu, next to Settings, instead of from the settings.
 - The permission that keeps the phone awake is explained better: it is used only during
   the daily check and does not turn on the screen.
 - The notification icon has the same closed smile as the app icon.

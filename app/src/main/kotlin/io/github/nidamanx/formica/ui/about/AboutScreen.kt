@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-package io.github.nidamanx.formica.ui.settings
+package io.github.nidamanx.formica.ui.about
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

@@ -74,6 +74,7 @@ private const val LARGE_TEXT_SCALE = 1.5f
 @Composable
 fun PantryScreen(
     onOpenSettings: () -> Unit,
+    onOpenAbout: () -> Unit,
     onNewProduct: () -> Unit,
     onOpenProduct: (String) -> Unit,
     viewModel: PantryViewModel = viewModel(factory = PantryViewModel.Factory),
@@ -99,7 +100,7 @@ fun PantryScreen(
     RestockQuestions(viewModel.restockQuestions, snackbar, viewModel::addToList)
 
     Scaffold(
-        topBar = { SectionTopBar(stringResource(R.string.nav_pantry), onOpenSettings) },
+        topBar = { SectionTopBar(stringResource(R.string.nav_pantry), onOpenSettings, onOpenAbout) },
         floatingActionButton = {
             FloatingActionButton(onClick = onNewProduct) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_new_product))

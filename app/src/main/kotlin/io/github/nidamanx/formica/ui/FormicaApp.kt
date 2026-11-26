@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.nidamanx.formica.R
+import io.github.nidamanx.formica.ui.about.AboutScreen
 import io.github.nidamanx.formica.ui.exchange.BackupsScreen
 import io.github.nidamanx.formica.ui.exchange.ExchangeScreen
 import io.github.nidamanx.formica.ui.exchange.ImportScreen
@@ -39,7 +40,6 @@ import io.github.nidamanx.formica.ui.expiries.ExpiriesScreen
 import io.github.nidamanx.formica.ui.pantry.PantryScreen
 import io.github.nidamanx.formica.ui.product.ProductDetailScreen
 import io.github.nidamanx.formica.ui.product.ProductFormScreen
-import io.github.nidamanx.formica.ui.settings.AboutScreen
 import io.github.nidamanx.formica.ui.settings.CatalogKind
 import io.github.nidamanx.formica.ui.settings.CatalogScreen
 import io.github.nidamanx.formica.ui.settings.SettingsScreen
@@ -69,7 +69,7 @@ private object Routes {
     const val SETTINGS = "settings"
     const val CATALOG = "settings/catalog/{kind}"
     const val EXCHANGE = "settings/exchange"
-    const val ABOUT = "settings/about"
+    const val ABOUT = "about"
     const val IMPORT = "import"
     const val BACKUPS = "settings/exchange/backups"
     const val PRODUCT_NEW = "new-product"
@@ -145,16 +145,21 @@ fun FormicaApp(
             composable(TopLevelDestination.PANTRY.route) {
                 PantryScreen(
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenAbout = { navController.navigate(Routes.ABOUT) },
                     onNewProduct = { navController.navigate(Routes.PRODUCT_NEW) },
                     onOpenProduct = { navController.navigate(Routes.productDetail(it)) },
                 )
             }
             composable(TopLevelDestination.SHOPPING_LIST.route) {
-                ShoppingScreen(onOpenSettings = { navController.navigate(Routes.SETTINGS) })
+                ShoppingScreen(
+                    onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenAbout = { navController.navigate(Routes.ABOUT) },
+                )
             }
             composable(TopLevelDestination.EXPIRIES.route) {
                 ExpiriesScreen(
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenAbout = { navController.navigate(Routes.ABOUT) },
                     onOpenProduct = { navController.navigate(Routes.productDetail(it)) },
                 )
             }
@@ -180,7 +185,6 @@ fun FormicaApp(
                     onBack = { navController.popBackStack() },
                     onOpenCatalog = { navController.navigate(Routes.catalog(it)) },
                     onOpenExchange = { navController.navigate(Routes.EXCHANGE) },
-                    onOpenAbout = { navController.navigate(Routes.ABOUT) },
                 )
             }
             composable(Routes.ABOUT) {
