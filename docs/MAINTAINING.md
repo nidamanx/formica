@@ -128,9 +128,9 @@ do.
   runners, two by two with different folder, time zone and file mode mask, no cache) must
   give the same unsigned APK byte for byte, as F-Droid requires. R8 runs on one thread
   (`android.r8.threadPoolSize=1` in `gradle.properties`): with several, it sometimes
-  narrowed a parameter type differently from one build to the next. It runs if the last commit of a push to `develop`
-  has `[reproducibility]` in its message, or by hand once the workflow is on `main`; when
-  the APKs differ, an annotation lists the entries that differ.
+  narrowed a parameter type differently from one build to the next. It runs only by hand,
+  before each release (*Actions → Reproducibility → Run workflow*); when the APKs differ,
+  an annotation lists the entries that differ.
 - CodeQL: code scanning of the Kotlin code (built as a debug app) and of the workflows,
   on every push to `main` or `develop`, on pull requests to `main` and every Monday.
   Alerts are in *Security → Code scanning*; those of `develop` are shown with the branch

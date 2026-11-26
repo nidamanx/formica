@@ -1,16 +1,13 @@
 # Checks that the release build is reproducible: four independent builds of the same
 # commit, on four runners, two by two in different conditions (folder, time zone, file
-# mode mask), must give the same unsigned APK byte for byte. Four, not two: a
+# mode mask of the build), must give the same unsigned APK byte for byte. Four, not two: a
 # difference that appears only sometimes (as R8's with several threads did) is more
 # likely to show up. F-Droid relies on this: it builds the app
 # itself and accepts the published signature only if the results match.
-# Only when asked: "[reproducibility]" in the message of the last commit of a push to
-# develop, or Actions > Reproducibility > Run workflow (once the file is on main).
+# Manual only, before each release: Actions > Reproducibility > Run workflow.
 name: Reproducibility
 
 on:
-  push:
-    branches: [develop]
   workflow_dispatch:
 
 permissions:
@@ -22,8 +19,6 @@ concurrency:
 
 jobs:
   build:
-    # Only a true/false comes from the commit message: it is never expanded in a command
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[reproducibility]')
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
