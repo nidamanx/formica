@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Creates a signing key for Formica on the maintainer's own computer, with openssl only.
-# Output: the keystore, encrypted and base64-encoded, for the password manager and the
-# GitHub secret, and the public certificate fingerprint. The plain key exists only in a
-# private temporary directory (in RAM when /dev/shm is available) and is deleted at exit.
+# Output: the keystore, encrypted and base64-encoded, for the GitHub secret, and the
+# public certificate fingerprint. The plain key exists only in a private temporary
+# directory (in RAM when /dev/shm is available) and is deleted at exit.
 set -euo pipefail
 
 usage() {
@@ -16,8 +16,8 @@ Usage: scripts/generate-signing-key.sh [-h] release|debug [output-dir]
               DEBUG_KEYSTORE_PASSWORD, DEBUG_KEYSTORE_BASE64)
   output-dir  where to write the two files (default: current directory)
 
-Asks twice for the password (at least 24 characters): save it in the password manager
-first, then paste it. Writes:
+Asks twice for the password (at least 24 characters): keep it somewhere safe, outside
+the repository, before pasting it. Writes:
   formica-<kind>-keystore.b64           encrypted keystore, one line of base64 (secret)
   formica-<kind>-certificate-sha256.txt certificate fingerprint (public)
 Needs openssl 3 and base64. Never run it on a shared machine or a CI runner.
@@ -80,7 +80,7 @@ read_password() {  # prompt
   fi
   printf '%s' "$value"
 }
-password=$(read_password "Password for the $kind key (from the password manager): ")
+password=$(read_password "Password for the $kind key: ")
 repeat=$(read_password "Same password again: ")
 [[ $password == "$repeat" ]] || { echo "Error: the two passwords differ" >&2; exit 1; }
 unset repeat
@@ -121,7 +121,7 @@ Done. Certificate SHA-256 (public):
   $fingerprint
 
 Next steps:
-  1. Save the content of $b64_file in the password manager, next to the password.
+  1. Keep a copy of $b64_file and of the password somewhere safe, outside the repository.
   2. In github.com/nidamanx/formica: Settings > Secrets and variables > Actions, create
      ${secret_prefix}KEYSTORE_BASE64 (content of that file) and ${secret_prefix}KEYSTORE_PASSWORD (the password).
   3. Delete the file: shred -u $b64_file

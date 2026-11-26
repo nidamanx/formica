@@ -11,11 +11,8 @@ the tag `v<versionName>` on a commit of `main`, created by the Release workflow.
 
 ## Signing keys
 
-The keys are never stored in the repository, not even encrypted. Each one exists in two
-places only:
-
-- the repository secrets (*Settings → Secrets and variables → Actions → Secrets*);
-- an offline backup in the maintainer's password manager.
+The keys are never stored in the repository, not even encrypted. The workflows read them
+from the repository secrets (*Settings → Secrets and variables → Actions → Secrets*).
 
 | Key | Secrets | Public fingerprint |
 |---|---|---|
@@ -31,21 +28,17 @@ release.
 of base64); `*_PASSWORD` the password given to the script. The fingerprints are public
 and are not secrets.
 
-Secrets cannot be read back from GitHub: if the backup is lost too, no update can ever
-be signed again and users would have to uninstall the app. Never replace the release
-key.
+Never replace the release key: with a new key, users cannot update and must uninstall
+the app.
 
 ### Creating a key
 
 On the maintainer's own computer (never a shared machine or a CI runner), with OpenSSL 3:
 
-1. Create the password in the password manager first (at least 24 characters).
-2. Run `scripts/generate-signing-key.sh release` (or `debug`) and enter the password.
-3. Copy the content of `formica-<kind>-keystore.b64` into a secure note of the password
-   manager (not a password field: it may cut long text). Paste it back from there into
-   a file and compare it with `cmp` before going on.
-4. Create the two secrets, then delete the file with `shred -u`.
-5. Put the fingerprint in `keystore/` (and, for the release key, in both READMEs).
+1. Run `scripts/generate-signing-key.sh release` (or `debug`) and enter a password of at
+   least 24 characters.
+2. Create the two secrets, then delete the file with `shred -u`.
+3. Put the fingerprint in `keystore/` (and, for the release key, in both READMEs).
 
 The workflows decrypt the keys with `scripts/decrypt-signing-key.sh`, which reports a
 wrong secret precisely (too short, not base64, cut, wrong password, other certificate)
