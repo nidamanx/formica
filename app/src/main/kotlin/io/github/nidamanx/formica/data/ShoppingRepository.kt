@@ -62,18 +62,23 @@ class ShoppingRepository(
         }
     }
 
-    suspend fun setBought(id: String, bought: Boolean) {
+    /**
+     * Ticks an item to buy or unticks a bought one, from its stored status: quick taps act on
+     * what the previous tap left. True when the item has just been ticked.
+     */
+    suspend fun toggleBought(id: String): Boolean {
         val ctx = context()
-        db.withTransaction {
+        return db.withTransaction {
             val stored = requireItem(id)
-            val status = if (bought) ShoppingStatus.BOUGHT else ShoppingStatus.TO_BUY
-            if (stored.status == status || stored.deletedAt != null) return@withTransaction
+            if (stored.deletedAt != null) return@withTransaction false
+            val bought = stored.status != ShoppingStatus.BOUGHT
             // Unticking must not create a second open item for the same product
             if (!bought && stored.productId != null && openItemFor(active(), stored.productId) != null) {
                 save(stored.softDeleted(ctx))
             } else {
-                save(stored.withStatus(status, ctx))
+                save(stored.withStatus(if (bought) ShoppingStatus.BOUGHT else ShoppingStatus.TO_BUY, ctx))
             }
+            bought
         }
     }
 

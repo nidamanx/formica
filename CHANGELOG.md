@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TalkBack reads the name and value of the selection and date fields, the item of each
   shopping list checkbox, and the days left on the round day counters.
 
+### Fixed
+
+- Quick taps on the shopping list: every tap ticks or unticks the item as expected, the
+  question about adding it to the pantry appears only for items still ticked, and the
+  questions of several items come one after the other.
+
 ## [1.0.0] - 2026-11-25
 
 ### Added

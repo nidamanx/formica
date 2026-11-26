@@ -19,7 +19,6 @@ import io.github.nidamanx.formica.domain.model.Category
 import io.github.nidamanx.formica.domain.model.Location
 import io.github.nidamanx.formica.domain.model.Product
 import io.github.nidamanx.formica.domain.model.ShoppingItem
-import io.github.nidamanx.formica.domain.model.ShoppingStatus
 import io.github.nidamanx.formica.domain.model.Store
 import io.github.nidamanx.formica.domain.runningLowSuggestions
 import io.github.nidamanx.formica.domain.shoppingView
@@ -77,6 +76,9 @@ class ShoppingViewModel(
 
     private val _dialog = MutableStateFlow<ShoppingDialog?>(null)
     val dialog: StateFlow<ShoppingDialog?> = _dialog
+
+    // Questions of items ticked while another question was open, shown one after the other
+    private val waiting = ArrayDeque<ShoppingDialog>()
 
     private val catalogs = combine(catalog.categories, catalog.stores, catalog.locations) { c, s, l ->
         Catalogs(c, s, l)
@@ -136,7 +138,7 @@ class ShoppingViewModel(
     }
 
     fun close() {
-        _dialog.value = null
+        _dialog.value = waiting.removeFirstOrNull()
     }
 
     fun addSuggestion(productId: String) {
@@ -148,17 +150,32 @@ class ShoppingViewModel(
      * ask first, open the purchase panel, or nothing.
      */
     fun toggle(row: ShoppingRow) {
-        val item = row.item
-        val bought = item.status == ShoppingStatus.BOUGHT
+        val id = row.item.id
         viewModelScope.launch {
-            shopping.setBought(item.id, !bought)
-            if (bought || row.product == null) return@launch
-            _dialog.value = when (settings.current().onTick) {
-                TickBehavior.ASK -> ShoppingDialog.AskPantry(item.id)
-                TickBehavior.ALWAYS -> ShoppingDialog.Purchase(item.id)
-                TickBehavior.NEVER -> null
+            if (!shopping.toggleBought(id)) {
+                withdrawQuestion(id)
+                return@launch
             }
+            if (row.product == null) return@launch
+            val question = when (settings.current().onTick) {
+                TickBehavior.ASK -> ShoppingDialog.AskPantry(id)
+                TickBehavior.ALWAYS -> ShoppingDialog.Purchase(id)
+                TickBehavior.NEVER -> null
+            } ?: return@launch
+            if (_dialog.value == null) _dialog.value = question else waiting.addLast(question)
         }
+    }
+
+    /** An item unticked again: its question, open or waiting, is not needed any more. */
+    private fun withdrawQuestion(itemId: String) {
+        waiting.removeAll { it.tickedItemId() == itemId }
+        if (_dialog.value?.tickedItemId() == itemId) close()
+    }
+
+    private fun ShoppingDialog.tickedItemId(): String? = when (this) {
+        is ShoppingDialog.AskPantry -> itemId
+        is ShoppingDialog.Purchase -> itemId
+        else -> null
     }
 
     fun purchase(
@@ -169,22 +186,22 @@ class ShoppingViewModel(
         locationId: String,
         storeId: String?,
     ) {
-        _dialog.value = null
+        close()
         viewModelScope.launch { pantry.purchase(productId, quantity, locationId, expiresOn, purchasedOn, storeId) }
     }
 
     fun addFree(draft: ShoppingItem) {
-        _dialog.value = null
+        close()
         viewModelScope.launch { shopping.addFree(draft) }
     }
 
     fun update(edited: ShoppingItem) {
-        _dialog.value = null
+        close()
         viewModelScope.launch { shopping.update(edited) }
     }
 
     fun delete(id: String) {
-        _dialog.value = null
+        close()
         viewModelScope.launch { shopping.delete(id) }
     }
 
