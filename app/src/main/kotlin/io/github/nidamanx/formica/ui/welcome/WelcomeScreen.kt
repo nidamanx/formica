@@ -5,21 +5,15 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,10 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
@@ -54,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.nidamanx.formica.R
 import io.github.nidamanx.formica.domain.cleanName
+import io.github.nidamanx.formica.ui.components.AppLogo
 import io.github.nidamanx.formica.ui.format.timeOfDayText
 
 /**
@@ -167,24 +159,5 @@ private fun WelcomeContent(proposal: WelcomeProposal, viewModel: WelcomeViewMode
                 Text(stringResource(R.string.action_start))
             }
         }
-    }
-}
-
-/** The launcher icon: its foreground on its background, cut like a launcher does (72 of 108). */
-@Composable
-private fun AppLogo() {
-    Box(
-        Modifier
-            .size(80.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(colorResource(R.color.icon_background)),
-        contentAlignment = Alignment.Center,
-    ) {
-        // Decorative: the title below names the app
-        Image(
-            painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = null,
-            modifier = Modifier.requiredSize(120.dp),
-        )
     }
 }

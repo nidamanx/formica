@@ -488,7 +488,7 @@
     <string name="about_permissions_title">Autorisations</string>
     <string name="about_perm_notifications">Notifications : pour le rappel quotidien des dates limites.</string>
     <string name="about_perm_boot">Lancement au démarrage : pour reprogrammer le rappel après le redémarrage du téléphone.</string>
-    <string name="about_perm_wake_lock">Empêcher la mise en veille : pour terminer la vérification quotidienne.</string>
+    <string name="about_perm_wake_lock">Empêcher la mise en veille : uniquement pendant la vérification quotidienne des dates limites, une fois par jour. N\'allume pas l\'écran.</string>
     <string name="about_perm_receiver">Autorisation interne de Formica : empêche les autres applications d\'envoyer des messages aux parties internes de Formica et ne donne accès à aucune donnée. Elle sert jusqu\'à Android 12 ; les versions suivantes offrent elles-mêmes la même protection et l\'autorisation reste inutilisée.</string>
     <string name="about_author">Auteur : %1$s</string>
     <string name="about_license">Logiciel libre, sous licence GNU AGPL v3 ou ultérieure</string>

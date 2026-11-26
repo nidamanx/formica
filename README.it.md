@@ -205,7 +205,7 @@ Formica **non ha accesso a internet** e chiede solo queste autorizzazioni:
 |---|---|
 | Notifiche (`POST_NOTIFICATIONS`) | La notifica giornaliera delle scadenze e delle preparazioni pronte. Da Android 13 viene chiesta, e si può rifiutare |
 | Avvio all'accensione (`RECEIVE_BOOT_COMPLETED`) | Ripianificare la notifica dopo il riavvio del telefono. Aggiunta da WorkManager, la libreria Android che la pianifica |
-| Mantenere attivo il dispositivo (`WAKE_LOCK`) | Completare il controllo giornaliero. Aggiunta da WorkManager |
+| Impedire la sospensione (`WAKE_LOCK`) | Solo durante il controllo giornaliero, una volta al giorno; non accende lo schermo. Aggiunta da WorkManager |
 | Autorizzazione interna di Formica (`io.github.nidamanx.formica.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`) | Impedisce ad altre app di mandare messaggi alle parti interne di Formica e non dà accesso a nessun dato. Serve fino ad Android 12; dalle versioni successive Android offre la stessa protezione da sé e l'autorizzazione resta inutilizzata. Nessun'altra app può ottenerla |
 
 Ogni build fallisce da sola se l'APK chiede qualcos'altro

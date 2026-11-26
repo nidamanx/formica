@@ -206,7 +206,7 @@ Formica has **no internet access** and requests only these permissions:
 |---|---|
 | Notifications (`POST_NOTIFICATIONS`) | The daily notification about expiry dates and preparations that are ready. From Android 13 it is asked for, and it can be denied |
 | Run at startup (`RECEIVE_BOOT_COMPLETED`) | Schedule the notification again after the phone restarts. Added by WorkManager, the Android library that schedules it |
-| Keep the device awake (`WAKE_LOCK`) | Complete the daily check. Added by WorkManager |
+| Prevent sleep (`WAKE_LOCK`) | Only during the daily check, once a day; it does not turn on the screen. Added by WorkManager |
 | Formica's internal permission (`io.github.nidamanx.formica.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`) | Stops other apps from sending messages to the internal parts of Formica and gives no access to any data. It is needed up to Android 12; later versions offer the same protection themselves and the permission stays unused. No other app can obtain it |
 
 The build fails automatically if the APK ever requests anything else

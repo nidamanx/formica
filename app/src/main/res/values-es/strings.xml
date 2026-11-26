@@ -486,7 +486,7 @@
     <string name="about_permissions_title">Permisos</string>
     <string name="about_perm_notifications">Notificaciones: para el aviso diario de caducidades.</string>
     <string name="about_perm_boot">Ejecutar al iniciar: para volver a programar el aviso después de reiniciar el teléfono.</string>
-    <string name="about_perm_wake_lock">Mantener el dispositivo activo: para completar la comprobación diaria.</string>
+    <string name="about_perm_wake_lock">Impedir la suspensión: solo durante la comprobación diaria de caducidades, una vez al día. No enciende la pantalla.</string>
     <string name="about_perm_receiver">Permiso interno de Formica: impide que otras aplicaciones envíen mensajes a las partes internas de Formica y no da acceso a ningún dato. Se necesita hasta Android 12; las versiones posteriores ofrecen la misma protección por sí solas y el permiso no se usa.</string>
     <string name="about_author">Autor: %1$s</string>
     <string name="about_license">Software libre, con licencia GNU AGPL v3 o posterior</string>

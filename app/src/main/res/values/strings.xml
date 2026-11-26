@@ -468,7 +468,7 @@
     <string name="about_permissions_title">Permissions</string>
     <string name="about_perm_notifications">Notifications: for the daily expiry reminder.</string>
     <string name="about_perm_boot">Run at startup: to schedule the reminder again after the phone restarts.</string>
-    <string name="about_perm_wake_lock">Keep the device awake: to complete the daily check.</string>
+    <string name="about_perm_wake_lock">Prevent sleep: only during the daily expiry check, once a day. It does not turn on the screen.</string>
     <string name="about_perm_receiver">Formica\'s internal permission: stops other apps from sending messages to the internal parts of Formica and gives no access to any data. It is needed up to Android 12; later versions offer the same protection themselves and the permission stays unused.</string>
     <string name="about_author">Author: %1$s</string>
     <string name="about_license">Free software, licensed under the GNU AGPL v3 or later</string>

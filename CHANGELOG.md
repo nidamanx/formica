@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- About: the app icon, name and version at the top, and every section in its own box.
+- The permission that keeps the phone awake is explained better: it is used only during
+  the daily check and does not turn on the screen.
+- The notification icon has the same closed smile as the app icon.
+
 ## [1.0.0] - 2026-11-25
 
 ### Added

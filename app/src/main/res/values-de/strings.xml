@@ -457,7 +457,7 @@
     <string name="about_permissions_title">Berechtigungen</string>
     <string name="about_perm_notifications">Benachrichtigungen: für die tägliche Erinnerung an die Haltbarkeit.</string>
     <string name="about_perm_boot">Beim Start ausführen: um die Erinnerung nach einem Neustart des Handys neu zu planen.</string>
-    <string name="about_perm_wake_lock">Ruhezustand verhindern: um die tägliche Prüfung abzuschließen.</string>
+    <string name="about_perm_wake_lock">Ruhezustand verhindern: nur während der täglichen Prüfung der Haltbarkeit, einmal am Tag. Schaltet den Bildschirm nicht ein.</string>
     <string name="about_perm_receiver">Interne Berechtigung von Formica: verhindert, dass andere Apps Nachrichten an interne Teile von Formica senden, und gibt keinen Zugriff auf Daten. Sie wird bis Android 12 gebraucht; neuere Versionen bieten denselben Schutz selbst, und die Berechtigung bleibt ungenutzt.</string>
     <string name="about_author">Autor: %1$s</string>
     <string name="about_license">Freie Software, lizenziert unter der GNU AGPL v3 oder neuer</string>
