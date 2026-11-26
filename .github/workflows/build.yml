@@ -85,7 +85,7 @@ jobs:
         env:
           FORMICA_DEBUG_KEYSTORE_FILE: ${{ steps.debug_key.outputs.file }}
           FORMICA_DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
-        # A failed download on the runner is retried once; any other error stops the build
+        # A failed download on the runner is retried up to twice; any other error stops the build
         run: >-
           scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log"
           lintDebug lintRelease testDebugUnitTest assembleDebug assembleRelease

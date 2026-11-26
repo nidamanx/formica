@@ -123,7 +123,7 @@ jobs:
 
       - name: Build debug APK
         if: env.SELECTED == 'true'
-        # A failed download on the runner is retried once; other errors become an annotation
+        # A failed download on the runner is retried up to twice; other errors become an annotation
         run: scripts/run-gradle.sh "$RUNNER_TEMP/gradle.log" assembleDebug
 
       # The emulator sometimes never exits after "adb emu kill" (seen on Android 8): the step
