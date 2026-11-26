@@ -62,12 +62,12 @@ without showing its value.
 4. Push these changes to `main` and wait for the Build and the emulator test to be green;
    run *Actions → Reproducibility → Run workflow* too.
 5. *Actions → Release → Run workflow* on `main`. The `build` job checks the version and
-   builds the unsigned APK (lint, tests, permissions) from a clean state; the `sign` job
-   decrypts the key, signs with `scripts/sign-apk.sh`, removes
-   the key, checks the certificate against `keystore/certificate-sha256.txt`, writes
-   `SHA256SUMS` and attests the build provenance; the `publish` job creates the release as
-   a draft, checks that every file is attached (uploading again what is missing), and
-   only then publishes it, which creates the tag `v<versionName>`.
+   builds the unsigned APK (lint, tests, permissions) from a clean state. The `publish`
+   job, on another runner, decrypts the key, signs with `scripts/sign-apk.sh`, removes the
+   key, checks the certificate against `keystore/certificate-sha256.txt`, writes
+   `SHA256SUMS` and attests the build provenance; then it creates the release as a draft,
+   checks that every file is attached (uploading again what is missing), and only then
+   publishes it, which creates the tag `v<versionName>`.
 6. Locally: `git fetch origin --tags`, then check the release page and the files.
 
 A published tag is never moved or deleted (repository ruleset): a wrong release is
