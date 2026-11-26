@@ -59,6 +59,8 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
+          # MIT-licensed cache: the default "enhanced" one is proprietary since v6
+          cache-provider: basic
           # Each build starts from nothing, as F-Droid's does
           cache-disabled: true
 
@@ -103,17 +105,20 @@ jobs:
           # For each build that differs from the first: the APK entries that differ
           # (usually classes.dex, with R8's map id; a time or a path written into a file)
           python3 - apks/*/formica-unsigned.apk <<'PY'
-          import sys, zipfile
+          import hashlib, sys, zipfile
           def entries(path):
               z = zipfile.ZipFile(path)
               return {i.filename: (i.CRC, i.file_size) for i in z.infolist()}, [i.filename for i in z.infolist()]
+          def sha(path):
+              with open(path, "rb") as f:
+                  return hashlib.sha256(f.read()).hexdigest()
           first = sys.argv[1]
           ea, oa = entries(first)
           for other in sys.argv[2:]:
+              if sha(other) == sha(first):
+                  continue
               eb, ob = entries(other)
               diff = sorted(n for n in ea.keys() | eb.keys() if ea.get(n) != eb.get(n))
-              if not diff and oa == ob:
-                  continue
               what = diff[:30] or ["same content, different zip metadata" + (" and order" if oa != ob else "")]
               name = other.split("/")[1]
               print(f"::error title=Not reproducible ({name} vs {first.split('/')[1]})::" + "%0A".join(what))
