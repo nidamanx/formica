@@ -14,7 +14,8 @@ Formica tiene in ordine la dispensa di casa e la lista della spesa, e le condivi
 <b>Lista della spesa</b>
 • Voci collegate alla dispensa o libere
 • Scorta minima: sotto la quantità scelta, il prodotto entra in lista da solo
-• Prodotti comprati spesso, raggruppati per categoria o per negozio
+• Suggerimenti: i prodotti che stanno per finire e quelli comprati spesso, da aggiungere con un tocco
+• Lista raggruppata per categoria o per negozio
 • Dove conviene: il negozio e il prezzo migliore di ogni prodotto
 
 <b>Scadenze</b>

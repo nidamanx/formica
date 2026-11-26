@@ -18,17 +18,17 @@
     <string name="demo_apricot_jam">Apricot jam</string>
     <string name="demo_honey">Honey</string>
     <string name="demo_olive_oil">Extra virgin olive oil</string>
-    <string name="demo_wholemeal_flour">Wholemeal flour</string>
+    <string name="demo_wholemeal_flour">Whole wheat flour</string>
     <string name="demo_brown_rice">Brown rice</string>
     <string name="demo_lentils">Lentils</string>
     <string name="demo_sauerkraut">Sauerkraut</string>
     <string name="demo_potatoes">Potatoes</string>
     <string name="demo_apples">Apples</string>
-    <string name="demo_wholemeal_bread">Wholemeal bread</string>
+    <string name="demo_wholemeal_bread">Whole wheat bread</string>
     <string name="demo_lemons">Lemons</string>
     <string name="demo_tomatoes">Tomatoes</string>
     <string name="demo_price_each">each</string>
-    <string name="demo_price_per_litre">per litre</string>
+    <string name="demo_price_per_litre">per liter</string>
     <string name="demo_note_ragu">Grandma\'s recipe</string>
     <string name="demo_note_oil">The oil mill sells from November to January</string>
 </resources>

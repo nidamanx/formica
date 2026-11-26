@@ -14,7 +14,8 @@ Formica hält den Vorrat zu Hause und die Einkaufsliste in Ordnung und teilt sie
 <b>Einkaufsliste</b>
 • Einträge aus dem Vorrat oder freier Text
 • Mindestvorrat: unter der gewählten Menge kommt das Produkt von selbst auf die Liste
-• Häufig gekaufte Produkte, nach Kategorie oder Geschäft gruppiert
+• Vorschläge: Produkte, die fast aufgebraucht sind, und häufig gekaufte, mit einem Tippen hinzuzufügen
+• Liste nach Kategorie oder Geschäft gruppiert
 • Am günstigsten bei: das Geschäft und der beste Preis für jedes Produkt
 
 <b>Haltbarkeit</b>

@@ -14,7 +14,8 @@ Formica mantiene en orden la despensa de casa y la lista de la compra, y las com
 <b>Lista de la compra</b>
 • Artículos vinculados a la despensa o texto libre
 • Stock mínimo: por debajo de la cantidad elegida, el producto entra solo en la lista
-• Productos que compras a menudo, agrupados por categoría o por tienda
+• Sugerencias: los productos que se están acabando y los que compras a menudo, para añadir con un toque
+• Lista agrupada por categoría o por tienda
 • Más barato en: la tienda y el mejor precio de cada producto
 
 <b>Caducidad</b>

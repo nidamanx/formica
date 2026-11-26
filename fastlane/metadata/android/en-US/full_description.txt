@@ -14,7 +14,8 @@ Formica keeps the household pantry and the shopping list in order, and shares th
 <b>Shopping list</b>
 • Items linked to the pantry or free text
 • Minimum stock: below the amount you choose, the product goes on the list by itself
-• Products bought often, grouped by category or by shop
+• Suggestions: products running low and products bought often, to add with one tap
+• List grouped by category or by shop
 • Best price: the shop and the best price for each product
 
 <b>Expiry dates</b>

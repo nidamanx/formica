@@ -227,7 +227,7 @@ ever requests another permission.
 
 ## Known limitations
 
-- The exchange is manual: phones do not synchronise by themselves.
+- The exchange is manual: phones do not synchronize by themselves.
 - Prices in "Cheapest at" are in euros.
 - A new purchase with the same expiry date and location as a pack already in the pantry,
   not opened yet, is added to that pack, which keeps the date and shop of the first

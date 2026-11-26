@@ -14,7 +14,8 @@ Formica tient en ordre le garde-manger de la maison et la liste de courses, et l
 <b>Liste de courses</b>
 • Articles liés au garde-manger ou texte libre
 • Stock minimum : en dessous de la quantité choisie, le produit s'ajoute tout seul à la liste
-• Produits achetés souvent, regroupés par catégorie ou par magasin
+• Suggestions : les produits bientôt épuisés et ceux achetés souvent, à ajouter d'un simple appui
+• Liste regroupée par catégorie ou par magasin
 • Moins cher chez : le magasin et le meilleur prix de chaque produit
 
 <b>Dates limites</b>
