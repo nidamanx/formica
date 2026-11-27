@@ -13,8 +13,8 @@ authors:
 repository-code: "https://github.com/nidamanx/formica"
 url: "https://github.com/nidamanx/formica"
 license: AGPL-3.0-or-later
-version: "1.0.0"
-date-released: "2026-11-25"
+version: "1.0.1"
+date-released: "2026-11-27"
 keywords:
   - android
   - pantry

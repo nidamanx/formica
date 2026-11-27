@@ -3,7 +3,7 @@
 [English](README.md) · **Italiano**
 
 [![Licenza: AGPL v3+](https://img.shields.io/badge/License-AGPL_v3%2B-blue.svg)](LICENSE)
-![Versione](https://img.shields.io/badge/version-1.0.0-informational)
+![Versione](https://img.shields.io/badge/version-1.0.1-informational)
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84)
 [![Internet](https://img.shields.io/badge/internet-no_access-brightgreen.svg)](#autorizzazioni)
 
