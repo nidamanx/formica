@@ -192,7 +192,7 @@ jobs:
             cat keystore/certificate-sha256.txt
             echo '```'
             echo
-            echo "Build provenance:"
+            echo "Build provenance (needs GitHub CLI 2.49 or newer, signed in: \`gh auth login\`):"
             echo
             echo '```'
             echo "gh attestation verify $apk --repo $GITHUB_REPOSITORY"

@@ -151,7 +151,8 @@ sha256sum -c SHA256SUMS
 ```
 
 **3. Provenienza della build.** Un'attestazione firmata dimostra che l'APK è stato
-prodotto dal workflow di release di questo repository a partire da un commit preciso:
+prodotto dal workflow di release di questo repository a partire da un commit preciso.
+Serve GitHub CLI 2.49 o più recente, con l'accesso fatto (`gh auth login`):
 
 ```
 gh attestation verify formica-<versione>.apk --repo nidamanx/formica
